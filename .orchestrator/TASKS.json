@@ -17,90 +17,116 @@
   },
   {
     "id": "DJ-P0-006",
-    "title": "Verifier: full-master continuity gate (D12) + INCONCLUSIVE verdict (D13)",
+    "title": "Verifier: full-master continuity gate (D12) + tri-state verdict (D13)",
+    "assignee": "devin-cli",
+    "status": "done",
+    "verified_by": "hermes",
+    "evidence": "49 tests green; holey master -> FAIL naming [90.0, 119.45]; clean -> PASS; no-ffmpeg -> INCONCLUSIVE; corrupt master -> FAIL"
+  },
+  {
+    "id": "DJ-P0-006b",
+    "title": "Verifier refinements: two-tier silence, artifact integrity, exit codes",
     "assignee": "devin-cli",
     "status": "in_progress",
-    "card": ".orchestrator/cards/DJ-P0-006.md",
-    "origin": "GPT assessment 2026-10-22, claim 1+3 — confirmed by Hermes on a master with a 29.45 s hole that still reported pass:true",
+    "card": ".orchestrator/cards/DJ-P0-006b.md",
+    "origin": "GPT rebuttal 2026-10-22 — single threshold missed low-level near-silence; missing master exited 2 not FAIL; exit 2 ambiguous",
     "acceptance": [
-      "verify on a master containing a long internal silence -> pass:false naming the region",
-      "verify on the clean DJ-P0-002 master -> pass:true",
-      "verify with ffmpeg absent -> pass:null + verdict INCONCLUSIVE + exit 2, no fabricated peak"
+      "-60 dBFS 2 s stretch -> FAIL",
+      "boundary fixtures at exactly 0.5 s and 2.0 s",
+      "anti-phase stereo with audio -> NOT silence",
+      "missing/corrupt master -> FAIL exit 1",
+      "INCONCLUSIVE -> exit 3; usage error -> exit 2"
     ]
   },
   {
     "id": "DJ-P0-007",
-    "title": "Quality mini-set 15-20 min with a real time-stretch transition",
+    "title": "Mini-set 15-20 min + G2b listening gate (no forced beatmatch)",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-006"],
+    "blocked_by": ["DJ-P0-006b"],
     "acceptance": [
       "plan.json + master.wav + render_report.json + verification.json",
-      "at least one transition actually stretches real audio (tempo_stretch != 1.0)",
       "no silent run > 2 s; true peak <= -1.2 dBTP; 0 clipped",
-      "listening review recorded per transition"
+      "listening verdict recorded per transition, checkable",
+      "transition choice is conservative: beat-crossfade only where beat phase AND phrase boundary are validated"
+    ]
+  },
+  {
+    "id": "DJ-P0-007b",
+    "title": "Controlled real-audio time-stretch probe (separate from the listening mix)",
+    "assignee": "devin-cli",
+    "status": "todo",
+    "blocked_by": ["DJ-P0-006b"],
+    "acceptance": [
+      "pick real pairs with close BPM; verify beat/phrase by hand",
+      "confirm ffmpeg rubberband actually stretches; measure and listen",
+      "report the measured stretch factor vs planned"
     ]
   },
   {
     "id": "DJ-P0-003",
-    "title": "G3: 60-minute set (3600 s +/-1 %) from the eligible corpus",
+    "title": "G3: 60-minute set (3600 s +/-1 %)",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-006"],
+    "blocked_by": ["DJ-P0-007", "DJ-P0-007b"],
+    "note": "GPT: do not open the 60-min master until the mini-set transition quality is accepted by listening",
     "acceptance": [
       "duration 3600 s within 1 %",
-      "no unplanned silence",
-      "true peak <= -1.2 dBTP, 0 clipped samples",
-      "no unintended work repetition; no mid-phrase cue cuts",
+      "no unplanned silence; no mid-phrase cue cuts; no unintended work repetition",
+      "true peak <= -1.2 dBTP, 0 clipped",
       "reproducible timeline + checksum"
     ]
   },
   {
     "id": "DJ-P0-004",
-    "title": "G1: unattended playback of a 20-track set on real audio hardware",
+    "title": "G1: unattended playback soak on real audio hardware",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-006"],
+    "blocked_by": ["DJ-P0-006b"],
     "acceptance": [
       "plays to EOF without intervention",
       "0 underflows across the whole run",
+      "frames_matched == true required for success (not just underflows == 0)",
       "planned vs actual duration gap < 1 s"
     ]
   },
   {
     "id": "DJ-P0-005",
-    "title": "G5: recovery — redefined (pre-render cannot be affected by a source file vanishing mid-play)",
+    "title": "G5: recovery — six independently testable failure classes",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-006"],
+    "blocked_by": ["DJ-P0-006b"],
     "acceptance": [
-      "planning-time corrupt/missing track: skip and continue, set still completes",
-      "render failure before playback: no half-master published",
-      "corrupt master WAV: player detects and reports",
-      "device loss / buffer interruption: handled, not a crash",
-      "test covers each failure path"
+      "F1 input/analysis/plan: skip corrupt/missing track and re-plan; no eligible corpus -> FAIL",
+      "F2 render/ffmpeg: never publish an incomplete master; keep the previous valid one; atomic publish via os.replace()",
+      "F3 artifact integrity: missing/corrupt master or wrong checksum/frame count -> block playback",
+      "F4 reader/disk starvation: record the error; must NOT masquerade as a normal EOF (player.py finally-sentinel bug)",
+      "F5 audio device/PortAudio: device loss / unopenable stream / underflow -> error + safe stop",
+      "F6 shutdown/interruption: Ctrl-C closes stream, reader, resources and records STOPPED",
+      "test covers each class"
     ]
   },
   {
     "id": "DJ-P0-008",
-    "title": "G2b/G6: listening gate — per-transition verdict + release lock",
+    "title": "G6: release acceptance",
     "assignee": "hermes",
     "status": "todo",
-    "blocked_by": ["DJ-P0-007"],
+    "blocked_by": ["DJ-P0-004", "DJ-P0-005"],
     "acceptance": [
-      "listening verdict recorded for every transition",
-      "verdicts drive fixes, not prose",
-      "release gate locked on the recorded evidence"
+      "final listening verdict",
+      "replay checksum",
+      "CI + release gates green",
+      "no required measurement left INCONCLUSIVE"
     ]
   },
   {
     "id": "DJ-P1-001",
-    "title": "P1: reference-mix understanding — style_profile.json from a reference DJ mix",
+    "title": "P1: reference-mix understanding — style_profile.json",
     "assignee": "devin-cli",
     "status": "todo",
     "blocked_by": ["DJ-P0-008"],
     "acceptance": [
-      "extract BPM trajectory, transition positions, overlap durations, phrase structure, energy arc",
+      "extract BPM trajectory, transition positions, overlap durations, phrase structure, energy arc from a reference DJ mix",
       "style_profile.json consumed by the planner",
       "deterministic validator gates any LLM rerank (D3)"
     ]

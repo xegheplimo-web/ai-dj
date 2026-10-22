@@ -1,0 +1,104 @@
+{
+  "plan_set_name": "mini",
+  "master_wav": "evidence\\dj_p0_006_holey.wav",
+  "checks": {
+    "duration_matches_plan": {
+      "planned_s": 1307.266,
+      "actual_s": 1307.261,
+      "tolerance_s": 1.0,
+      "ok": true
+    },
+    "true_peak": {
+      "dbtp": -1.2,
+      "limit_dbtp": -1.0,
+      "measured_by": "ffmpeg ebur128=peak=true",
+      "integrated_lufs": -20.1,
+      "ok": true
+    },
+    "clipping": {
+      "count": 0,
+      "ok": true
+    },
+    "silence": {
+      "max_silent_run_ms": 29450.0,
+      "worst_region_s": [
+        90.0,
+        119.45
+      ],
+      "silent_hops_total": 589,
+      "allowed_silent_regions_s": [
+        [
+          0.0,
+          0.05
+        ],
+        [
+          1304.261,
+          1307.261
+        ]
+      ],
+      "transition_windows": {
+        "max_silent_run_in_transitions_ms": 0.0,
+        "worst_region_s": null
+      },
+      "silence_ok": false
+    },
+    "beat_deviation_transitions": [
+      {
+        "index": 0,
+        "type": "beat_crossfade",
+        "beat_check": "measured_on_master",
+        "grid_points": 16,
+        "onsets": 22,
+        "matched": 10,
+        "coverage": 0.625,
+        "median_abs_dev_ms": 38.965,
+        "p95_abs_dev_ms": 60.507,
+        "ibi_diagnostic_ms": 156.299,
+        "within_threshold": false
+      },
+      {
+        "index": 1,
+        "type": "crossfade",
+        "beat_check": "not_beat_aligned"
+      },
+      {
+        "index": 2,
+        "type": "crossfade",
+        "beat_check": "not_beat_aligned"
+      },
+      {
+        "index": 3,
+        "type": "crossfade",
+        "beat_check": "not_beat_aligned"
+      },
+      {
+        "index": 4,
+        "type": "cut",
+        "beat_check": "not_beat_aligned"
+      }
+    ],
+    "beat_deviation_within_threshold": false,
+    "synthetic_alignment_check": {
+      "probe": "synthetic_click_tracks_through_render_plan",
+      "bpm_a": 100.0,
+      "bpm_b": 104.0,
+      "stretch_factor": 0.961538,
+      "detected_beats_in_overlap": 10,
+      "render_true_peak_dbtp": -2.5,
+      "measured_ibi_ms": 600.0,
+      "target_ibi_ms": 600.0,
+      "deviation_ms": 0.0,
+      "within_threshold": true,
+      "threshold_ms": 20.0
+    },
+    "samplerate_matches": {
+      "expected": 48000,
+      "actual": 48000,
+      "ok": true
+    }
+  },
+  "pass": false,
+  "verdict": "FAIL",
+  "unmeasured_checks": [],
+  "notes": "synthetic_alignment_check is the ground-truth beat contract (timing.py on rendered click tracks); per-transition onset numbers on real music are diagnostics, not the gate. silence_ok is a full-master continuity gate (D12); a required check that cannot be measured yields INCONCLUSIVE, never PASS (D13)."
+}

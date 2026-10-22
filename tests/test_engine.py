@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
+import io
 import json
 import shutil
 import sys
@@ -12,14 +14,16 @@ from pathlib import Path
 from unittest import mock
 
 import numpy as np
+import soundfile as sf
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from ai_dj.analysis import analyzer, corpus
+from ai_dj.cli import main as cli_main
 from ai_dj.planner import energy_arc, key_distance, plan_set, write_plan
 from ai_dj.render import render_plan
 from ai_dj.timing import MASTER_SR, synthesize_click_track, write_wav_pcm16
-from ai_dj.verify import synthetic_alignment_check
+from ai_dj.verify import synthetic_alignment_check, verify_master
 
 
 def _beat_times(bpm: float, duration_s: float) -> list[float]:
@@ -495,6 +499,345 @@ class TestRenderer(unittest.TestCase):
             f"deviation {result['deviation_ms']:.2f} ms exceeds contract",
         )
         self.assertGreater(result["detected_beats_in_overlap"], 5)
+
+
+def _tone_wav(
+    path: Path,
+    duration_s: float,
+    gaps: list[tuple[float, float]] = (),
+    regions: list[tuple[float, float, float | None]] = (),
+    mode: str = "same",
+) -> Path:
+    """Continuous stereo tone at MASTER_SR with optional edited spans.
+
+    ``gaps``: zeroed [start, end) spans (digital silence).
+    ``regions``: (start, end, rms_dbfs) — a sine at RMS ``dbfs`` fills the span
+    (``None`` means digital zeros). ``mode``: ``same`` L=R; ``antiphase``
+    R=-L; ``dead_right`` R=0.
+    """
+    n = int(duration_s * MASTER_SR)
+    t = np.arange(n, dtype=np.float64) / MASTER_SR
+    tone = 0.5 * np.sin(2.0 * np.pi * 220.0 * t)
+    right = -tone if mode == "antiphase" else tone.copy()
+    if mode == "dead_right":
+        right[:] = 0.0
+    data = np.stack([tone, right], axis=1).astype(np.float32)
+    for start_s, end_s in gaps:
+        data[int(start_s * MASTER_SR) : int(end_s * MASTER_SR)] = 0.0
+    for start_s, end_s, dbfs in regions:
+        i0, i1 = int(start_s * MASTER_SR), int(end_s * MASTER_SR)
+        if dbfs is None:
+            data[i0:i1] = 0.0
+        else:
+            tt = np.arange(i1 - i0, dtype=np.float64) / MASTER_SR
+            amp = np.sqrt(2.0) * 10.0 ** (dbfs / 20.0)
+            data[i0:i1] = (amp * np.sin(2.0 * np.pi * 220.0 * tt))[:, None]
+    sf.write(str(path), data, MASTER_SR, subtype="PCM_24")
+    return path
+
+
+def _verify_plan(duration_s: float, transitions: list[dict] | None = None) -> dict:
+    """Minimal plan whose timeline matches a rendered-tone fixture."""
+    return {
+        "plan_version": 1,
+        "set_name": "verify-fixture",
+        "master_sr": MASTER_SR,
+        "tracks": [],
+        "transitions": transitions or [],
+        "timeline": {
+            "total_samples": int(duration_s * MASTER_SR),
+            "total_duration_s": duration_s,
+        },
+    }
+
+
+class TestVerifier(unittest.TestCase):
+    """D12: silence_ok gates the whole master; D13: unmeasurable -> INCONCLUSIVE."""
+
+    def test_silent_hole_outside_transitions_fails(self) -> None:
+        """Regression DJ-P0-006: a 3 s hole inside track content must fail."""
+        with tempfile.TemporaryDirectory() as tmp:
+            plan = _verify_plan(
+                15.0,
+                transitions=[
+                    {
+                        "index": 0,
+                        "type": "crossfade",
+                        "duration_samples": int(2.0 * MASTER_SR),
+                        "overlap_start_sample": int(2.0 * MASTER_SR),
+                        "overlap_end_sample": int(4.0 * MASTER_SR),
+                    }
+                ],
+            )
+            wav = _tone_wav(Path(tmp) / "m.wav", 15.0, gaps=[(6.0, 9.0)])
+            report = verify_master(plan, wav)
+            self.assertIs(report["pass"], False)
+            self.assertEqual(report["verdict"], "FAIL")
+            sil = report["checks"]["silence"]
+            self.assertFalse(sil["silence_ok"])
+            self.assertGreaterEqual(sil["max_silent_run_ms"], 2900.0)
+            self.assertEqual(sil["worst_region_s"], [6.0, 9.0])
+            # A digital-silence hole trips both tiers (DJ-P0-006b):
+            self.assertFalse(sil["digital_silence"]["ok"])
+            self.assertFalse(sil["low_level"]["ok"])
+            self.assertEqual(sil["digital_silence"]["worst_region_s"], [6.0, 9.0])
+            self.assertEqual(sil["low_level"]["worst_region_s"], [6.0, 9.0])
+            # Transition-window silence stays reported, as diagnostics only:
+            self.assertEqual(sil["transition_windows"]["max_silent_run_in_transitions_ms"], 0.0)
+            self.assertIsNone(sil["transition_windows"]["worst_region_s"])
+            self.assertGreater(sil["silent_hops_total"], 0)
+
+    def test_declared_gap_and_edge_fades_are_deliberate(self) -> None:
+        """Silence in the renderer's fade edges or plan-declared gaps is exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            plan = _verify_plan(15.0)
+            plan["allowed_silent_gaps_s"] = [[6.0, 9.0]]
+            wav = _tone_wav(
+                Path(tmp) / "m.wav",
+                15.0,
+                gaps=[(0.0, 0.05), (6.0, 9.0), (13.0, 15.0)],
+            )
+            sil = verify_master(plan, wav)["checks"]["silence"]
+            self.assertTrue(sil["silence_ok"])
+            self.assertEqual(sil["max_silent_run_ms"], 0.0)
+            self.assertIsNone(sil["worst_region_s"])
+            self.assertIn([6.0, 9.0], sil["allowed_silent_regions_s"])
+
+    def test_low_level_near_silence_fails(self) -> None:
+        """DJ-P0-006b tier 2: 2 s at ~-60 dBFS fails though it is not digital."""
+        with tempfile.TemporaryDirectory() as tmp:
+            wav = _tone_wav(Path(tmp) / "m.wav", 15.0, regions=[(6.0, 8.0, -60.5)])
+            report = verify_master(_verify_plan(15.0), wav)
+            self.assertIs(report["pass"], False)
+            self.assertEqual(report["verdict"], "FAIL")
+            sil = report["checks"]["silence"]
+            self.assertFalse(sil["silence_ok"])
+            self.assertFalse(sil["low_level"]["ok"])
+            # far above -90 dBFS: the digital-silence tier stays clean
+            self.assertTrue(sil["digital_silence"]["ok"])
+            self.assertAlmostEqual(sil["low_level"]["max_run_s"], 2.0, places=2)
+            self.assertEqual(sil["low_level"]["worst_region_s"], [6.0, 8.0])
+            self.assertIn([6.0, 8.0], sil["low_level"]["violating_runs_s"])
+            # 3 s short-term loudness is reported as a diagnostic: the quiet
+            # 2 s stretch drags the minimum window well below program level.
+            self.assertGreaterEqual(sil["short_term_3s"]["min_dbfs"], -16.0)
+            self.assertLessEqual(sil["short_term_3s"]["min_dbfs"], -12.0)
+            self.assertGreaterEqual(sil["short_term_3s"]["at_s"], 4.5)
+            self.assertLessEqual(sil["short_term_3s"]["at_s"], 6.5)
+
+    def test_min_run_boundaries_are_inclusive(self) -> None:
+        """Rule C: >= is inclusive — exactly 0.5 s / 2.0 s runs must fail."""
+        with tempfile.TemporaryDirectory() as tmp:
+            plan = _verify_plan(15.0)
+            exact_digital = _tone_wav(Path(tmp) / "d.wav", 15.0, gaps=[(6.0, 6.5)])
+            sil = verify_master(plan, exact_digital)["checks"]["silence"]
+            self.assertFalse(sil["digital_silence"]["ok"])
+            self.assertAlmostEqual(sil["digital_silence"]["max_run_s"], 0.5, places=2)
+            self.assertEqual(sil["digital_silence"]["violating_runs_s"], [[6.0, 6.5]])
+            self.assertTrue(sil["low_level"]["ok"])  # 0.5 s < 2.0 s
+
+            exact_low = _tone_wav(Path(tmp) / "l.wav", 15.0, regions=[(6.0, 8.0, -60.5)])
+            sil = verify_master(plan, exact_low)["checks"]["silence"]
+            self.assertFalse(sil["low_level"]["ok"])
+            self.assertAlmostEqual(sil["low_level"]["max_run_s"], 2.0, places=2)
+            self.assertEqual(sil["low_level"]["violating_runs_s"], [[6.0, 8.0]])
+            self.assertTrue(sil["digital_silence"]["ok"])
+
+            under = _tone_wav(
+                Path(tmp) / "u.wav",
+                15.0,
+                gaps=[(6.0, 6.45)],
+                regions=[(8.0, 9.95, -60.5)],
+            )
+            sil = verify_master(plan, under)["checks"]["silence"]
+            self.assertTrue(sil["silence_ok"])
+            self.assertAlmostEqual(sil["digital_silence"]["max_run_s"], 0.45, places=2)
+            self.assertAlmostEqual(sil["low_level"]["max_run_s"], 1.95, places=2)
+
+    def test_antiphase_stereo_is_not_silence(self) -> None:
+        """Rule A: L=-R cancels in a mono mixdown but both channels carry audio."""
+        with tempfile.TemporaryDirectory() as tmp:
+            wav = _tone_wav(Path(tmp) / "m.wav", 15.0, mode="antiphase")
+            sil = verify_master(_verify_plan(15.0), wav)["checks"]["silence"]
+            self.assertTrue(sil["silence_ok"])
+            self.assertEqual(sil["digital_silence"]["silent_blocks"], 0)
+            self.assertEqual(sil["low_level"]["silent_blocks"], 0)
+            self.assertEqual(sil["dead_channels"], [])
+            self.assertEqual(len(sil["channel_rms_dbfs"]), 2)
+            self.assertAlmostEqual(sil["channel_rms_dbfs"][0], sil["channel_rms_dbfs"][1], places=2)
+
+    def test_dead_channel_is_flagged(self) -> None:
+        """Per-channel RMS exposes a dead channel without failing the tier."""
+        with tempfile.TemporaryDirectory() as tmp:
+            wav = _tone_wav(Path(tmp) / "m.wav", 15.0, mode="dead_right")
+            sil = verify_master(_verify_plan(15.0), wav)["checks"]["silence"]
+            self.assertEqual(sil["dead_channels"], [1])
+            self.assertLessEqual(sil["channel_rms_dbfs"][1], -90.0)
+            self.assertGreater(sil["channel_rms_dbfs"][0], -20.0)
+            self.assertTrue(sil["silence_ok"])
+
+    def test_missing_master_is_fail_not_usage_error(self) -> None:
+        """Gap 2: a required artifact that is absent is FAIL, not exit-2 usage."""
+        with tempfile.TemporaryDirectory() as tmp:
+            report = verify_master(_verify_plan(15.0), Path(tmp) / "nope.wav")
+            self.assertIs(report["pass"], False)
+            self.assertEqual(report["verdict"], "FAIL")
+            art = report["checks"]["artifact"]
+            self.assertFalse(art["ok"])
+            self.assertFalse(art["exists"])
+            self.assertFalse(art["decodable"])
+            self.assertIn("duration_matches_plan", report["unmeasured_checks"])
+
+    def test_corrupt_master_is_fail(self) -> None:
+        """Gap 2: an undecodable master file is FAIL with artifact detail."""
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = Path(tmp) / "bad.wav"
+            bad.write_bytes(b"not a wav")
+            report = verify_master(_verify_plan(15.0), bad)
+            self.assertIs(report["pass"], False)
+            self.assertEqual(report["verdict"], "FAIL")
+            art = report["checks"]["artifact"]
+            self.assertFalse(art["ok"])
+            self.assertTrue(art["exists"])
+            self.assertFalse(art["decodable"])
+            self.assertTrue(art["error"])
+
+    def test_no_ffmpeg_and_a_hole_still_fails(self) -> None:
+        """FAIL is never masked by INCONCLUSIVE: measured hole beats unmeasured."""
+        with tempfile.TemporaryDirectory() as tmp:
+            holey = _tone_wav(Path(tmp) / "h.wav", 15.0, gaps=[(6.0, 9.0)])
+            with mock.patch("shutil.which", return_value=None):
+                report = verify_master(_verify_plan(15.0), holey)
+            self.assertIs(report["pass"], False)
+            self.assertEqual(report["verdict"], "FAIL")
+            self.assertIn("true_peak", report["unmeasured_checks"])
+
+    @unittest.skipUnless(shutil.which("ffmpeg"), "ffmpeg not installed")
+    def test_clean_master_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            report = verify_master(_verify_plan(15.0), _tone_wav(Path(tmp) / "m.wav", 15.0))
+            self.assertIs(report["pass"], True)
+            self.assertEqual(report["verdict"], "PASS")
+            self.assertEqual(report["unmeasured_checks"], [])
+            self.assertTrue(report["checks"]["silence"]["silence_ok"])
+
+    def test_unmeasured_checks_yield_inconclusive(self) -> None:
+        """D13: without ffmpeg the true-peak check is unmeasured -> pass: null."""
+        with tempfile.TemporaryDirectory() as tmp:
+            wav = _tone_wav(Path(tmp) / "m.wav", 15.0)
+            with mock.patch("shutil.which", return_value=None):
+                report = verify_master(_verify_plan(15.0), wav)
+            self.assertIsNone(report["pass"])
+            self.assertEqual(report["verdict"], "INCONCLUSIVE")
+            self.assertIsNone(report["checks"]["true_peak"]["dbtp"])
+            self.assertIsNone(report["checks"]["true_peak"]["ok"])
+            self.assertIn("true_peak", report["unmeasured_checks"])
+
+    def test_verify_cli_exit_codes(self) -> None:
+        """0 = PASS, 1 = FAIL (incl. missing/corrupt artifact), 3 = INCONCLUSIVE,
+        2 = usage/environment error with no verdict emitted."""
+        with tempfile.TemporaryDirectory() as tmp:
+            plan_path = Path(tmp) / "plan.json"
+            plan_path.write_text(json.dumps(_verify_plan(15.0)), encoding="utf-8")
+            out = Path(tmp) / "v.json"
+
+            def run(*argv: str) -> tuple[int, dict | None]:
+                buf = io.StringIO()
+                with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+                    code = cli_main(list(argv))
+                try:
+                    return code, json.loads(buf.getvalue())
+                except json.JSONDecodeError:
+                    return code, None
+
+            # Missing master: required artifact absent -> FAIL report, exit 1.
+            code, rep = run(
+                "verify",
+                "--plan",
+                str(plan_path),
+                "--master",
+                str(Path(tmp) / "nope.wav"),
+                "--out",
+                str(out),
+            )
+            self.assertEqual(code, 1)
+            self.assertIs(rep["pass"], False)
+            self.assertEqual(rep["verdict"], "FAIL")
+            self.assertFalse(rep["checks"]["artifact"]["ok"])
+
+            # Corrupt master: required artifact undecodable -> FAIL, exit 1.
+            bad = Path(tmp) / "bad.wav"
+            bad.write_bytes(b"not a wav")
+            code, rep = run(
+                "verify", "--plan", str(plan_path), "--master", str(bad), "--out", str(out)
+            )
+            self.assertEqual(code, 1)
+            self.assertIs(rep["pass"], False)
+            self.assertEqual(rep["verdict"], "FAIL")
+            self.assertFalse(rep["checks"]["artifact"]["ok"])
+
+            holey = _tone_wav(Path(tmp) / "hole.wav", 15.0, gaps=[(6.0, 9.0)])
+            code, rep = run(
+                "verify", "--plan", str(plan_path), "--master", str(holey), "--out", str(out)
+            )
+            self.assertEqual(code, 1)
+            self.assertIs(rep["pass"], False)
+            self.assertEqual(rep["verdict"], "FAIL")
+
+            # No ffmpeg but a measured hole: FAIL is never masked -> exit 1.
+            with mock.patch("shutil.which", return_value=None):
+                code, rep = run(
+                    "verify",
+                    "--plan",
+                    str(plan_path),
+                    "--master",
+                    str(holey),
+                    "--out",
+                    str(out),
+                )
+            self.assertEqual(code, 1)
+            self.assertEqual(rep["verdict"], "FAIL")
+
+            # No ffmpeg on a clean master: unmeasured required check -> exit 3.
+            clean = _tone_wav(Path(tmp) / "clean.wav", 15.0)
+            with mock.patch("shutil.which", return_value=None):
+                code, rep = run(
+                    "verify",
+                    "--plan",
+                    str(plan_path),
+                    "--master",
+                    str(clean),
+                    "--out",
+                    str(out),
+                )
+            self.assertEqual(code, 3)
+            self.assertIsNone(rep["pass"])
+            self.assertEqual(rep["verdict"], "INCONCLUSIVE")
+
+            # Unreadable plan: usage error -> exit 2, no verdict emitted.
+            code, rep = run(
+                "verify",
+                "--plan",
+                str(Path(tmp) / "no-plan.json"),
+                "--master",
+                str(clean),
+                "--out",
+                str(Path(tmp) / "v2.json"),
+            )
+            self.assertEqual(code, 2)
+            self.assertIn("error", rep)
+            self.assertNotIn("verdict", rep)
+
+            # Argparse usage error: exit 2, no verdict JSON on stdout.
+            buf = io.StringIO()
+            with (
+                contextlib.redirect_stdout(buf),
+                contextlib.redirect_stderr(buf),
+                self.assertRaises(SystemExit) as cm,
+            ):
+                cli_main(["verify", "--plan", str(plan_path)])
+            self.assertEqual(cm.exception.code, 2)
+            self.assertNotIn('"verdict"', buf.getvalue())
 
 
 if __name__ == "__main__":

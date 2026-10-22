@@ -1,7 +1,9 @@
 """AI DJ command line: scan / analyze / plan / render / play / verify.
 
-Every command prints a JSON result on stdout (or a JSON error on stderr) and
-exits 0 on success, 1 on gate/logic failure, 2 on usage/environment errors.
+Every command prints a JSON result on stdout (or a JSON error on stderr).
+Exit codes: 0 = success/PASS, 1 = gate/logic failure/FAIL, 3 = INCONCLUSIVE
+(a required measurement is missing; verify only), 2 = usage/environment
+errors (no verdict is ever emitted on a usage error).
 """
 
 from __future__ import annotations
@@ -213,9 +215,11 @@ def cmd_verify(args: argparse.Namespace) -> int:
         return _fail({"error": f"cannot read plan: {exc}"}, 2)
     try:
         report = verify_master(plan, args.master, out_path=args.out)
-    except FileNotFoundError as exc:
-        return _fail({"error": str(exc)}, 2)
+    except Exception as exc:
+        return _fail({"error": f"verify failed: {type(exc).__name__}: {exc}"}, 2)
     _emit(report)
+    if report["pass"] is None:
+        return 3
     return 0 if report["pass"] else 1
 
 
