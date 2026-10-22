@@ -103,16 +103,29 @@ def energy_arc(n: int, lo: float, hi: float) -> list[float]:
     return arc
 
 
-def _eligible(records: list[dict]) -> list[dict]:
-    """Analysis records usable for planning (ok, long enough, any beat data)."""
-    ok = []
+def _eligible(
+    records: list[dict], include_ineligible: bool = False
+) -> tuple[list[dict], list[dict]]:
+    """Split analysis records into (usable, flagged-by-eligibility-rule).
+
+    The D10 corpus rule: a track is set material only when the analyzer gave
+    it a positive ``eligible`` verdict. Records without a verdict — e.g. rows
+    written before the rule existed — fail closed, not open.
+    ``include_ineligible`` is the escape hatch restoring pre-rule behaviour:
+    flagged records stay in the usable list but are still reported.
+    """
+    ok, flagged = [], []
     for r in records:
         if r.get("status") != "ok":
             continue
         if (r.get("duration_s") or 0) < MIN_DURATION_S:
             continue
+        if r.get("eligible") is not True:
+            flagged.append(r)
+            if not include_ineligible:
+                continue
         ok.append(r)
-    return ok
+    return ok, flagged
 
 
 def _dedup_works(records: list[dict]) -> list[dict]:
@@ -235,19 +248,29 @@ def _choose_transition(a: dict, b: dict) -> dict:
 
 def plan_set(
     records: list[dict],
+    *,
     n_tracks: int = 6,
     set_name: str = "mini",
     seed: int = 0,
     energy_target: float | None = None,
+    include_ineligible: bool = False,
 ) -> dict:
     """Build a deterministic plan for an n-track mini-set.
 
     ``seed`` is part of the contract (stored in the plan); P0 uses pure greedy
     selection — no RNG calls — so the seed currently only documents intent.
+
+    ``include_ineligible`` disables the D10 corpus eligibility filter; the
+    plan records which tracks the rule excluded — or would have, when the
+    escape hatch is on.
     """
-    pool = _dedup_works(_eligible(records))
+    eligible_records, flagged = _eligible(records, include_ineligible=include_ineligible)
+    pool = _dedup_works(eligible_records)
     if len(pool) < 2:
-        raise ValueError(f"only {len(pool)} eligible tracks after dedup/eligibility")
+        raise ValueError(
+            f"only {len(pool)} eligible tracks after dedup/eligibility"
+            + (f" ({len(flagged)} excluded by eligibility rule)" if flagged else "")
+        )
     n = max(2, min(n_tracks, len(pool)))
 
     energies = [r.get("energy_mean") or 0.0 for r in pool]
@@ -364,6 +387,29 @@ def plan_set(
             "min_duration_s": MIN_DURATION_S,
         },
         "energy_arc": arc,
+        "eligibility": {
+            "include_ineligible": include_ineligible,
+            "excluded": [
+                {
+                    "recording_id": r["recording_id"],
+                    "title": r.get("title"),
+                    "exclusion_reason": r.get("exclusion_reason"),
+                }
+                for r in sorted(flagged, key=lambda r: r["recording_id"])
+            ]
+            if not include_ineligible
+            else [],
+            "overridden": [
+                {
+                    "recording_id": r["recording_id"],
+                    "title": r.get("title"),
+                    "exclusion_reason": r.get("exclusion_reason"),
+                }
+                for r in sorted(flagged, key=lambda r: r["recording_id"])
+            ]
+            if include_ineligible
+            else [],
+        },
         "track_count": n,
         "tracks": tracks,
         "transitions": transitions,

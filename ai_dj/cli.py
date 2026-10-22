@@ -84,6 +84,15 @@ def cmd_analyze(args: argparse.Namespace) -> int:
             "total": len(records),
             "analyzed_ok": len(ok),
             "errors": errs,
+            "excluded": [
+                {
+                    "recording_id": r["recording_id"],
+                    "title": r.get("title"),
+                    "exclusion_reason": r.get("exclusion_reason"),
+                }
+                for r in ok
+                if r.get("eligible") is not True
+            ],
             "tracks": [
                 {
                     "recording_id": r["recording_id"],
@@ -94,6 +103,9 @@ def cmd_analyze(args: argparse.Namespace) -> int:
                     "key": r.get("key"),
                     "tempo_confidence": r.get("tempo_confidence"),
                     "duration_s": r.get("duration_s"),
+                    "silence_run_ratio": r.get("silence_run_ratio"),
+                    "eligible": r.get("eligible"),
+                    "exclusion_reason": r.get("exclusion_reason"),
                 }
                 for r in ok
             ],
@@ -110,6 +122,15 @@ def cmd_plan(args: argparse.Namespace) -> int:
         cache.close()
     if not records:
         return _fail({"error": f"analysis cache is empty: {args.cache} — run analyze first"}, 2)
+    if args.include_ineligible:
+        flagged = [r for r in records if r.get("status") == "ok" and r.get("eligible") is not True]
+        print(
+            f"WARNING: --include-ineligible — {len(flagged)} track(s) that failed "
+            "the eligibility rule are selectable again:",
+            file=sys.stderr,
+        )
+        for r in flagged:
+            print(f"  - {r.get('title')}: {r.get('exclusion_reason')}", file=sys.stderr)
     try:
         plan = plan_set(
             records,
@@ -117,6 +138,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
             set_name=args.set_name,
             seed=args.seed,
             energy_target=args.energy_target,
+            include_ineligible=args.include_ineligible,
         )
     except ValueError as exc:
         return _fail({"error": str(exc)}, 1)
@@ -125,6 +147,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
         {
             "written_to": str(out),
             "set_name": plan["set_name"],
+            "eligibility": plan["eligibility"],
             "track_count": plan["track_count"],
             "total_duration_s": plan["timeline"]["total_duration_s"],
             "tracks": [
@@ -165,7 +188,8 @@ def cmd_render(args: argparse.Namespace) -> int:
     except Exception as exc:
         return _fail({"error": f"render failed: {type(exc).__name__}: {exc}"}, 1)
     _emit(report)
-    peak_ok = report["true_peak_dbtp"] <= report["peak_limit_dbtp"]
+    peak = report["true_peak_dbtp"]
+    peak_ok = peak is None or peak <= report["peak_limit_dbtp"]
     # Real-music beat offsets are diagnostics (G2b), not render failures; the
     # hard 20 ms contract is gated by `verify` on synthetic ground truth.
     return 0 if report["clipping_count"] == 0 and peak_ok else 1
@@ -219,6 +243,11 @@ def build_parser() -> argparse.ArgumentParser:
     pl.add_argument("--tracks", type=int, default=6)
     pl.add_argument("--seed", type=int, default=0)
     pl.add_argument("--energy-target", type=float, default=None)
+    pl.add_argument(
+        "--include-ineligible",
+        action="store_true",
+        help="allow tracks that failed the eligibility rule (escape hatch)",
+    )
     pl.set_defaults(func=cmd_plan)
 
     r = sub.add_parser("render", help="render plan.json to a master WAV")

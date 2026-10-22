@@ -30,9 +30,20 @@ from pathlib import Path
 import librosa
 import numpy as np
 
-ANALYSIS_VERSION = 1
+ANALYSIS_VERSION = 2
 ANALYSIS_SR = 22050
 DEFAULT_CACHE = "analysis_cache.sqlite"
+
+# Corpus eligibility contract (D10): non-song files (training clips, raw
+# sessions) carry long contiguous silent stretches; real songs do not. A
+# block of SILENCE_BLOCK_S seconds counts as silent when its RMS stays below
+# -SILENCE_DB dBFS; only runs of at least MIN_SILENCE_RUN_S count, so quiet
+# intros/outros and inter-phrase gaps cannot move the metric. Measured
+# separation on the real corpus: songs 0.0-0.2 %, non-songs 21.8-31.9 %.
+MAX_SILENCE_RUN_FRACTION = 0.02
+MIN_SILENCE_RUN_S = 2.0
+SILENCE_DB = 100.0
+SILENCE_BLOCK_S = 0.05
 
 # Beats per bar assumed for the (estimated) downbeat grid.
 _BEATS_PER_BAR = 4
@@ -103,6 +114,35 @@ def estimate_key(chroma_mean: np.ndarray) -> tuple[str, float]:
     if best_corr < _KEY_MIN_CORR:
         return "UNKNOWN", round(best_corr, 3)
     return best_key, round(best_corr, 3)
+
+
+def silence_metrics(y: np.ndarray, sr: int) -> tuple[float, float]:
+    """Share of the signal inside long silent runs, and the longest such run.
+
+    Returns ``(ratio, longest_run_s)`` where ``ratio`` is the fraction of the
+    duration occupied by contiguous silent runs of ``MIN_SILENCE_RUN_S`` or
+    more — the D10 eligibility metric, computed on SILENCE_BLOCK_S blocks at
+    ``-SILENCE_DB`` dBFS RMS. Short silences (between phrases, after clicks)
+    never reach the run threshold and do not count.
+    """
+    block = max(1, int(SILENCE_BLOCK_S * sr))
+    n = len(y) // block
+    if n == 0:
+        return 0.0, 0.0
+    frames = y[: n * block].reshape(n, block)
+    rms = np.sqrt(np.mean(frames * frames, axis=1))
+    silent = rms <= 10.0 ** (-SILENCE_DB / 20.0)
+    run_s = long_s = longest_s = 0.0
+    for v in np.append(silent, False):
+        if v:
+            run_s += SILENCE_BLOCK_S
+        elif run_s > 0.0:
+            longest_s = max(longest_s, run_s)
+            if run_s >= MIN_SILENCE_RUN_S:
+                long_s += run_s
+            run_s = 0.0
+    duration_s = len(y) / float(sr)
+    return (long_s / duration_s if duration_s > 0 else 0.0), longest_s
 
 
 def _energy_regions(
@@ -184,6 +224,9 @@ def analyze_track(path: str | Path) -> dict:
 
     downbeat_times = beat_times[::_BEATS_PER_BAR]
 
+    s_ratio, s_longest = silence_metrics(y, sr)
+    eligible = bool(s_ratio <= MAX_SILENCE_RUN_FRACTION)
+
     return {
         "analysis_version": ANALYSIS_VERSION,
         "analysis_sr": sr,
@@ -208,6 +251,12 @@ def analyze_track(path: str | Path) -> dict:
         "outro_start_s": round(outro_start_s, 3),
         "rms_db": round(rms_db, 2),
         "peak_db": round(peak_db, 2),
+        "silence_run_ratio": round(s_ratio, 4),
+        "longest_silence_run_s": round(s_longest, 3),
+        "eligible": eligible,
+        "exclusion_reason": (
+            None if eligible else f"silence_run_ratio {s_ratio:.3f} > {MAX_SILENCE_RUN_FRACTION}"
+        ),
     }
 
 
@@ -235,8 +284,11 @@ class AnalysisCache:
         self._conn.commit()
 
     def get(self, recording_id: str) -> dict | None:
+        # Rows written by an older ANALYSIS_VERSION are treated as misses so
+        # the next analyze run transparently recomputes them (schema upgrade).
         row = self._conn.execute(
-            "SELECT payload FROM tracks WHERE recording_id = ?", (recording_id,)
+            "SELECT payload FROM tracks WHERE recording_id = ? AND analysis_version = ?",
+            (recording_id, ANALYSIS_VERSION),
         ).fetchone()
         return json.loads(row[0]) if row else None
 

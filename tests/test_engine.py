@@ -9,6 +9,9 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
+
+import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -34,9 +37,10 @@ def _record(
     *,
     duration_s: float = 200.0,
     conf: float = 0.9,
+    **overrides,
 ) -> dict:
     beats = _beat_times(bpm, duration_s)
-    return {
+    rec = {
         "recording_id": rec_id,
         "work_id": work_id,
         "title": rec_id,
@@ -59,7 +63,13 @@ def _record(
         "rms_db": -20.0,
         "intro_end_s": 5.0,
         "outro_start_s": duration_s - 12.0,
+        "silence_run_ratio": 0.0,
+        "longest_silence_run_s": 0.0,
+        "eligible": True,
+        "exclusion_reason": None,
     }
+    rec.update(overrides)
+    return rec
 
 
 class TestWorkTitleNormalization(unittest.TestCase):
@@ -225,6 +235,120 @@ class TestPlanner(unittest.TestCase):
             plan_set(records, n_tracks=6, set_name="t")
 
 
+class TestAnalyzerEligibility(unittest.TestCase):
+    """D10: long contiguous silent runs mark a file as not-a-song."""
+
+    def test_long_silent_gap_is_ineligible(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            clicks, sr, _ = synthesize_click_track(120.0, 10.0)
+            gap = np.zeros(int(6.0 * sr), dtype=np.float32)
+            tail, _, _ = synthesize_click_track(120.0, 10.0)
+            y = np.concatenate([clicks, gap, tail])
+            wav = Path(tmp) / "session.wav"
+            write_wav_pcm16(wav, y, sr)
+            rec = analyzer.analyze_track(wav)
+            self.assertIn("silence_run_ratio", rec)
+            self.assertFalse(rec["eligible"])
+            self.assertGreater(rec["silence_run_ratio"], 0.02)
+            self.assertGreaterEqual(rec["longest_silence_run_s"], 5.9)
+            self.assertIn("silence_run_ratio", rec["exclusion_reason"])
+
+    def test_active_track_stays_eligible(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            y, sr, _ = synthesize_click_track(120.0, 12.0)
+            wav = Path(tmp) / "song.wav"
+            write_wav_pcm16(wav, y, sr)
+            rec = analyzer.analyze_track(wav)
+            self.assertTrue(rec["eligible"])
+            self.assertIsNone(rec["exclusion_reason"])
+            self.assertLessEqual(rec["silence_run_ratio"], 0.02)
+
+    def test_short_silent_runs_do_not_count(self) -> None:
+        # Click tracks are near-silent between beats: ~0.49 s runs, all under
+        # the 2 s run threshold -> ratio stays 0 and the track is eligible.
+        with tempfile.TemporaryDirectory() as tmp:
+            y, sr, _ = synthesize_click_track(120.0, 12.0)
+            wav = Path(tmp) / "clicks.wav"
+            write_wav_pcm16(wav, y, sr)
+            rec = analyzer.analyze_track(wav)
+            self.assertTrue(rec["eligible"])
+            self.assertEqual(rec["silence_run_ratio"], 0.0)
+
+
+class TestPlannerEligibility(unittest.TestCase):
+    """The planner must never select a track without an eligibility verdict."""
+
+    def _records(self) -> list[dict]:
+        return [
+            _record("rec-a", "work-a", 100.0, "A minor", 0.30),
+            _record("rec-b", "work-b", 103.0, "C major", 0.45),
+            _record(
+                "rec-c",
+                "work-c",
+                130.0,
+                "F# minor",
+                0.60,
+                eligible=False,
+                silence_run_ratio=0.319,
+                longest_silence_run_s=46.8,
+                exclusion_reason="silence_run_ratio 0.319 > 0.02",
+            ),
+        ]
+
+    def test_ineligible_track_is_excluded(self) -> None:
+        plan = plan_set(self._records(), n_tracks=3, set_name="t")
+        ids = [t["recording_id"] for t in plan["tracks"]]
+        self.assertNotIn("rec-c", ids)
+        self.assertEqual(len(ids), 2)
+        excluded = plan["eligibility"]["excluded"]
+        self.assertEqual([e["recording_id"] for e in excluded], ["rec-c"])
+        self.assertIn("silence_run_ratio", excluded[0]["exclusion_reason"])
+        self.assertFalse(plan["eligibility"]["include_ineligible"])
+
+    def test_missing_eligibility_flag_fails_closed(self) -> None:
+        # v1 cache rows predate the rule: no verdict means not selectable.
+        records = self._records()
+        del records[2]["eligible"]
+        plan = plan_set(records, n_tracks=3, set_name="t")
+        self.assertNotIn("rec-c", [t["recording_id"] for t in plan["tracks"]])
+
+    def test_include_ineligible_restores_selection(self) -> None:
+        plan = plan_set(self._records(), n_tracks=3, set_name="t", include_ineligible=True)
+        ids = [t["recording_id"] for t in plan["tracks"]]
+        self.assertIn("rec-c", ids)
+        self.assertEqual(len(ids), 3)
+        self.assertEqual(plan["eligibility"]["excluded"], [])
+        self.assertEqual([o["recording_id"] for o in plan["eligibility"]["overridden"]], ["rec-c"])
+        self.assertTrue(plan["eligibility"]["include_ineligible"])
+
+    def test_real_cache_never_selects_ineligible(self) -> None:
+        cache_path = Path(__file__).resolve().parent.parent / "analysis_cache.sqlite"
+        if not cache_path.exists():
+            self.skipTest("real analysis cache not present")
+        cache = analyzer.AnalysisCache(cache_path)
+        try:
+            records = [
+                r
+                for r in cache.all_records()
+                if r.get("analysis_version") == analyzer.ANALYSIS_VERSION
+            ]
+        finally:
+            cache.close()
+        if not records:
+            self.skipTest("cache holds no current-version records")
+        ineligible = {
+            r["recording_id"]
+            for r in records
+            if r.get("status") == "ok" and r.get("eligible") is not True
+        }
+        plan = plan_set(records, n_tracks=6, set_name="cache-check")
+        ids = {t["recording_id"] for t in plan["tracks"]}
+        self.assertTrue(ids.isdisjoint(ineligible), f"ineligible selected: {ids & ineligible}")
+        by_id = {r["recording_id"]: r for r in records}
+        for t in plan["tracks"]:
+            self.assertIs(by_id[t["recording_id"]]["eligible"], True)
+
+
 class TestAnalyzerIdempotent(unittest.TestCase):
     def test_click_track_analysis_repeats_identically(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -312,23 +436,30 @@ def _synth_plan(tmp: Path, bpm_a: float, bpm_b: float) -> dict:
     }
 
 
+def _cut_plan(tmp: Path) -> dict:
+    """Two click tracks hard-spliced; no stretch, no overlap window."""
+    plan = _synth_plan(tmp, 100.0, 100.0)
+    plan["transitions"][0]["type"] = "cut"
+    plan["transitions"][0]["duration_samples"] = 0
+    plan["transitions"][0]["overlap_start_sample"] = plan["tracks"][0]["cue_out_samples"]
+    plan["transitions"][0]["overlap_end_sample"] = plan["tracks"][0]["cue_out_samples"]
+    plan["tracks"][1]["tempo_stretch"] = 1.0
+    plan["tracks"][1]["master_start_sample"] = plan["tracks"][0]["cue_out_samples"]
+    plan["tracks"][1]["segment_master_samples"] = plan["tracks"][1]["cue_out_samples"]
+    total = plan["tracks"][0]["cue_out_samples"] + plan["tracks"][1]["cue_out_samples"]
+    plan["timeline"] = {
+        "total_samples": total,
+        "total_duration_s": total / MASTER_SR,
+    }
+    return plan
+
+
 class TestRenderer(unittest.TestCase):
+    @unittest.skipUnless(shutil.which("ffmpeg"), "ffmpeg not installed")
     def test_cut_render_is_deterministic(self) -> None:
         """No-stretch render must produce byte-identical WAVs."""
         with tempfile.TemporaryDirectory() as tmp:
-            plan = _synth_plan(Path(tmp), 100.0, 100.0)
-            plan["transitions"][0]["type"] = "cut"
-            plan["transitions"][0]["duration_samples"] = 0
-            plan["transitions"][0]["overlap_start_sample"] = plan["tracks"][0]["cue_out_samples"]
-            plan["transitions"][0]["overlap_end_sample"] = plan["tracks"][0]["cue_out_samples"]
-            plan["tracks"][1]["tempo_stretch"] = 1.0
-            plan["tracks"][1]["master_start_sample"] = plan["tracks"][0]["cue_out_samples"]
-            plan["tracks"][1]["segment_master_samples"] = plan["tracks"][1]["cue_out_samples"]
-            total = plan["tracks"][0]["cue_out_samples"] + plan["tracks"][1]["cue_out_samples"]
-            plan["timeline"] = {
-                "total_samples": total,
-                "total_duration_s": total / MASTER_SR,
-            }
+            plan = _cut_plan(Path(tmp))
             w1 = render_plan(plan, Path(tmp) / "m1.wav")
             render_plan(plan, Path(tmp) / "m2.wav")
             self.assertEqual(
@@ -340,6 +471,20 @@ class TestRenderer(unittest.TestCase):
             self.assertAlmostEqual(
                 w1["total_samples_actual"], plan["timeline"]["total_samples"], delta=1024
             )
+
+    def test_render_without_ffmpeg_is_not_fatal(self) -> None:
+        """D11: missing ffmpeg downgrades the true-peak check, never raises."""
+        with tempfile.TemporaryDirectory() as tmp:
+            plan = _cut_plan(Path(tmp))
+            with mock.patch("shutil.which", return_value=None):
+                report = render_plan(plan, Path(tmp) / "m.wav")
+            self.assertIsNone(report["true_peak_dbtp"])
+            self.assertIsNone(report["integrated_lufs"])
+            self.assertIn("unavailable", report["true_peak_measured_by"])
+            self.assertIn("ffmpeg", report["true_peak_measured_by"])
+            self.assertEqual(report["clipping_count"], 0)
+            self.assertIn("sample-peak", report["peak_protection"])
+            self.assertTrue((Path(tmp) / "m.wav").exists())
 
     @unittest.skipUnless(shutil.which("ffmpeg"), "ffmpeg not installed")
     def test_beat_aligned_overlap_within_contract(self) -> None:

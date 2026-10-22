@@ -288,7 +288,7 @@ def render_plan(plan: dict, out_wav: str | Path, report_path: str | Path | None 
     sf.write(str(out), master, sr, subtype="PCM_24")
 
     loud = ffmpeg_true_peak_dbtp(out)
-    if loud["true_peak_dbtp"] > TRUE_PEAK_LIMIT_DBTP:
+    if loud["true_peak_dbtp"] is not None and loud["true_peak_dbtp"] > TRUE_PEAK_LIMIT_DBTP:
         extra = TRUE_PEAK_TARGET_DBTP - loud["true_peak_dbtp"]
         scale_db += extra
         master *= float(10.0 ** (extra / 20.0))
@@ -308,7 +308,14 @@ def render_plan(plan: dict, out_wav: str | Path, report_path: str | Path | None 
         "true_peak_dbtp": loud["true_peak_dbtp"],
         "integrated_lufs": loud["integrated_lufs"],
         "loudness_range_lu": loud["loudness_range_lu"],
-        "true_peak_measured_by": "ffmpeg ebur128=peak=true",
+        "true_peak_measured_by": (
+            "ffmpeg ebur128=peak=true" if loud["available"] else "unavailable: ffmpeg not on PATH"
+        ),
+        "peak_protection": (
+            "sample-peak pre-scale + ffmpeg true-peak re-measure"
+            if loud["available"]
+            else "sample-peak pre-scale only (true peak not measured)"
+        ),
         "peak_limit_dbtp": TRUE_PEAK_LIMIT_DBTP,
         "peak_scale_applied_db": round(scale_db, 3),
         "clipping_count": clipping,
@@ -331,10 +338,18 @@ def ffmpeg_true_peak_dbtp(path: str | Path) -> dict:
 
     Returns ``{true_peak_dbtp, integrated_lufs, loudness_range_lu}`` parsed from
     the ebur128 summary — an implementation independent of this codebase.
+    Without ffmpeg the check is *unavailable, not faked* (D11/D6): all values
+    are ``None`` and ``available`` is False; the sample-peak pre-scale is then
+    the only headroom protection and the report says so.
     """
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
-        raise RuntimeError("ffmpeg not found on PATH (required for true-peak check)")
+        return {
+            "true_peak_dbtp": None,
+            "integrated_lufs": None,
+            "loudness_range_lu": None,
+            "available": False,
+        }
     proc = subprocess.run(
         [
             ffmpeg,
@@ -362,6 +377,7 @@ def ffmpeg_true_peak_dbtp(path: str | Path) -> dict:
         "true_peak_dbtp": float(peak_m.group(1)),
         "integrated_lufs": float(i_m.group(1)) if i_m else None,
         "loudness_range_lu": float(lra_m.group(1)) if lra_m else None,
+        "available": True,
     }
 
 

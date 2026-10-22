@@ -203,6 +203,8 @@ def verify_master(plan: dict, master_wav: str | Path, out_path: str | Path | Non
     # this codebase, run on the artifact on disk.
     loud = _render.ffmpeg_true_peak_dbtp(master_wav)
     peak_db = loud["true_peak_dbtp"]
+    # D11: no ffmpeg -> unmeasured (ok: None), not a failure and not a fake 0.
+    peak_ok = None if peak_db is None else peak_db <= _render.TRUE_PEAK_LIMIT_DBTP
     clipping = int(np.count_nonzero(np.abs(data) >= _render.CLIP_THRESHOLD))
 
     silence = _silence_check(mono, plan, file_sr)
@@ -222,11 +224,15 @@ def verify_master(plan: dict, master_wav: str | Path, out_path: str | Path | Non
             "ok": bool(duration_ok),
         },
         "true_peak": {
-            "dbtp": round(peak_db, 3),
+            "dbtp": round(peak_db, 3) if peak_db is not None else None,
             "limit_dbtp": _render.TRUE_PEAK_LIMIT_DBTP,
-            "measured_by": "ffmpeg ebur128=peak=true",
+            "measured_by": (
+                "ffmpeg ebur128=peak=true"
+                if loud.get("available")
+                else "unavailable: ffmpeg not on PATH"
+            ),
             "integrated_lufs": loud["integrated_lufs"],
-            "ok": peak_db <= _render.TRUE_PEAK_LIMIT_DBTP,
+            "ok": peak_ok,
         },
         "clipping": {"count": clipping, "ok": clipping == 0},
         "silence": silence,
@@ -239,7 +245,7 @@ def verify_master(plan: dict, master_wav: str | Path, out_path: str | Path | Non
     }
     hard_checks = [
         duration_ok,
-        peak_db <= _render.TRUE_PEAK_LIMIT_DBTP,
+        peak_ok is not False,
         clipping == 0,
         silence["silence_ok"],
         file_sr == sr,
