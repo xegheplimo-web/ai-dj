@@ -2,4 +2,4 @@
 numpy>=2.0
 librosa>=1.0.0
 soundfile>=0.13
-sounddevice>=0.5
+sounddevice>=0.5.6
