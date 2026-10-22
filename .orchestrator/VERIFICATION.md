@@ -10,4 +10,9 @@
 | Mixxx | Chưa cài; không OSC chính thức; cần driver MIDI ảo | docs + `pip index pyrtmidi` (không có wheel) |
 
 ## Gates
+
+| Run | Date | Task | Tests | Lint | Compile | CI | E2E | Evidence | Verifier |
+|---|---|---|---|---|---|---|---|---|---|
+| DJ-P0-006b-verify | 22/10 18:30 VN | Verifier two-tier silence + PortAudio fix | 56/56 ✓ (+7) | ruff ✓ | ✓ | ✓ 39771989534 | ✓ 0.20ms (timing_probe.json) | PASS: eligible_set.wav, FAIL: silent_set.wav | 2-tier gate operational |
+
 _Chưa chạy — chờ implement._

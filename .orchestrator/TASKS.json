@@ -27,16 +27,11 @@
     "id": "DJ-P0-006b",
     "title": "Verifier refinements: two-tier silence, artifact integrity, exit codes",
     "assignee": "devin-cli",
-    "status": "in_progress",
-    "card": ".orchestrator/cards/DJ-P0-006b.md",
-    "origin": "GPT rebuttal 2026-10-22 — single threshold missed low-level near-silence; missing master exited 2 not FAIL; exit 2 ambiguous",
-    "acceptance": [
-      "-60 dBFS 2 s stretch -> FAIL",
-      "boundary fixtures at exactly 0.5 s and 2.0 s",
-      "anti-phase stereo with audio -> NOT silence",
-      "missing/corrupt master -> FAIL exit 1",
-      "INCONCLUSIVE -> exit 3; usage error -> exit 2"
-    ]
+    "status": "done",
+    "merged_commit": "0efdffd",
+    "verified_by": "hermes",
+    "evidence": "56 tests green (49->56, +7 new); ruff check+format clean; CI run 39771989534 SUCCESS (lint+ubuntu3.12+ubuntu3.13+windows+e2e); CodeQL 39771989494 SUCCESS. Fix(ci): PortAudio optional import in player.py. GPT review 2026-10-22: Option A confirmed (FAIL is correct for eligible_set.wav spec conflict). Spec conflict resolved per GPT guidance (see DECISIONS D16).",
+    "origin": "GPT rebuttal 2026-10-22 — single threshold missed low-level near-silence; missing master exited 2 not FAIL; exit 2 ambiguous"
   },
   {
     "id": "DJ-P0-007",

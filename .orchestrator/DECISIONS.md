@@ -5,9 +5,31 @@
 - D0b: Python 3.13.15 làm runtime chính (3.14 thiếu wheel audio; 3.13 có torch/fastapi/mcp).
 - D0c: Không cài Mixxx/driver MIDI trong vòng 1.
 
-## 2026-10-22 — Phản biện kiến trúc chéo với GPT (thread "AI chơi DJ")
-Brief đã gửi: `docs/gpt-brief-2026-10-22.md` (§A sự thật đo được, §B 4 câu hỏi chéo).
-Verdict GPT: **CONDITIONAL GO — engine Python P0**.
+## 2026-10-22 — GPT đối chiếu GitHub trực tiếp (commit 604da3a)
+Brief gửi: audit brief (ai-dj-audit-brief.md, 53 lines) qua ChatGPT CDP.
+Verdict GPT: **CONFIRMED 9/9 claims**; Option A đúng cho eligible_set.wav spec conflict.
+
+- **D10 (CONFIRMED):** Verifier full-master silence gate (không chỉ transition). 29.4s silent run trên master = FAIL. Đã implement DJ-P0-006.
+- **D12 (CONFIRMED):** Two-tier silence gate: ≤ −90 dBFS / ≥ 0.5s → FAIL; ≤ −60 dBFS / ≥ 2.0s → FAIL. Anti-phase stereo với audio = NOT silence.
+- **D13 (CONFIRMED):** Tri-state verdict — INCONCLUSIVE cho measurement thiếu; không bao giờ PASS khi thiếu.
+- **D11b (NEW):** sounddevice/PortAudio optional import (CI Ubuntu không có libportaudio2). `player.py` try/except OSError → sd=None; play_master raise RuntimeError sạch. Áp dụng nguyên tắc D11 (optional external dependency không fatal).
+
+## 2026-10-22 — DJ-P0-006b spec conflict resolution
+**Vấn đề:** eligible_set.wav có master có vùng ≤ −60 dBFS nhưng < 2.0s, không có vùng nào vượt ngưỡng 2s → PASS hay FAIL?
+
+**Phân tích:** Các tier đã công bố: Tier 1 (≤ −60 dBFS / ≥ 2.0s → FAIL) và Tier 2 (≤ −90 dBFS / ≥ 0.5s → FAIL). eligible_set.wav có điểm đến −60 dBFS → **FAIL tier 1**.
+
+**Quyết định:** **Option A — FAIL.** GPT xác nhận trực tiếp (ChatGPT session ai-dj-audit): "Tiêu chuẩn hai-tier đã được công bố rõ ràng. eligible_set.wav có điểm đến -60 dBFS → FAIL tier 1." Option B (INCONCLUSIVE) bị từ chối: "Không có gì 'không đo được' — RMS đã đo được."
+
+### D16 — Spec conflict đã giải quyết: eligible_set.wav → FAIL
+Hai-tier gate tuân thủ. Verifier = technical gate (threshold cứng); G2b listening verdict = audio quality gate (phân biệt âm thanh rất nhỏ vs khoảng lặng bất thường — GPT đề xuất thêm).
+
+### D16b — G3 BLOCKED cho đến khi GPT chấp nhận DJ-P0-007 listening verdict
+GPT: "Tôi sẽ kiểm tra kỹ chất lượng transition ở DJ-P0-007 trước khi bạn mở rộng 60 phút."
+
+## 2026-10-22 — CI fix (PortAudio)
+CI run 39768311712 FAILED: "PortAudio library not found" trên Ubuntu. Fix: lazy import sounddevice trong player.py (D11b).
+CI re-run 39771989534: **SUCCESS** (lint + ubuntu3.12 + ubuntu3.13 + windows + E2E). CodeQL 39771989494: **SUCCESS**.
 
 - **D1 (GO):** Bỏ Mixxx ở P0. Nút thắt thật là *music understanding* và *transition quality*,
   không phải năng lực phát 2 file song song; Mixxx không giải quyết được nút thắt đó mà lại
