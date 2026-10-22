@@ -89,7 +89,7 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Upload evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: timing-evidence
           path: evidence/timing_probe.json
