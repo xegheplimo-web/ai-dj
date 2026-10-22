@@ -56,149 +56,18 @@ def _records() -> list[dict]:
     ]
 
 
-# Byte-identical output of the pre-anchor greedy planner on _records() above
-# (n_tracks=3, set_name="anchor-test", seed=0). Captured at HEAD b22eeb6.
-LEGACY_GOLDEN = """{
-  "plan_version": 1,
-  "set_name": "anchor-test",
-  "seed": 0,
-  "generated_by": "ai_dj.planner",
-  "master_sr": 48000,
-  "constraints": {
-    "min_beat_conf": 0.5,
-    "beatmatch_bpm_tol": 0.06,
-    "crossfade_bpm_tol": 0.15,
-    "max_stretch": 1.06,
-    "min_duration_s": 60.0
-  },
-  "energy_arc": [
-    0.3,
-    0.5816,
-    0.3
-  ],
-  "eligibility": {
-    "include_ineligible": false,
-    "excluded": [],
-    "overridden": []
-  },
-  "track_count": 3,
-  "tracks": [
-    {
-      "index": 0,
-      "recording_id": "rec-1",
-      "work_id": "work-1",
-      "title": "rec-1",
-      "path": "/fake/rec-1.wav",
-      "bpm": 100.0,
-      "bpm_raw": 200.0,
-      "key": "A minor",
-      "tempo_confidence": 0.9,
-      "median_ibi_s": 0.6,
-      "cue_in_s": 0.0,
-      "cue_out_s": 118.0,
-      "cue_in_samples": 0,
-      "cue_out_samples": 5664000,
-      "segment_source_samples": 5664000,
-      "tempo_stretch": 1.0,
-      "gain_db": 0.0,
-      "energy_mean": 0.3,
-      "beats_in_segment_s": [],
-      "segment_master_samples": 5664000,
-      "master_start_sample": 0
-    },
-    {
-      "index": 1,
-      "recording_id": "rec-2",
-      "work_id": "work-2",
-      "title": "rec-2",
-      "path": "/fake/rec-2.wav",
-      "bpm": 103.0,
-      "bpm_raw": 206.0,
-      "key": "C major",
-      "tempo_confidence": 0.9,
-      "median_ibi_s": 0.5825242718446602,
-      "cue_in_s": 0.0,
-      "cue_out_s": 118.0,
-      "cue_in_samples": 0,
-      "cue_out_samples": 5664000,
-      "segment_source_samples": 5664000,
-      "tempo_stretch": 0.970874,
-      "gain_db": 0.0,
-      "energy_mean": 0.45,
-      "beats_in_segment_s": [],
-      "segment_master_samples": 5833919,
-      "master_start_sample": 5203200
-    },
-    {
-      "index": 2,
-      "recording_id": "rec-4",
-      "work_id": "work-4",
-      "title": "rec-4",
-      "path": "/fake/rec-4.wav",
-      "bpm": 105.0,
-      "bpm_raw": 210.0,
-      "key": "G major",
-      "tempo_confidence": 0.9,
-      "median_ibi_s": 0.5714285714285714,
-      "cue_in_s": 0.0,
-      "cue_out_s": 118.0,
-      "cue_in_samples": 0,
-      "cue_out_samples": 5664000,
-      "segment_source_samples": 5664000,
-      "tempo_stretch": 1.0,
-      "gain_db": 0.0,
-      "energy_mean": 0.55,
-      "beats_in_segment_s": [],
-      "segment_master_samples": 5664000,
-      "master_start_sample": 10749119
-    }
-  ],
-  "transitions": [
-    {
-      "index": 0,
-      "from_track": 0,
-      "to_track": 1,
-      "type": "beat_crossfade",
-      "duration_s": 9.6,
-      "duration_samples": 460800,
-      "confidence": 0.765,
-      "reasons": [
-        "bpm_matched",
-        "key_compatible",
-        "bpm_diff_3.0%"
-      ],
-      "target_bpm": 100.0,
-      "overlap_start_sample": 5203200,
-      "overlap_end_sample": 5664000
-    },
-    {
-      "index": 1,
-      "from_track": 1,
-      "to_track": 2,
-      "type": "crossfade",
-      "duration_s": 6.0,
-      "duration_samples": 288000,
-      "confidence": 0.63,
-      "reasons": [
-        "key_clash_5st",
-        "bpm_diff_1.9%"
-      ],
-      "target_bpm": null,
-      "overlap_start_sample": 10749119,
-      "overlap_end_sample": 11037119
-    }
-  ],
-  "timeline": {
-    "total_samples": 16413119,
-    "total_duration_s": 341.94
-  }
-}
-"""
+# G8 regression contract (DJ-P2-CONTINUITY-002, clause C2): the legacy
+# byte-identical golden captured at HEAD b22eeb6 (pre-continuity, v2 snapshot)
+# is ARCHIVED at tests/fixtures/legacy_golden_plan_v2.json for reference only —
+# it is NOT a gate. The current contract: same v3 snapshot + same
+# algorithm/params/seed -> byte-identical plan.json (see
+# TestG8CurrentContract in tests/test_hardening.py).
 
 
 class TestAnchorPlanning(unittest.TestCase):
     def test_anchor_included_exactly_once(self) -> None:
-        # rec-3 loses the greedy pick (see LEGACY_GOLDEN); the anchor forces it in.
+        # rec-3 loses the greedy pick (see the archived v2 golden fixture);
+        # the anchor forces it in.
         plan = plan_set(_records(), n_tracks=3, set_name="t", include_ids=["rec-3"])
         ids = [t["recording_id"] for t in plan["tracks"]]
         self.assertEqual(ids.count("rec-3"), 1)
@@ -260,13 +129,20 @@ class TestAnchorPlanning(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "deduplicated"):
             plan_set(records, include_ids=["rec-1b"])
 
-    def test_no_anchor_matches_legacy_golden(self) -> None:
-        """Regression: without include_ids the greedy plan is byte-identical."""
+    def test_no_anchor_omits_anchor_metadata(self) -> None:
+        """Regression: without include_ids the plan carries no anchor keys."""
         plan = plan_set(_records(), n_tracks=3, set_name="anchor-test", seed=0)
-        serialized = json.dumps(plan, indent=2, ensure_ascii=False) + "\n"
-        self.assertEqual(serialized, LEGACY_GOLDEN)
         for key in ("request", "planner", "anchor_resolution"):
             self.assertNotIn(key, plan)
+
+    def test_no_anchor_plan_is_byte_deterministic(self) -> None:
+        """G8-current on the greedy path: same input -> byte-identical output."""
+        p1 = plan_set(_records(), n_tracks=3, set_name="anchor-test", seed=0)
+        p2 = plan_set(list(reversed(_records())), n_tracks=3, set_name="anchor-test", seed=0)
+        self.assertEqual(
+            json.dumps(p1, indent=2, ensure_ascii=False) + "\n",
+            json.dumps(p2, indent=2, ensure_ascii=False) + "\n",
+        )
 
 
 if __name__ == "__main__":

@@ -60,3 +60,40 @@ CI re-run 39771989534: **SUCCESS** (lint + ubuntu3.12 + ubuntu3.13 + windows + E
   trên nhạc Bolero, không phải sai số của rubberband.
 - `ai_dj/timing.py` + `scripts/timing_probe.py` là harness đo độc lập (Hermes-owned, verification
   glue) — không dùng output của engine làm ground truth.
+
+## 2026-10-23 — DJ-P2-CONTINUITY-002 hardening (GPT decision A + C + F + (a))
+
+### D17 — Cue Boundary Is Not Phrase-Safe (transparent limitation, Flag #3 = F)
+
+- Downbeat-aligned cue chỉ đảm bảo điểm cue nằm trên downbeat **ước lượng**
+  (grid `estimated: true`, 4/4-assumed từ beat đầu tiên) — nó **không chứng minh**
+  đó là ranh giới câu nhạc (phrase boundary).
+- Continuity trimming có thể loại bỏ phần vocal hoặc outro quan trọng của bài hát.
+- Anchor inclusion + D12 PASS **không đồng nghĩa** bảo toàn đầy đủ bài hát:
+  gate chỉ chứng minh không có khoảng lặng vi phạm, không chứng minh người nghe
+  nhận đủ nội dung quan trọng.
+- Mọi anchor/track bị trim đáng kể phải báo rõ `cue_in_s`, `cue_out_s`, thời
+  lượng bị loại và lý do — đã implement qua `cue_report` trong plan.json
+  (DJ-P2-CONTINUITY-002).
+- **G2b listening verdict vẫn bắt buộc** trước nghiệm thu âm nhạc — không tự
+  động PASS từ JSON.
+- Phrase-boundary model chỉ triển khai khi có bộ audio được đánh giá để đo độ
+  chính xác thực tế (độ chính xác 8-bar/32-bar trên Bolero chưa được đo — nhận
+  diện cấu trúc từ downbeat ước lượng tạo cảm giác an toàn giả).
+
+Ví dụ thực tế: anchor "Sao Lòng Còn Thương" đã chuyển cue-out từ ~387.397 s
+xuống ~351.759 s — rút ngắn ~35.64 s. Thay đổi đủ lớn để **bắt buộc xem xét
+bằng nghe**; không thể chỉ dựa vào D12 PASS để khẳng định người nghe nhận đủ
+phần quan trọng của bài hát.
+
+### D18 — Verified-artifact gate & simulation honesty (Flag #2 = C)
+
+- Pipeline hợp đồng: `PLAN` (simulation nhanh, prune) → `RENDER` (một master
+  thật) → `VERIFY` (đọc audio thật) → `PASS` cho phép phát / `FAIL|INCONCLUSIVE`
+  chặn phát. **Simulation KHÔNG chứng minh PASS D12** — chỉ dự báo tính khả
+  thi để giảm render vô ích; `verify.py` giữ veto authority duy nhất.
+- `play` chỉ chấp nhận master có verdict PASS hợp lệ, ràng buộc SHA-256 của
+  cả `plan.json` và WAV (đổi 1 trong 2 file → PASS cũ mất hiệu lực).
+- Fail-closed tuyệt đối (Flag #1 = A): corpus thiếu continuity payload →
+  `plan` exit 5 (`CORPUS_UNMEASURED` toàn bộ / `ANALYSIS_REQUIRED` một phần
+  + `missing_recording_ids`); **không** có waiver `--allow-unmeasured`.

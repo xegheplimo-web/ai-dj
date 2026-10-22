@@ -205,7 +205,7 @@
     "id": "DJ-P2-CONTINUITY-002",
     "title": "P0: Final Contract Hardening (fail-closed + verify-by-render + D17 limitation + G8 v3)",
     "assignee": "devin-cli",
-    "status": "todo",
+    "status": "review",
     "priority": 1,
     "card": ".orchestrator/cards/DJ-P2-CONTINUITY-002.md",
     "verified_by": "hermes",
@@ -222,6 +222,7 @@
       "H9 all tests pass, ruff clean",
       "H10 verify.py thresholds unchanged"
     ],
-    "note": "No .devin/ writes. No commit/push. No verify.py threshold change. NO --allow-unmeasured waiver (GPT rejected)."
+    "note": "Hermes verify PASS H1-H10 (2026-10-23): 107 tests, ruff clean, verify.py diff empty, H4 byte_identical True, H5/H6 play gate real exit codes, H7 2 FN regression fixtures, D17+D18.",
+    "last_update": "2026-10-23"
   }
 ]

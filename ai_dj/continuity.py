@@ -91,6 +91,18 @@ def measure_master_blocks(path: str | Path) -> np.ndarray:
     return block_rms_dbfs(_render.load_audio_48k(path), MASTER_SR)
 
 
+def has_continuity_payload(rec: dict) -> bool:
+    """True when ``rec`` carries the current contract payload the planner needs.
+
+    Same test ``assess_segment`` uses to mark a record ``unmeasured``: current
+    ``continuity_version`` plus a non-empty per-block level map. Records with
+    stale payloads are *missing data*, not audio-infeasible tracks — the CLI
+    ``plan`` input gate reports them as ANALYSIS_REQUIRED / CORPUS_UNMEASURED,
+    never PLAN_INFEASIBLE.
+    """
+    return rec.get("continuity_version") == CONTINUITY_VERSION and bool(rec.get("block_rms_dbfs"))
+
+
 def default_cue_points(rec: dict) -> tuple[float, float]:
     """cue_in/cue_out seconds: intro end on a downbeat, outro start on a downbeat.
 

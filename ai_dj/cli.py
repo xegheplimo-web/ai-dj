@@ -1,11 +1,14 @@
 """AI DJ command line: scan / analyze / plan / render / play / verify.
 
 Every command prints a JSON result on stdout (or a JSON error on stderr).
-Exit codes: 0 = success/PASS, 1 = gate/logic failure/FAIL, 3 = INCONCLUSIVE
-(a required measurement is missing; verify only), 2 = usage/environment
-errors (no verdict is ever emitted on a usage error), 4 = PLAN_INFEASIBLE
-(plan only: no ordering satisfies the D12 continuity hard constraint —
-structured violation ranges ride on the error JSON).
+Exit codes: 0 = success/PASS, 1 = gate/logic failure/FAIL (play only:
+PLAYBACK_REFUSED when the verified-artifact gate blocks playback),
+3 = INCONCLUSIVE (a required measurement is missing; verify only),
+2 = usage/environment errors (no verdict is ever emitted on a usage error),
+4 = PLAN_INFEASIBLE (plan only: no ordering satisfies the D12 continuity
+hard constraint — structured violation ranges ride on the error JSON),
+5 = data-not-analyzed (plan only: ANALYSIS_REQUIRED / CORPUS_UNMEASURED —
+the corpus lacks the continuity payload; re-run analyze).
 """
 
 from __future__ import annotations
@@ -17,9 +20,16 @@ from pathlib import Path
 
 from ai_dj.analysis.analyzer import DEFAULT_CACHE, AnalysisCache, analyze_corpus
 from ai_dj.analysis.corpus import TrackRef, duplicate_report, scan_corpus
-from ai_dj.planner import PlanInfeasible, load_plan, plan_set, write_plan
+from ai_dj.planner import (
+    PlanInfeasible,
+    load_plan,
+    plan_set,
+    unmeasured_corpus_error,
+    write_plan,
+)
 from ai_dj.player import play_master
 from ai_dj.render import render_plan
+from ai_dj.verdict import PlaybackRefused, write_verdict
 from ai_dj.verify import verify_master
 
 DEFAULT_EVIDENCE = Path("evidence")
@@ -135,6 +145,12 @@ def cmd_plan(args: argparse.Namespace) -> int:
         )
         for r in flagged:
             print(f"  - {r.get('title')}: {r.get('exclusion_reason')}", file=sys.stderr)
+    # C1 (Flag #1 = A, fail-closed): the selectable pool must carry the
+    # continuity payload BEFORE beam search runs — missing data is a data
+    # error (exit 5), never PLAN_INFEASIBLE, and there is no waiver flag.
+    data_error = unmeasured_corpus_error(records, include_ineligible=args.include_ineligible)
+    if data_error is not None:
+        return _fail(data_error, 5)
     include_ids = [args.include_track] if args.include_track else None
     try:
         plan = plan_set(
@@ -211,6 +227,8 @@ def cmd_play(args: argparse.Namespace) -> int:
         report = play_master(args.master, report_path=args.report, progress=args.progress)
     except FileNotFoundError as exc:
         return _fail({"error": str(exc)}, 2)
+    except PlaybackRefused as exc:
+        return _fail(exc.payload, 1)
     except Exception as exc:
         return _fail({"error": f"playback failed: {type(exc).__name__}: {exc}"}, 1)
     _emit(report)
@@ -223,7 +241,10 @@ def cmd_verify(args: argparse.Namespace) -> int:
     except (OSError, json.JSONDecodeError) as exc:
         return _fail({"error": f"cannot read plan: {exc}"}, 2)
     try:
-        report = verify_master(plan, args.master, out_path=args.out)
+        report = verify_master(plan, args.master)
+        # C3 (Flag #2 = C): the verdict is bound to the SHA-256 of BOTH
+        # plan.json and the WAV; the sidecar verdict is what `play` gates on.
+        write_verdict(report, plan_path=args.plan, master_wav=args.master, report_path=args.out)
     except Exception as exc:
         return _fail({"error": f"verify failed: {type(exc).__name__}: {exc}"}, 2)
     _emit(report)

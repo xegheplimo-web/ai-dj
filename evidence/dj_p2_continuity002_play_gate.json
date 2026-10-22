@@ -1,0 +1,126 @@
+{
+  "card": "DJ-P2-CONTINUITY-002 / C3 (Flag #2 = C), gates H5+H6",
+  "how_generated": "real render + verify + play CLI runs on a minimal plan; tamper = one appended/flipped byte",
+  "render": {
+    "exit_code": 0
+  },
+  "verify": {
+    "exit_code": 0,
+    "verdict": "PASS"
+  },
+  "verdict_sidecar": {
+    "verdict": "PASS",
+    "pass": true,
+    "verify_report": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\verification.json",
+    "verified_by": "ai_dj.verify",
+    "plan_json": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\gate_plan.json",
+    "plan_sha256": "c7e2f5315e92bca3f27f81732f2a08be14dc533957d83fd4749b767bf31363d9",
+    "master_wav": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.wav",
+    "master_sha256": "33ec80eaa75182eeea46d10f61f746714e4dd01b12d6a45b6b650cd017a735c5"
+  },
+  "play_attempts": {
+    "no_verdict": {
+      "argv": [
+        "python",
+        "-m",
+        "ai_dj.cli",
+        "play",
+        "--master",
+        "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.wav"
+      ],
+      "exit_code": 1,
+      "json": {
+        "error": "PLAYBACK_REFUSED",
+        "reason": "verify_verdict_missing",
+        "message": "no verify verdict for C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.wav — run `verify` on this master before playing it",
+        "verdict_file": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.verify.json"
+      },
+      "stderr_head": [
+        "{",
+        "  \"error\": \"PLAYBACK_REFUSED\",",
+        "  \"reason\": \"verify_verdict_missing\",",
+        "  \"message\": \"no verify verdict for C:\\\\Users\\\\atton\\\\AppData\\\\Local\\\\Temp\\\\tmpfak4e66a\\\\master.wav — run `verify` on this master before playing it\","
+      ]
+    },
+    "plan_changed_after_pass": {
+      "argv": [
+        "python",
+        "-m",
+        "ai_dj.cli",
+        "play",
+        "--master",
+        "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.wav"
+      ],
+      "exit_code": 1,
+      "json": {
+        "error": "PLAYBACK_REFUSED",
+        "reason": "verify_plan_changed",
+        "message": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\gate_plan.json changed since the master was verified — the old PASS is invalid; re-render and re-verify",
+        "plan_json": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\gate_plan.json",
+        "verdict_file": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.verify.json"
+      },
+      "stderr_head": [
+        "{",
+        "  \"error\": \"PLAYBACK_REFUSED\",",
+        "  \"reason\": \"verify_plan_changed\",",
+        "  \"message\": \"C:\\\\Users\\\\atton\\\\AppData\\\\Local\\\\Temp\\\\tmpfak4e66a\\\\gate_plan.json changed since the master was verified — the old PASS is invalid; re-render and re-verify\","
+      ]
+    },
+    "master_changed_after_pass": {
+      "argv": [
+        "python",
+        "-m",
+        "ai_dj.cli",
+        "play",
+        "--master",
+        "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.wav"
+      ],
+      "exit_code": 1,
+      "json": {
+        "error": "PLAYBACK_REFUSED",
+        "reason": "verify_master_changed",
+        "message": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.wav changed since it was verified — the old PASS is invalid; re-run `verify` on the current file",
+        "verdict_file": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.verify.json"
+      },
+      "stderr_head": [
+        "{",
+        "  \"error\": \"PLAYBACK_REFUSED\",",
+        "  \"reason\": \"verify_master_changed\",",
+        "  \"message\": \"C:\\\\Users\\\\atton\\\\AppData\\\\Local\\\\Temp\\\\tmpfak4e66a\\\\master.wav changed since it was verified — the old PASS is invalid; re-run `verify` on the current file\","
+      ]
+    },
+    "bound_pass_play": {
+      "argv": [
+        "python",
+        "-m",
+        "ai_dj.cli",
+        "play",
+        "--master",
+        "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.wav"
+      ],
+      "exit_code": 0,
+      "json": {
+        "master_wav": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.wav",
+        "verify_gate": {
+          "verdict": "PASS",
+          "verdict_file": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\master.verify.json",
+          "plan_json": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\gate_plan.json",
+          "plan_sha256": "c7e2f5315e92bca3f27f81732f2a08be14dc533957d83fd4749b767bf31363d9",
+          "master_sha256": "33ec80eaa75182eeea46d10f61f746714e4dd01b12d6a45b6b650cd017a735c5"
+        },
+        "total_frames": 480000,
+        "frames_emitted": 480000,
+        "frames_matched": true,
+        "underflows": 0,
+        "block_frames": 4096,
+        "queue_depth": 8,
+        "stopped_early": false,
+        "device_index": 4,
+        "samplerate": 48000,
+        "channels": 2
+      },
+      "stderr_head": []
+    }
+  },
+  "note": "PLAYBACK_REFUSED = the gate blocked it; any other play outcome after a bound PASS means the gate accepted (sounddevice may play a short tone or fail on device availability)"
+}

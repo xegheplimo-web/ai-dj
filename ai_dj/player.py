@@ -20,6 +20,8 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
+from ai_dj.verdict import require_play_gate, verdict_path
+
 try:
     import sounddevice as sd
 except OSError:
@@ -99,6 +101,9 @@ def play_master(
     master_wav = Path(master_wav)
     if not master_wav.exists():
         raise FileNotFoundError(f"master not found: {master_wav}")
+    # Verified-artifact gate (C3): only a master whose bound verify verdict is
+    # PASS may reach the audio path — anything else fails closed.
+    gate = require_play_gate(master_wav)
     if sd is None:
         raise RuntimeError(
             "sounddevice/PortAudio is not available on this system — "
@@ -146,6 +151,13 @@ def play_master(
 
     report = {
         "master_wav": str(master_wav),
+        "verify_gate": {
+            "verdict": gate["verdict"],
+            "verdict_file": str(verdict_path(master_wav)),
+            "plan_json": gate.get("plan_json"),
+            "plan_sha256": gate.get("plan_sha256"),
+            "master_sha256": gate.get("master_sha256"),
+        },
         "total_frames": int(total_frames),
         "frames_emitted": state["frames_emitted"],
         "frames_matched": state["frames_emitted"] >= total_frames,

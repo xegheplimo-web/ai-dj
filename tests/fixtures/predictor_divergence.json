@@ -1,0 +1,109 @@
+{
+  "fixture": "predictor_divergence",
+  "card": "DJ-P2-CONTINUITY-002 / clause C4",
+  "recorded_at": "2026-10-23",
+  "predictor": "ai_dj.continuity.find_master_violations (max-of-contributors bound)",
+  "verifier": "ai_dj.verify._silence_check (D12 two-tier gate on the real WAV)",
+  "summary": {
+    "cases": 6,
+    "agreement_clean": 1,
+    "agreement_violation": 0,
+    "false_positive": 3,
+    "false_negative": 2,
+    "note": "FP = predictor flags a violation the verifier clears (conservative, safe direction). FN = predictor PASS but verifier FAIL — recorded as regression fixtures (regression_fixture: true)."
+  },
+  "cases": [
+    {
+      "case": "phase_cancellation_constructed",
+      "category": "phase_cancellation",
+      "harness": "constructed_master",
+      "predictor_pass": true,
+      "verifier_pass": false,
+      "outcome": "false_negative",
+      "regression_fixture": true,
+      "measured": {
+        "predicted_violations": [],
+        "digital": {"ok": false, "max_run_s": 4.0, "violating_runs_s": [[16.0, 20.0]]},
+        "low_level": {"ok": false, "max_run_s": 4.0, "violating_runs_s": [[16.0, 20.0]]}
+      },
+      "note": "max-of-contributors is phase-blind: two loud sources cancelling to digital zeros is invisible to the predictor; the verifier sees the 4 s hole. render_plan's equal-power fades cannot sustain cancellation, so the bound failure is shown on a constructed master."
+    },
+    {
+      "case": "phase_cancellation_render",
+      "category": "phase_cancellation",
+      "harness": "render_plan",
+      "predictor_pass": true,
+      "verifier_pass": true,
+      "outcome": "agreement_clean",
+      "measured": {
+        "predicted_violations": [],
+        "digital": {"ok": true, "max_run_s": 0.0, "violating_runs_s": []},
+        "low_level": {"ok": true, "max_run_s": 0.0, "violating_runs_s": []}
+      },
+      "note": "anti-phase sources through the real equal-power crossfade: the fade collapses cancellation to a sub-0.5 s dip, so predictor and verifier agree."
+    },
+    {
+      "case": "gain_peak_scale_gap",
+      "category": "gain",
+      "harness": "render_plan",
+      "predictor_pass": true,
+      "verifier_pass": false,
+      "outcome": "false_negative",
+      "regression_fixture": true,
+      "measured": {
+        "predicted_violations": [],
+        "digital": {"ok": true, "max_run_s": 0.0, "violating_runs_s": []},
+        "low_level": {"ok": false, "max_run_s": 3.0, "violating_runs_s": [[14.0, 17.0]]}
+      },
+      "note": "master-wide peak-protection gain is applied after the mix; the predictor models only per-track gain_db, so a -55 dBFS stretch it clears measures below -60 dBFS on disk."
+    },
+    {
+      "case": "fade_crossfade_quiet_pair",
+      "category": "fade",
+      "harness": "render_plan",
+      "predictor_pass": false,
+      "verifier_pass": true,
+      "outcome": "false_positive",
+      "measured": {
+        "predicted_violations": [
+          {"tier": "low_level_minus60", "master_range_s": [17.0, 19.0], "duration_s": 2.0, "present_recording_ids": ["rec-a", "rec-b"], "reason": "uncovered_silence_run"}
+        ],
+        "digital": {"ok": true, "max_run_s": 0.0, "violating_runs_s": []},
+        "low_level": {"ok": true, "max_run_s": 0.0, "violating_runs_s": []}
+      },
+      "note": "equal-power sum of two -58 dBFS sources stays ~-55 dBFS; max-of-contributors dips below -60 dBFS where both envelopes are low — predictor over-flags (safe direction)."
+    },
+    {
+      "case": "time_stretch",
+      "category": "time_stretch",
+      "harness": "render_plan+rubberband",
+      "predictor_pass": false,
+      "verifier_pass": true,
+      "outcome": "false_positive",
+      "measured": {
+        "predicted_violations": [
+          {"tier": "digital_minus90", "master_range_s": [23.6, 24.1], "duration_s": 0.5, "present_recording_ids": ["rec-b"], "reason": "uncovered_silence_run"}
+        ],
+        "digital": {"ok": true, "max_run_s": 0.4, "violating_runs_s": []},
+        "low_level": {"ok": true, "max_run_s": 0.4, "violating_runs_s": []}
+      },
+      "note": "0.5 s source hole at stretch 1.05 lands ~0.4 s on the master — the conservative bound over-flags (safe direction)."
+    },
+    {
+      "case": "block_boundary",
+      "category": "block_boundary",
+      "harness": "render_plan",
+      "predictor_pass": false,
+      "verifier_pass": true,
+      "outcome": "false_positive",
+      "measured": {
+        "predicted_violations": [
+          {"tier": "digital_minus90", "master_range_s": [27.0, 27.5], "duration_s": 0.5, "present_recording_ids": ["rec-b"], "reason": "uncovered_silence_run"}
+        ],
+        "digital": {"ok": true, "max_run_s": 0.45, "violating_runs_s": []},
+        "low_level": {"ok": true, "max_run_s": 0.45, "violating_runs_s": []}
+      },
+      "note": "predictor samples each source block at the master block's center; the verifier averages true RMS, so half-block straddles shrink the measured run below the threshold."
+    }
+  ]
+}

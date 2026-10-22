@@ -1,0 +1,135 @@
+{
+  "plan_version": 1,
+  "set_name": "anchor-test",
+  "seed": 0,
+  "generated_by": "ai_dj.planner",
+  "master_sr": 48000,
+  "constraints": {
+    "min_beat_conf": 0.5,
+    "beatmatch_bpm_tol": 0.06,
+    "crossfade_bpm_tol": 0.15,
+    "max_stretch": 1.06,
+    "min_duration_s": 60.0
+  },
+  "energy_arc": [
+    0.3,
+    0.5816,
+    0.3
+  ],
+  "eligibility": {
+    "include_ineligible": false,
+    "excluded": [],
+    "overridden": []
+  },
+  "track_count": 3,
+  "tracks": [
+    {
+      "index": 0,
+      "recording_id": "rec-1",
+      "work_id": "work-1",
+      "title": "rec-1",
+      "path": "/fake/rec-1.wav",
+      "bpm": 100.0,
+      "bpm_raw": 200.0,
+      "key": "A minor",
+      "tempo_confidence": 0.9,
+      "median_ibi_s": 0.6,
+      "cue_in_s": 0.0,
+      "cue_out_s": 118.0,
+      "cue_in_samples": 0,
+      "cue_out_samples": 5664000,
+      "segment_source_samples": 5664000,
+      "tempo_stretch": 1.0,
+      "gain_db": 0.0,
+      "energy_mean": 0.3,
+      "beats_in_segment_s": [],
+      "segment_master_samples": 5664000,
+      "master_start_sample": 0
+    },
+    {
+      "index": 1,
+      "recording_id": "rec-2",
+      "work_id": "work-2",
+      "title": "rec-2",
+      "path": "/fake/rec-2.wav",
+      "bpm": 103.0,
+      "bpm_raw": 206.0,
+      "key": "C major",
+      "tempo_confidence": 0.9,
+      "median_ibi_s": 0.5825242718446602,
+      "cue_in_s": 0.0,
+      "cue_out_s": 118.0,
+      "cue_in_samples": 0,
+      "cue_out_samples": 5664000,
+      "segment_source_samples": 5664000,
+      "tempo_stretch": 0.970874,
+      "gain_db": 0.0,
+      "energy_mean": 0.45,
+      "beats_in_segment_s": [],
+      "segment_master_samples": 5833919,
+      "master_start_sample": 5203200
+    },
+    {
+      "index": 2,
+      "recording_id": "rec-4",
+      "work_id": "work-4",
+      "title": "rec-4",
+      "path": "/fake/rec-4.wav",
+      "bpm": 105.0,
+      "bpm_raw": 210.0,
+      "key": "G major",
+      "tempo_confidence": 0.9,
+      "median_ibi_s": 0.5714285714285714,
+      "cue_in_s": 0.0,
+      "cue_out_s": 118.0,
+      "cue_in_samples": 0,
+      "cue_out_samples": 5664000,
+      "segment_source_samples": 5664000,
+      "tempo_stretch": 1.0,
+      "gain_db": 0.0,
+      "energy_mean": 0.55,
+      "beats_in_segment_s": [],
+      "segment_master_samples": 5664000,
+      "master_start_sample": 10749119
+    }
+  ],
+  "transitions": [
+    {
+      "index": 0,
+      "from_track": 0,
+      "to_track": 1,
+      "type": "beat_crossfade",
+      "duration_s": 9.6,
+      "duration_samples": 460800,
+      "confidence": 0.765,
+      "reasons": [
+        "bpm_matched",
+        "key_compatible",
+        "bpm_diff_3.0%"
+      ],
+      "target_bpm": 100.0,
+      "overlap_start_sample": 5203200,
+      "overlap_end_sample": 5664000
+    },
+    {
+      "index": 1,
+      "from_track": 1,
+      "to_track": 2,
+      "type": "crossfade",
+      "duration_s": 6.0,
+      "duration_samples": 288000,
+      "confidence": 0.63,
+      "reasons": [
+        "key_clash_5st",
+        "bpm_diff_1.9%"
+      ],
+      "target_bpm": null,
+      "overlap_start_sample": 10749119,
+      "overlap_end_sample": 11037119
+    }
+  ],
+  "timeline": {
+    "total_samples": 16413119,
+    "total_duration_s": 341.94
+  }
+}

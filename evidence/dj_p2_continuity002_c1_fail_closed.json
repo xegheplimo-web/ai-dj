@@ -1,0 +1,73 @@
+{
+  "card": "DJ-P2-CONTINUITY-002 / C1 (Flag #1 = A), gates H1+H2",
+  "how_generated": "real subprocess runs of `python -m ai_dj.cli plan` against seeded v3 caches missing the continuity payload",
+  "corpus_unmeasured": {
+    "argv": [
+      "python",
+      "-m",
+      "ai_dj.cli",
+      "plan",
+      "--cache",
+      "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\all_unmeasured.sqlite",
+      "--out",
+      "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\p_all.json"
+    ],
+    "exit_code": 5,
+    "json": {
+      "error": "CORPUS_UNMEASURED",
+      "reason": "missing_continuity_data",
+      "analysis_version_required": 3,
+      "continuity_version_required": 1,
+      "missing_recording_ids": [
+        "rec-1",
+        "rec-2",
+        "rec-3",
+        "rec-4"
+      ],
+      "missing_count": 4,
+      "message": "Every usable corpus record lacks the continuity payload — run analyze before planning."
+    },
+    "stderr_head": [
+      "{",
+      "  \"error\": \"CORPUS_UNMEASURED\",",
+      "  \"reason\": \"missing_continuity_data\",",
+      "  \"analysis_version_required\": 3,"
+    ]
+  },
+  "analysis_required": {
+    "argv": [
+      "python",
+      "-m",
+      "ai_dj.cli",
+      "plan",
+      "--cache",
+      "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\partial.sqlite",
+      "--out",
+      "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\p_part.json"
+    ],
+    "exit_code": 5,
+    "json": {
+      "error": "ANALYSIS_REQUIRED",
+      "reason": "missing_continuity_data",
+      "analysis_version_required": 3,
+      "continuity_version_required": 1,
+      "missing_recording_ids": [
+        "rec-2",
+        "rec-4"
+      ],
+      "missing_count": 2,
+      "message": "Re-analyze the corpus before planning."
+    },
+    "stderr_head": [
+      "{",
+      "  \"error\": \"ANALYSIS_REQUIRED\",",
+      "  \"reason\": \"missing_continuity_data\",",
+      "  \"analysis_version_required\": 3,"
+    ]
+  },
+  "plan_files_written": {
+    "corpus_unmeasured": false,
+    "analysis_required": false
+  },
+  "note": "exit 5 = data-not-analyzed; exit 4 remains PLAN_INFEASIBLE; no --allow-unmeasured waiver exists"
+}

@@ -29,12 +29,15 @@ import math
 from pathlib import Path
 
 from ai_dj import render as _render
+from ai_dj.analysis.analyzer import ANALYSIS_VERSION
 from ai_dj.continuity import (
+    CONTINUITY_VERSION,
     COVER_STRETCH,
     assess_segment,
     coverage_span_s,
     default_cue_points,
     find_master_violations,
+    has_continuity_payload,
 )
 from ai_dj.timing import MASTER_SR
 
@@ -455,7 +458,10 @@ def _greedy_order(pool: list[dict], arc: list[float], median_rms: float) -> list
 
 
 def _build_tracks(
-    chosen: list[dict], cues: list[tuple[float, float]], median_rms: float
+    chosen: list[dict],
+    cues: list[tuple[float, float]],
+    median_rms: float,
+    assessments: list[dict] | None = None,
 ) -> list[dict]:
     """Per-track plan entries from the chosen order + assessed cue points."""
     tracks: list[dict] = []
@@ -467,29 +473,44 @@ def _build_tracks(
         beats_in_seg = [
             round(b - cue_in, 5) for b in (rec.get("beat_times_s") or []) if cue_in <= b < cue_out
         ]
-        tracks.append(
-            {
-                "index": i,
-                "recording_id": rec["recording_id"],
-                "work_id": rec["work_id"],
-                "title": rec["title"],
-                "path": rec["path"],
-                "bpm": rec.get("bpm_corrected"),
-                "bpm_raw": rec.get("bpm_raw"),
-                "key": rec.get("key", "UNKNOWN"),
-                "tempo_confidence": rec.get("tempo_confidence", 0.0),
-                "median_ibi_s": rec.get("median_ibi_s"),
+        track = {
+            "index": i,
+            "recording_id": rec["recording_id"],
+            "work_id": rec["work_id"],
+            "title": rec["title"],
+            "path": rec["path"],
+            "bpm": rec.get("bpm_corrected"),
+            "bpm_raw": rec.get("bpm_raw"),
+            "key": rec.get("key", "UNKNOWN"),
+            "tempo_confidence": rec.get("tempo_confidence", 0.0),
+            "median_ibi_s": rec.get("median_ibi_s"),
+            "cue_in_s": cue_in,
+            "cue_out_s": cue_out,
+            "cue_in_samples": round(cue_in * MASTER_SR),
+            "cue_out_samples": round(cue_out * MASTER_SR),
+            "segment_source_samples": seg_src,
+            "tempo_stretch": 1.0,
+            "gain_db": round(gain, 2),
+            "energy_mean": rec.get("energy_mean", 0.0),
+            "beats_in_segment_s": beats_in_seg,
+        }
+        a = assessments[i] if assessments else None
+        if a is not None and a["status"] == "adjusted":
+            # D17 transparency: a cue moved to satisfy D12 drops source
+            # content — the plan must say where and how much, not just PASS.
+            def_in, def_out = default_cue_points(rec)
+            track["cue_report"] = {
+                "status": "adjusted",
+                "default_cue_in_s": def_in,
+                "default_cue_out_s": def_out,
                 "cue_in_s": cue_in,
                 "cue_out_s": cue_out,
-                "cue_in_samples": round(cue_in * MASTER_SR),
-                "cue_out_samples": round(cue_out * MASTER_SR),
-                "segment_source_samples": seg_src,
-                "tempo_stretch": 1.0,
-                "gain_db": round(gain, 2),
-                "energy_mean": rec.get("energy_mean", 0.0),
-                "beats_in_segment_s": beats_in_seg,
+                "removed_head_s": round(cue_in - def_in, 3),
+                "removed_tail_s": round(def_out - cue_out, 3),
+                "removed_total_s": round((def_out - def_in) - (cue_out - cue_in), 3),
+                "reason": "uncovered_silence_run",
             }
-        )
+        tracks.append(track)
     return tracks
 
 
@@ -537,14 +558,16 @@ def _layout_master(tracks: list[dict], transitions: list[dict]) -> int:
 
 def _assess_order(
     chosen: list[dict], decs: list[dict], median_rms: float
-) -> tuple[list[tuple[float, float]], list[tuple[dict, dict]]]:
+) -> tuple[list[tuple[float, float]], list[tuple[dict, dict]], list[dict]]:
     """Per-slot continuity assessment for a candidate ordering.
 
-    Returns ``(cues, blocked)``: the assessed cue pair per chosen track plus
-    the (record, assessment) pairs whose best legal cue still violates D12.
+    Returns ``(cues, blocked, assessments)``: the assessed cue pair per chosen
+    track, the (record, assessment) pairs whose best legal cue still violates
+    D12, and the full per-slot assessments (needed for the D17 cue_report).
     """
     cues: list[tuple[float, float]] = []
     blocked: list[tuple[dict, dict]] = []
+    assessments: list[dict] = []
     for i, rec in enumerate(chosen):
         head_cov = _render.MASTER_FADE_IN_S if i == 0 else coverage_span_s(decs[i - 1])
         tail_cov = _render.MASTER_FADE_OUT_S if i == len(chosen) - 1 else coverage_span_s(decs[i])
@@ -552,9 +575,10 @@ def _assess_order(
             rec, head_cov * COVER_STRETCH, tail_cov * COVER_STRETCH, _gain_for(rec, median_rms)
         )
         cues.append((a["cue_in"], a["cue_out"]))
+        assessments.append(a)
         if a["status"] == "infeasible":
             blocked.append((rec, a))
-    return cues, blocked
+    return cues, blocked, assessments
 
 
 def _select_order(
@@ -592,7 +616,7 @@ def _select_order(
             chosen = _greedy_order(pool_now, arc, median_rms)
 
         decs = [_choose_transition(chosen[i], chosen[i + 1]) for i in range(len(chosen) - 1)]
-        cues, blocked = _assess_order(chosen, decs, median_rms)
+        cues, blocked, assessments = _assess_order(chosen, decs, median_rms)
         anchor_blocked = next(
             (a for r, a in blocked if anchor and r["recording_id"] == anchor["recording_id"]),
             None,
@@ -609,7 +633,7 @@ def _select_order(
             banned.update(r["recording_id"] for r, _a in blocked)
             continue
 
-        tracks = _build_tracks(chosen, cues, median_rms)
+        tracks = _build_tracks(chosen, cues, median_rms, assessments)
         transitions = _build_transitions(chosen, decs, tracks)
         cursor = _layout_master(tracks, transitions)
         sim = find_master_violations(
@@ -634,6 +658,47 @@ def _select_order(
         reason="replan_exhausted",
         context={"excluded_recording_ids": sorted(banned)},
     )
+
+
+def unmeasured_corpus_error(
+    records: list[dict], *, include_ineligible: bool = False
+) -> dict | None:
+    """C1 input gate (Flag #1 = A): the selectable pool must be fully measured.
+
+    Computes the same pool the search would use — ``_eligible`` honouring the
+    include-ineligible escape hatch, then ``_dedup_works`` — and checks every
+    record for the current continuity payload, before beam search runs. All
+    missing -> ``CORPUS_UNMEASURED``; a subset -> ``ANALYSIS_REQUIRED`` with
+    the exact recording ids. Missing data is never conflated with
+    audio-infeasible tracks (data errors are exit 5, PLAN_INFEASIBLE stays
+    exit 4) and there is deliberately no runtime waiver.
+    """
+    usable, _flagged = _eligible(records, include_ineligible)
+    pool = _dedup_works(usable)
+    missing = sorted(r["recording_id"] for r in pool if not has_continuity_payload(r))
+    if not missing:
+        return None
+    base = {
+        "reason": "missing_continuity_data",
+        "analysis_version_required": ANALYSIS_VERSION,
+        "continuity_version_required": CONTINUITY_VERSION,
+        "missing_recording_ids": missing,
+        "missing_count": len(missing),
+    }
+    if len(missing) == len(pool):
+        return {
+            "error": "CORPUS_UNMEASURED",
+            **base,
+            "message": (
+                "Every usable corpus record lacks the continuity payload — "
+                "run analyze before planning."
+            ),
+        }
+    return {
+        "error": "ANALYSIS_REQUIRED",
+        **base,
+        "message": "Re-analyze the corpus before planning.",
+    }
 
 
 def _anchor_metadata(anchor: dict, chosen: list[dict], seed: int) -> dict:
@@ -716,7 +781,9 @@ def plan_set(
     median_rms = sorted(r.get("rms_db") or -30.0 for r in pool)[len(pool) // 2]
 
     # D12 continuity contract: search only among candidates that can produce a
-    # legal segment, then prove the chosen ordering on a simulated master.
+    # legal segment, then screen the chosen ordering on a simulated master.
+    # The simulation does NOT prove the render passes D12 — it predicts
+    # feasibility to reduce wasted renders; verify.py is the only gate (C3).
     chosen, tracks, transitions, cursor, n, arc = _select_order(
         pool, n_tracks, anchor, e_lo=e_lo, e_hi=e_hi, median_rms=median_rms
     )

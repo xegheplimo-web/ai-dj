@@ -1,0 +1,194 @@
+{
+  "card": "DJ-P2-CONTINUITY-002 / C2 + gates H3+H4",
+  "how_generated": "two real `plan` runs on the same v3 snapshot/params/seed",
+  "run_1": {
+    "argv": [
+      "python",
+      "-m",
+      "ai_dj.cli",
+      "plan",
+      "--cache",
+      "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\full.sqlite",
+      "--out",
+      "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\plan_a.json"
+    ],
+    "exit_code": 0,
+    "json": {
+      "written_to": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\plan_a.json",
+      "set_name": "mini",
+      "eligibility": {
+        "include_ineligible": false,
+        "excluded": [],
+        "overridden": []
+      },
+      "track_count": 4,
+      "total_duration_s": 395.974,
+      "tracks": [
+        {
+          "index": 0,
+          "title": "rec-1",
+          "bpm": 100.0,
+          "key": "A minor",
+          "tempo_stretch": 1.0,
+          "gain_db": 0.0
+        },
+        {
+          "index": 1,
+          "title": "rec-2",
+          "bpm": 103.0,
+          "key": "C major",
+          "tempo_stretch": 0.970874,
+          "gain_db": 0.0
+        },
+        {
+          "index": 2,
+          "title": "rec-4",
+          "bpm": 105.0,
+          "key": "G major",
+          "tempo_stretch": 1.0,
+          "gain_db": 0.0
+        },
+        {
+          "index": 3,
+          "title": "rec-3",
+          "bpm": 130.0,
+          "key": "F# minor",
+          "tempo_stretch": 1.0,
+          "gain_db": 0.0
+        }
+      ],
+      "transitions": [
+        {
+          "index": 0,
+          "type": "beat_crossfade",
+          "duration_s": 9.6,
+          "confidence": 0.765,
+          "reasons": [
+            "bpm_matched",
+            "key_compatible",
+            "bpm_diff_3.0%"
+          ]
+        },
+        {
+          "index": 1,
+          "type": "crossfade",
+          "duration_s": 6.0,
+          "confidence": 0.63,
+          "reasons": [
+            "key_clash_5st",
+            "bpm_diff_1.9%"
+          ]
+        },
+        {
+          "index": 2,
+          "type": "echo_out",
+          "duration_s": 10.0,
+          "confidence": 0.4,
+          "reasons": [
+            "key_marginal_2st",
+            "bpm_diff_23.8%",
+            "echo_tail_available"
+          ]
+        }
+      ]
+    },
+    "stderr_head": [],
+    "plan_sha256": "f4d7a00be88ac3bc6d0ecd28e96e768e3074b4e1ad77b5a989fa8b0d631603ef"
+  },
+  "run_2": {
+    "argv": [
+      "python",
+      "-m",
+      "ai_dj.cli",
+      "plan",
+      "--cache",
+      "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\full.sqlite",
+      "--out",
+      "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\plan_b.json"
+    ],
+    "exit_code": 0,
+    "json": {
+      "written_to": "C:\\Users\\atton\\AppData\\Local\\Temp\\tmpfak4e66a\\plan_b.json",
+      "set_name": "mini",
+      "eligibility": {
+        "include_ineligible": false,
+        "excluded": [],
+        "overridden": []
+      },
+      "track_count": 4,
+      "total_duration_s": 395.974,
+      "tracks": [
+        {
+          "index": 0,
+          "title": "rec-1",
+          "bpm": 100.0,
+          "key": "A minor",
+          "tempo_stretch": 1.0,
+          "gain_db": 0.0
+        },
+        {
+          "index": 1,
+          "title": "rec-2",
+          "bpm": 103.0,
+          "key": "C major",
+          "tempo_stretch": 0.970874,
+          "gain_db": 0.0
+        },
+        {
+          "index": 2,
+          "title": "rec-4",
+          "bpm": 105.0,
+          "key": "G major",
+          "tempo_stretch": 1.0,
+          "gain_db": 0.0
+        },
+        {
+          "index": 3,
+          "title": "rec-3",
+          "bpm": 130.0,
+          "key": "F# minor",
+          "tempo_stretch": 1.0,
+          "gain_db": 0.0
+        }
+      ],
+      "transitions": [
+        {
+          "index": 0,
+          "type": "beat_crossfade",
+          "duration_s": 9.6,
+          "confidence": 0.765,
+          "reasons": [
+            "bpm_matched",
+            "key_compatible",
+            "bpm_diff_3.0%"
+          ]
+        },
+        {
+          "index": 1,
+          "type": "crossfade",
+          "duration_s": 6.0,
+          "confidence": 0.63,
+          "reasons": [
+            "key_clash_5st",
+            "bpm_diff_1.9%"
+          ]
+        },
+        {
+          "index": 2,
+          "type": "echo_out",
+          "duration_s": 10.0,
+          "confidence": 0.4,
+          "reasons": [
+            "key_marginal_2st",
+            "bpm_diff_23.8%",
+            "echo_tail_available"
+          ]
+        }
+      ]
+    },
+    "stderr_head": [],
+    "plan_sha256": "f4d7a00be88ac3bc6d0ecd28e96e768e3074b4e1ad77b5a989fa8b0d631603ef"
+  },
+  "byte_identical": true,
+  "note": "legacy v2 golden is archived at tests/fixtures/legacy_golden_plan_v2.json (reference only, not a gate)"
+}
