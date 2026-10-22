@@ -1,0 +1,16 @@
+# Normalize line endings to LF in the repository.
+* text=auto eol=lf
+
+# Windows scripts stay CRLF on checkout.
+*.bat eol=crlf
+*.cmd eol=crlf
+
+# Binary assets must never be normalized.
+*.wav binary
+*.mp3 binary
+*.flac binary
+*.png binary
+*.jpg binary
+*.zip binary
+*.db binary
+*.sqlite binary
