@@ -99,6 +99,9 @@ def record(
     }
     if with_continuity:
         rec["continuity_version"] = continuity.CONTINUITY_VERSION
+        rec["block_ms"] = int(continuity.BLOCK_S * 1000)
+        rec["channels"] = "all_channels_rms"
+        rec["continuity_sr"] = MASTER_SR
         rec["block_rms_dbfs"] = stereo_blocks(duration_s, silent_spans)
         rec["silence_intervals"] = {
             "digital_minus90": [[a, z] for a, z in silent_spans],

@@ -33,6 +33,7 @@ from ai_dj.analysis.analyzer import ANALYSIS_VERSION
 from ai_dj.continuity import (
     CONTINUITY_VERSION,
     COVER_STRETCH,
+    assess_anchor_segment,
     assess_segment,
     coverage_span_s,
     default_cue_points,
@@ -216,7 +217,13 @@ def _slot_coverages(slot: int, n_slots: int, dec_in: dict | None) -> tuple[float
 
 
 def _candidate_feasible(
-    cand: dict, slot: int, n_slots: int, prev: dict | None, median_rms: float
+    cand: dict,
+    slot: int,
+    n_slots: int,
+    prev: dict | None,
+    *,
+    median_rms: float,
+    preserve_anchor_id: str | None = None,
 ) -> bool:
     """Hard constraint (D12): drop candidates that cannot produce a legal segment.
 
@@ -224,11 +231,20 @@ def _candidate_feasible(
     empty; ``infeasible`` means no legitimate cue exists — the track is
     removed from the beam, not penalised (GPT: a penalty cannot keep a fully
     silent opener from winning on other costs). Records without continuity
-    data are ``unmeasured`` — never pruned.
+    data are ``unmeasured`` — never pruned. An anchor under content
+    preservation (``anchor_last``) at the last slot is screened by the
+    preserving assessment instead — same legality bound, richer cue space.
     """
     dec_in = _choose_transition(prev, cand) if prev is not None else None
     head_s, tail_s = _slot_coverages(slot, n_slots, dec_in)
-    a = assess_segment(cand, head_s, tail_s, _gain_for(cand, median_rms))
+    if (
+        preserve_anchor_id is not None
+        and cand["recording_id"] == preserve_anchor_id
+        and slot == n_slots - 1
+    ):
+        a = assess_anchor_segment(cand, head_s, tail_s, _gain_for(cand, median_rms))
+    else:
+        a = assess_segment(cand, head_s, tail_s, _gain_for(cand, median_rms))
     return a["status"] != "infeasible"
 
 
@@ -363,22 +379,31 @@ def _resolve_anchor(anchor_id: str, records: list[dict], pool: list[dict]) -> di
 
 
 def _anchored_order(
-    pool: list[dict], arc: list[float], anchor: dict, median_rms: float
+    pool: list[dict],
+    arc: list[float],
+    anchor: dict,
+    median_rms: float,
+    anchor_last: bool = False,
 ) -> list[dict]:
     """Beam-search the lowest-cost ordering containing ``anchor`` exactly once.
 
-    Every slot is tried as the anchor position; within a position the anchor
-    is the only candidate for that slot and is withheld from all others. A
-    state's score is the accumulated ``J(S)`` prefix cost — arc fit plus
-    pairwise transition risk — and ties break on the track-id sequence, so
-    the result is deterministic. States violating hard constraints (track
-    repeats, anchor displaced, or a candidate whose played segment cannot
-    satisfy the D12 continuity contract) are never expanded.
+    Every slot is tried as the anchor position — or only the last slot when
+    ``anchor_last`` requests content preservation (C1/G2B-001: the anchor
+    closes the set so its ending is never traded against a following track).
+    Within a position the anchor is the only candidate for that slot and is
+    withheld from all others. A state's score is the accumulated ``J(S)``
+    prefix cost — arc fit plus pairwise transition risk — and ties break on
+    the track-id sequence, so the result is deterministic. States violating
+    hard constraints (track repeats, anchor displaced, or a candidate whose
+    played segment cannot satisfy the D12 continuity contract) are never
+    expanded.
     """
     anchor_id = anchor["recording_id"]
     others = [r for r in pool if r["recording_id"] != anchor_id]
     by_id = {r["recording_id"]: r for r in pool}
     n = len(arc)
+    preserve_anchor_id = anchor_id if anchor_last else None
+    positions = (n - 1,) if anchor_last else range(n)
 
     def step_cost(prev: dict | None, cand: dict, slot: int) -> float:
         c = abs((cand.get("energy_mean") or 0.0) - arc[slot])
@@ -387,7 +412,7 @@ def _anchored_order(
         return c
 
     best: tuple[float, tuple[str, ...]] | None = None
-    for anchor_pos in range(n):
+    for anchor_pos in positions:
         beam: list[tuple[float, tuple[str, ...]]] = [(0.0, ())]
         for slot in range(n):
             candidates = (anchor,) if slot == anchor_pos else others
@@ -398,7 +423,14 @@ def _anchored_order(
                 for cand in candidates:
                     if cand["recording_id"] in used:
                         continue
-                    if not _candidate_feasible(cand, slot, n, prev, median_rms):
+                    if not _candidate_feasible(
+                        cand,
+                        slot,
+                        n,
+                        prev,
+                        median_rms=median_rms,
+                        preserve_anchor_id=preserve_anchor_id,
+                    ):
                         continue
                     expanded.append(
                         (
@@ -412,14 +444,33 @@ def _anchored_order(
         if beam and (best is None or beam[0] < best):
             best = beam[0]
     if best is None:
-        a = assess_segment(anchor, 0.0, 0.0, _gain_for(anchor, median_rms))
+        a = (
+            assess_anchor_segment(
+                anchor,
+                0.0,
+                _render.MASTER_FADE_OUT_S * COVER_STRETCH,
+                _gain_for(anchor, median_rms),
+            )
+            if anchor_last
+            else assess_segment(anchor, 0.0, 0.0, _gain_for(anchor, median_rms))
+        )
         raise PlanInfeasible(
             f"no feasible plan found containing anchor {anchor_id!r}: "
-            f"the anchor cannot be placed in any slot without violating the "
-            f"D12 continuity contract ({a['reason']})",
-            reason="anchor_infeasible",
+            + (
+                "the anchor cannot be placed at the end of the set without "
+                "violating the D12 continuity contract "
+                if anchor_last
+                else "the anchor cannot be placed in any slot without violating "
+                "the D12 continuity contract "
+            )
+            + f"({a['reason']})",
+            reason="anchor_last_infeasible" if anchor_last else "anchor_infeasible",
             violations=a["fatal"] or a["violations"],
-            context={"anchor_id": anchor_id, "assessment_status": a["status"]},
+            context={
+                "anchor_id": anchor_id,
+                "anchor_last": anchor_last,
+                "assessment_status": a["status"],
+            },
         )
     return [by_id[i] for i in best[1]]
 
@@ -442,7 +493,9 @@ def _greedy_order(pool: list[dict], arc: list[float], median_rms: float) -> list
 
     for slot in range(n):
         prev = chosen[-1] if chosen else None
-        feasible = [c for c in remaining if _candidate_feasible(c, slot, n, prev, median_rms)]
+        feasible = [
+            c for c in remaining if _candidate_feasible(c, slot, n, prev, median_rms=median_rms)
+        ]
         if not feasible:
             raise PlanInfeasible(
                 f"no feasible candidate for slot {slot}: every remaining track "
@@ -495,23 +548,56 @@ def _build_tracks(
             "beats_in_segment_s": beats_in_seg,
         }
         a = assessments[i] if assessments else None
-        if a is not None and a["status"] == "adjusted":
-            # D17 transparency: a cue moved to satisfy D12 drops source
-            # content — the plan must say where and how much, not just PASS.
-            def_in, def_out = default_cue_points(rec)
-            track["cue_report"] = {
-                "status": "adjusted",
-                "default_cue_in_s": def_in,
-                "default_cue_out_s": def_out,
-                "cue_in_s": cue_in,
-                "cue_out_s": cue_out,
-                "removed_head_s": round(cue_in - def_in, 3),
-                "removed_tail_s": round(def_out - cue_out, 3),
-                "removed_total_s": round((def_out - def_in) - (cue_out - cue_in), 3),
-                "reason": "uncovered_silence_run",
-            }
+        # D17/P2 transparency: every track reports what its cue keeps and
+        # what it drops — the default cue already trims intro/outro, and
+        # that content loss is declared, not hidden behind default semantics.
+        track["cue_report"] = _cue_report(rec, a, cue_in, cue_out)
         tracks.append(track)
     return tracks
+
+
+def _cue_report(rec: dict, a: dict | None, cue_in: float, cue_out: float) -> dict:
+    """Per-track cue report: kept vs removed content, plus the reason.
+
+    ``removed_head_s``/``removed_tail_s`` measure the EXTRA trim vs the
+    default cue; ``head_trim_vs_source_s``/``tail_trim_vs_source_s`` measure
+    the total removed vs the original file — two different quantities, both
+    declared. For an anchor under preservation the audited option set and
+    the chosen placement mode are included.
+    """
+    src = rec.get("duration_s")
+    src_s = float(src) if isinstance(src, (int, float)) else None
+    def_in, def_out = default_cue_points(rec)
+    report = {
+        "status": a["status"] if a else "unassessed",
+        "source_duration_s": round(src_s, 3) if src_s else None,
+        "default_cue_in_s": def_in,
+        "default_cue_out_s": def_out,
+        "cue_in_s": round(cue_in, 5),
+        "cue_out_s": round(cue_out, 5),
+        "retained_s": round(cue_out - cue_in, 3),
+        "retained_vs_source": (
+            round((cue_out - cue_in) / src_s, 4) if src_s and src_s > 0 else None
+        ),
+        "head_trim_vs_source_s": round(cue_in, 3),
+        "tail_trim_vs_source_s": round(max(0.0, src_s - cue_out), 3) if src_s else None,
+        "removed_head_s": round(cue_in - def_in, 3),
+        "removed_tail_s": round(def_out - cue_out, 3),
+        "removed_total_s": round((def_out - def_in) - (cue_out - cue_in), 3),
+        "reason": a["reason"] if a else "unassessed",
+        "note": (
+            "removed_head_s/removed_tail_s = the EXTRA trim vs the default "
+            "cue; head_trim_vs_source_s/tail_trim_vs_source_s = total removed "
+            "vs the original file including the default intro/outro trims"
+        ),
+    }
+    if a is not None and a.get("preserved"):
+        report["preserved"] = True
+        report["mode"] = a.get("mode")
+        report["options"] = [
+            {k: v for k, v in o.items() if k != "violations"} for o in a.get("options", [])
+        ]
+    return report
 
 
 def _build_transitions(chosen: list[dict], decs: list[dict], tracks: list[dict]) -> list[dict]:
@@ -557,13 +643,19 @@ def _layout_master(tracks: list[dict], transitions: list[dict]) -> int:
 
 
 def _assess_order(
-    chosen: list[dict], decs: list[dict], median_rms: float
+    chosen: list[dict],
+    decs: list[dict],
+    median_rms: float,
+    preserve_anchor_id: str | None = None,
 ) -> tuple[list[tuple[float, float]], list[tuple[dict, dict]], list[dict]]:
     """Per-slot continuity assessment for a candidate ordering.
 
     Returns ``(cues, blocked, assessments)``: the assessed cue pair per chosen
     track, the (record, assessment) pairs whose best legal cue still violates
     D12, and the full per-slot assessments (needed for the D17 cue_report).
+    An anchor under content preservation occupies the last slot and is
+    assessed by ``assess_anchor_segment`` — the content-maximising cue
+    search, not the first-feasible trim.
     """
     cues: list[tuple[float, float]] = []
     blocked: list[tuple[dict, dict]] = []
@@ -571,9 +663,15 @@ def _assess_order(
     for i, rec in enumerate(chosen):
         head_cov = _render.MASTER_FADE_IN_S if i == 0 else coverage_span_s(decs[i - 1])
         tail_cov = _render.MASTER_FADE_OUT_S if i == len(chosen) - 1 else coverage_span_s(decs[i])
-        a = assess_segment(
-            rec, head_cov * COVER_STRETCH, tail_cov * COVER_STRETCH, _gain_for(rec, median_rms)
-        )
+        gain = _gain_for(rec, median_rms)
+        if (
+            preserve_anchor_id is not None
+            and rec["recording_id"] == preserve_anchor_id
+            and i == len(chosen) - 1
+        ):
+            a = assess_anchor_segment(rec, head_cov * COVER_STRETCH, tail_cov * COVER_STRETCH, gain)
+        else:
+            a = assess_segment(rec, head_cov * COVER_STRETCH, tail_cov * COVER_STRETCH, gain)
         cues.append((a["cue_in"], a["cue_out"]))
         assessments.append(a)
         if a["status"] == "infeasible":
@@ -589,6 +687,7 @@ def _select_order(
     e_lo: float,
     e_hi: float,
     median_rms: float,
+    anchor_last: bool = False,
 ) -> tuple[list[dict], list[dict], list[dict], int, int, list[float]]:
     """Order + cue + master layout under the D12 hard constraint.
 
@@ -596,9 +695,13 @@ def _select_order(
     after an ordering is committed the master block map is forward-simulated
     and any track the simulation still catches is banned and the order
     rebuilt — unless it is the anchor, where infeasibility is reported,
-    never hidden.
+    never hidden. Under ``anchor_last`` the anchor additionally may not be
+    displaced from the final slot or cue-trimmed by the re-planning loop —
+    its preserving assessment is a content-protection contract, and a
+    failure is PLAN_INFEASIBLE, never a silent cut.
     """
     by_id = {r["recording_id"]: r for r in pool}
+    preserve_anchor_id = anchor["recording_id"] if anchor and anchor_last else None
     banned: set[str] = set()
     for _attempt in range(len(pool) + 2):
         pool_now = [r for r in pool if r["recording_id"] not in banned]
@@ -611,23 +714,27 @@ def _select_order(
         n = max(2, min(n_tracks, len(pool_now)))
         arc = energy_arc(n, e_lo, e_hi)
         if anchor is not None:
-            chosen = _anchored_order(pool_now, arc, anchor, median_rms)
+            chosen = _anchored_order(pool_now, arc, anchor, median_rms, anchor_last)
         else:
             chosen = _greedy_order(pool_now, arc, median_rms)
 
         decs = [_choose_transition(chosen[i], chosen[i + 1]) for i in range(len(chosen) - 1)]
-        cues, blocked, assessments = _assess_order(chosen, decs, median_rms)
+        cues, blocked, assessments = _assess_order(chosen, decs, median_rms, preserve_anchor_id)
         anchor_blocked = next(
             (a for r, a in blocked if anchor and r["recording_id"] == anchor["recording_id"]),
             None,
         )
         if anchor_blocked is not None:
             raise PlanInfeasible(
-                f"anchor {anchor['recording_id']!r} has no cue placement that "
+                f"anchor {anchor['recording_id']!r} has no content-preserving cue "
+                "placement that satisfies the D12 continuity contract "
+                f"({anchor_blocked['reason']})"
+                if anchor_last
+                else f"anchor {anchor['recording_id']!r} has no cue placement that "
                 f"satisfies the D12 continuity contract ({anchor_blocked['reason']})",
-                reason="anchor_infeasible",
+                reason="anchor_content_infeasible" if anchor_last else "anchor_infeasible",
                 violations=anchor_blocked["fatal"] or anchor_blocked["violations"],
-                context={"anchor_id": anchor["recording_id"]},
+                context={"anchor_id": anchor["recording_id"], "anchor_last": anchor_last},
             )
         if blocked:
             banned.update(r["recording_id"] for r, _a in blocked)
@@ -647,10 +754,11 @@ def _select_order(
         if not removable:
             raise PlanInfeasible(
                 "no feasible plan: the anchor's played segment contains "
-                "silence no transition can cover",
-                reason="anchor_infeasible",
+                "silence no transition can cover"
+                + (" at the required last position" if anchor_last else ""),
+                reason="anchor_last_infeasible" if anchor_last else "anchor_infeasible",
                 violations=sim["violations"],
-                context={"anchor_id": anchor["recording_id"]},
+                context={"anchor_id": anchor["recording_id"], "anchor_last": anchor_last},
             )
         banned |= removable
     raise PlanInfeasible(
@@ -701,13 +809,60 @@ def unmeasured_corpus_error(
     }
 
 
-def _anchor_metadata(anchor: dict, chosen: list[dict], seed: int) -> dict:
-    """Additive plan.json metadata for an anchored run (request + provenance)."""
+def _anchor_metadata(
+    anchor: dict,
+    chosen: list[dict],
+    seed: int,
+    *,
+    anchor_last: bool = False,
+    anchor_assessment: dict | None = None,
+) -> dict:
+    """Additive plan.json metadata for an anchored run (request + provenance).
+
+    Under ``anchor_last`` the preservation contract is recorded explicitly:
+    the anchor's slot, the content-maximal cue chosen, the retained fraction
+    of the source, and every alternative placement the search considered —
+    the trim is auditable, never hidden.
+    """
     anchor_id = anchor["recording_id"]
+    slot = next(i for i, t in enumerate(chosen) if t["recording_id"] == anchor_id)
+    entry = {
+        "recording_id": anchor_id,
+        "work_id": anchor.get("work_id"),
+        "title": anchor.get("title"),
+        "slot_index": slot,
+        "position": "last" if anchor_last else "any",
+        "source_sha256": anchor.get("sha256"),
+    }
+    if anchor_last and anchor_assessment is not None:
+        src_s = float(anchor.get("duration_s") or 0.0)
+        retained = anchor_assessment["cue_out"] - anchor_assessment["cue_in"]
+        entry["preservation"] = {
+            "policy": (
+                "anchor_last: the anchor closes the set; the cue is the "
+                "content-maximal D12-legal placement, chosen by the "
+                "preserving assessment — every alternative is listed in "
+                "options; nothing is trimmed silently"
+            ),
+            "mode": anchor_assessment.get("mode"),
+            "cue_in_s": anchor_assessment["cue_in"],
+            "cue_out_s": anchor_assessment["cue_out"],
+            "retained_s": round(retained, 3),
+            "retained_vs_source": round(retained / src_s, 4) if src_s > 0 else None,
+            "tail_trim_vs_source_s": (
+                round(max(0.0, src_s - anchor_assessment["cue_out"]), 3) if src_s else None
+            ),
+            "options": [
+                {k: v for k, v in o.items() if k != "violations"}
+                for o in anchor_assessment.get("options", [])
+            ],
+        }
     return {
         "request": {
             "request_type": "include_track",
             "include_track_ids": [anchor_id],
+            "anchor_last": anchor_last,
+            "content_preservation": anchor_last,
         },
         "planner": {
             "algorithm": "anchored_beam_v1",
@@ -718,17 +873,8 @@ def _anchor_metadata(anchor: dict, chosen: list[dict], seed: int) -> dict:
             "requested_count": 1,
             "included_count": 1,
             "all_included": True,
-            "anchors": [
-                {
-                    "recording_id": anchor_id,
-                    "work_id": anchor.get("work_id"),
-                    "title": anchor.get("title"),
-                    "slot_index": next(
-                        i for i, t in enumerate(chosen) if t["recording_id"] == anchor_id
-                    ),
-                    "source_sha256": anchor.get("sha256"),
-                }
-            ],
+            "anchor_last": anchor_last,
+            "anchors": [entry],
         },
     }
 
@@ -742,6 +888,7 @@ def plan_set(
     energy_target: float | None = None,
     include_ineligible: bool = False,
     include_ids: list[str] | None = None,
+    anchor_last: bool = False,
 ) -> dict:
     """Build a deterministic plan for an n-track mini-set.
 
@@ -755,8 +902,16 @@ def plan_set(
     ``include_ids`` switches to anchor-aware planning: a beam search over the
     whole sequence that guarantees the requested recording appears exactly
     once. Exactly one anchor is supported for now.
+
+    ``anchor_last`` upgrades an include request into the C1/G2B-001
+    preservation contract: the anchor is fixed to the LAST slot and its cue
+    is the content-maximal D12-legal placement (``assess_anchor_segment``),
+    so a continuity trim may never silently eat the anchor's content — if no
+    preserving placement exists, the plan fails closed as PLAN_INFEASIBLE.
     """
     include_ids = list(include_ids or [])
+    if anchor_last and not include_ids:
+        raise ValueError("anchor_last requires include_ids — pass --include-track <recording_id>")
     if len(include_ids) > 1:
         raise PlanInfeasible(
             "anchor-aware planning supports exactly one include id, "
@@ -785,7 +940,13 @@ def plan_set(
     # The simulation does NOT prove the render passes D12 — it predicts
     # feasibility to reduce wasted renders; verify.py is the only gate (C3).
     chosen, tracks, transitions, cursor, n, arc = _select_order(
-        pool, n_tracks, anchor, e_lo=e_lo, e_hi=e_hi, median_rms=median_rms
+        pool,
+        n_tracks,
+        anchor,
+        e_lo=e_lo,
+        e_hi=e_hi,
+        median_rms=median_rms,
+        anchor_last=anchor_last,
     )
 
     plan = {
@@ -835,7 +996,24 @@ def plan_set(
     }
 
     if anchor is not None:
-        plan.update(_anchor_metadata(anchor, chosen, seed))
+        anchor_assessment = None
+        if anchor_last:
+            anchor_track = next(t for t in tracks if t["recording_id"] == anchor["recording_id"])
+            anchor_assessment = {
+                "cue_in": anchor_track["cue_in_s"],
+                "cue_out": anchor_track["cue_out_s"],
+                "mode": (anchor_track.get("cue_report") or {}).get("mode"),
+                "options": (anchor_track.get("cue_report") or {}).get("options", []),
+            }
+        plan.update(
+            _anchor_metadata(
+                anchor,
+                chosen,
+                seed,
+                anchor_last=anchor_last,
+                anchor_assessment=anchor_assessment,
+            )
+        )
     return plan
 
 
@@ -843,7 +1021,7 @@ def write_plan(plan: dict, out_path: str | Path) -> Path:
     """Serialize a plan byte-identically: fixed key order, rounded floats."""
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(plan, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    out.write_bytes((json.dumps(plan, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
     return out
 
 

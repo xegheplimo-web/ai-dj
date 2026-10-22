@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS",
+  "pass": true,
+  "verify_report": "evidence/dj_p2_miniset_verification.json",
+  "verified_by": "ai_dj.verify",
+  "provenance": {
+    "binding": "sha256 over the bytes of plan.json + master.wav measured at verify time",
+    "limits": "binds this verdict to the exact artifact bytes — it is NOT anti-forgery evidence, does not prove the WAV was rendered from this plan, and carries no signature; D12 permits plan-declared allowed_silent_gaps_s — the planner emits none, and any exempt regions are listed in the verify report"
+  },
+  "plan_json": "evidence\\dj_p2_miniset_plan.json",
+  "plan_sha256": "287048f33a4ea4000cdf1535e867689a3ee775fbb491124a4318c85d09f22fdf",
+  "master_wav": "evidence\\dj_p2_miniset_master.wav",
+  "master_sha256": "185e6243841ccafa298d718036f52466b81f7a808a63651deb9a12069ca8b39e"
+}

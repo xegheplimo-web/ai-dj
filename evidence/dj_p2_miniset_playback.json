@@ -1,0 +1,20 @@
+{
+  "master_wav": "evidence\\dj_p2_miniset_master.wav",
+  "verify_gate": {
+    "verdict": "PASS",
+    "verdict_file": "evidence\\dj_p2_miniset_master.verify.json",
+    "plan_json": "evidence\\dj_p2_miniset_plan.json",
+    "plan_sha256": "287048f33a4ea4000cdf1535e867689a3ee775fbb491124a4318c85d09f22fdf",
+    "master_sha256": "185e6243841ccafa298d718036f52466b81f7a808a63651deb9a12069ca8b39e"
+  },
+  "total_frames": 44668964,
+  "frames_emitted": 44668964,
+  "frames_matched": true,
+  "underflows": 0,
+  "block_frames": 4096,
+  "queue_depth": 8,
+  "stopped_early": false,
+  "device_index": 4,
+  "samplerate": 48000,
+  "channels": 2
+}

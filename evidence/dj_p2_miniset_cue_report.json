@@ -1,0 +1,262 @@
+{
+  "set_name": "dj-p2-miniset",
+  "plan_json": "evidence/dj_p2_miniset_plan.json",
+  "plan_sha256": "see artifact_binding in dj_p2_miniset_verification.json",
+  "total_duration_s": 930.603,
+  "tracks": [
+    {
+      "index": 0,
+      "recording_id": "rec-798dc7ccde6f2433",
+      "title": "Khóa Ly Biệt (Cover Duy)",
+      "master_start_s": 0.0,
+      "tempo_stretch": 1.0,
+      "cue_report": {
+        "status": "ok",
+        "source_duration_s": 152.469,
+        "default_cue_in_s": 24.26485,
+        "default_cue_out_s": 149.39719,
+        "cue_in_s": 24.26485,
+        "cue_out_s": 149.39719,
+        "retained_s": 125.132,
+        "retained_vs_source": 0.8207,
+        "head_trim_vs_source_s": 24.265,
+        "tail_trim_vs_source_s": 3.072,
+        "removed_head_s": 0.0,
+        "removed_tail_s": 0.0,
+        "removed_total_s": 0.0,
+        "reason": "ok",
+        "note": "removed_head_s/removed_tail_s = the EXTRA trim vs the default cue; head_trim_vs_source_s/tail_trim_vs_source_s = total removed vs the original file including the default intro/outro trims"
+      }
+    },
+    {
+      "index": 1,
+      "recording_id": "rec-d92d5b9fbbc9024e",
+      "title": "Untitled Session 6_mixdown",
+      "master_start_s": 118.445,
+      "tempo_stretch": 0.944447,
+      "cue_report": {
+        "status": "adjusted",
+        "source_duration_s": 389.735,
+        "default_cue_in_s": 1.69506,
+        "default_cue_out_s": 387.735,
+        "cue_in_s": 1.69506,
+        "cue_out_s": 352.66467,
+        "retained_s": 350.97,
+        "retained_vs_source": 0.9005,
+        "head_trim_vs_source_s": 1.695,
+        "tail_trim_vs_source_s": 37.07,
+        "removed_head_s": 0.0,
+        "removed_tail_s": 35.07,
+        "removed_total_s": 35.07,
+        "reason": "uncovered_silence_run",
+        "note": "removed_head_s/removed_tail_s = the EXTRA trim vs the default cue; head_trim_vs_source_s/tail_trim_vs_source_s = total removed vs the original file including the default intro/outro trims"
+      }
+    },
+    {
+      "index": 2,
+      "recording_id": "rec-793608aaeb5b6242",
+      "title": "vô thường và buông xả(1)",
+      "master_start_s": 484.059,
+      "tempo_stretch": 1.0,
+      "cue_report": {
+        "status": "ok",
+        "source_duration_s": 99.265,
+        "default_cue_in_s": 0.60372,
+        "default_cue_out_s": 98.765,
+        "cue_in_s": 0.60372,
+        "cue_out_s": 98.765,
+        "retained_s": 98.161,
+        "retained_vs_source": 0.9889,
+        "head_trim_vs_source_s": 0.604,
+        "tail_trim_vs_source_s": 0.5,
+        "removed_head_s": 0.0,
+        "removed_tail_s": 0.0,
+        "removed_total_s": 0.0,
+        "reason": "ok",
+        "note": "removed_head_s/removed_tail_s = the EXTRA trim vs the default cue; head_trim_vs_source_s/tail_trim_vs_source_s = total removed vs the original file including the default intro/outro trims"
+      }
+    },
+    {
+      "index": 3,
+      "recording_id": "rec-36bd9cb09f26f5b8",
+      "title": "Sao Lòng Còn Thương - Trọng Hải",
+      "master_start_s": 576.22,
+      "tempo_stretch": 1.0,
+      "cue_report": {
+        "status": "adjusted",
+        "source_duration_s": 389.397,
+        "default_cue_in_s": 0.48762,
+        "default_cue_out_s": 387.397,
+        "cue_in_s": 0.48762,
+        "cue_out_s": 354.87057,
+        "retained_s": 354.383,
+        "retained_vs_source": 0.9101,
+        "head_trim_vs_source_s": 0.488,
+        "tail_trim_vs_source_s": 34.526,
+        "removed_head_s": 0.0,
+        "removed_tail_s": 32.526,
+        "removed_total_s": 32.526,
+        "reason": "uncovered_silence_run",
+        "note": "removed_head_s/removed_tail_s = the EXTRA trim vs the default cue; head_trim_vs_source_s/tail_trim_vs_source_s = total removed vs the original file including the default intro/outro trims",
+        "preserved": true,
+        "mode": "tail_covered",
+        "options": [
+          {
+            "mode": "tail_covered",
+            "cue_in_s": 0.48762,
+            "cue_out_s": 354.87057,
+            "retained_s": 354.383,
+            "chosen": true
+          },
+          {
+            "mode": "tail_covered",
+            "cue_in_s": 0.48762,
+            "cue_out_s": 353.36127,
+            "retained_s": 352.874,
+            "chosen": false
+          },
+          {
+            "mode": "tail_trim",
+            "cue_in_s": 0.48762,
+            "cue_out_s": 351.75909,
+            "retained_s": 351.271,
+            "chosen": false
+          },
+          {
+            "mode": "head_covered",
+            "cue_in_s": 345.76834,
+            "cue_out_s": 387.397,
+            "retained_s": 41.629,
+            "chosen": false
+          },
+          {
+            "mode": "head_covered",
+            "cue_in_s": 347.27764,
+            "cue_out_s": 387.397,
+            "retained_s": 40.119,
+            "chosen": false
+          },
+          {
+            "mode": "head_covered",
+            "cue_in_s": 348.76372,
+            "cue_out_s": 387.397,
+            "retained_s": 38.633,
+            "chosen": false
+          },
+          {
+            "mode": "head_covered",
+            "cue_in_s": 350.2498,
+            "cue_out_s": 387.397,
+            "retained_s": 37.147,
+            "chosen": false
+          },
+          {
+            "mode": "head_covered",
+            "cue_in_s": 351.75909,
+            "cue_out_s": 387.397,
+            "retained_s": 35.638,
+            "chosen": false
+          },
+          {
+            "mode": "head_advance",
+            "cue_in_s": 353.36127,
+            "cue_out_s": 387.397,
+            "retained_s": 34.036,
+            "chosen": false
+          }
+        ]
+      }
+    }
+  ],
+  "anchor_resolution": {
+    "requested_count": 1,
+    "included_count": 1,
+    "all_included": true,
+    "anchor_last": true,
+    "anchors": [
+      {
+        "recording_id": "rec-36bd9cb09f26f5b8",
+        "work_id": "work-fbaa2c6a791c",
+        "title": "Sao Lòng Còn Thương - Trọng Hải",
+        "slot_index": 3,
+        "position": "last",
+        "source_sha256": "36bd9cb09f26f5b8e469a70964907a72a7c1b6084debfb0ae4f79b19e42b6d35",
+        "preservation": {
+          "policy": "anchor_last: the anchor closes the set; the cue is the content-maximal D12-legal placement, chosen by the preserving assessment — every alternative is listed in options; nothing is trimmed silently",
+          "mode": "tail_covered",
+          "cue_in_s": 0.48762,
+          "cue_out_s": 354.87057,
+          "retained_s": 354.383,
+          "retained_vs_source": 0.9101,
+          "tail_trim_vs_source_s": 34.526,
+          "options": [
+            {
+              "mode": "tail_covered",
+              "cue_in_s": 0.48762,
+              "cue_out_s": 354.87057,
+              "retained_s": 354.383,
+              "chosen": true
+            },
+            {
+              "mode": "tail_covered",
+              "cue_in_s": 0.48762,
+              "cue_out_s": 353.36127,
+              "retained_s": 352.874,
+              "chosen": false
+            },
+            {
+              "mode": "tail_trim",
+              "cue_in_s": 0.48762,
+              "cue_out_s": 351.75909,
+              "retained_s": 351.271,
+              "chosen": false
+            },
+            {
+              "mode": "head_covered",
+              "cue_in_s": 345.76834,
+              "cue_out_s": 387.397,
+              "retained_s": 41.629,
+              "chosen": false
+            },
+            {
+              "mode": "head_covered",
+              "cue_in_s": 347.27764,
+              "cue_out_s": 387.397,
+              "retained_s": 40.119,
+              "chosen": false
+            },
+            {
+              "mode": "head_covered",
+              "cue_in_s": 348.76372,
+              "cue_out_s": 387.397,
+              "retained_s": 38.633,
+              "chosen": false
+            },
+            {
+              "mode": "head_covered",
+              "cue_in_s": 350.2498,
+              "cue_out_s": 387.397,
+              "retained_s": 37.147,
+              "chosen": false
+            },
+            {
+              "mode": "head_covered",
+              "cue_in_s": 351.75909,
+              "cue_out_s": 387.397,
+              "retained_s": 35.638,
+              "chosen": false
+            },
+            {
+              "mode": "head_advance",
+              "cue_in_s": 353.36127,
+              "cue_out_s": 387.397,
+              "retained_s": 34.036,
+              "chosen": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "semantics_note": "source_duration_s = full decoded source length; default_cue_* = analyzer intro/outro boundary; cue_in_s/cue_out_s = actual planned range; retained_s = cue_out-cue_in; head_trim_vs_source_s/tail_trim_vs_source_s = TOTAL removed vs the original file (default trim + any extra); removed_head_s/removed_tail_s = the EXTRA trim vs the default cue introduced by D12 coverage; removed_total_s = their sum."
+}

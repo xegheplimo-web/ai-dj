@@ -221,7 +221,7 @@
     "id": "DJ-P2-MINISET-G2B-001",
     "title": "P0: Anchor-Preserved 15-20 min Mini-Set (P1+P2, M1-M8 gates, G2b)",
     "assignee": "devin-cli",
-    "status": "todo",
+    "status": "running",
     "priority": 1,
     "card": ".orchestrator/cards/DJ-P2-MINISET-G2B-001.md",
     "verified_by": "hermes",
@@ -240,6 +240,6 @@
       "P2 cue report covers ALL trim vs source (not only adjusted cue)",
       "C4 adversarial FN regression becomes a historical fixture with controlled baseline"
     ],
-    "note": "GPT: protect anchor content in planner, not via G2b. NO D12 threshold change, NO silent-gap exemption, NO hiding trims."
+    "note": "Dispatched to Devin CLI (pid 29664) 2026-10-23."
   }
 ]

@@ -26,6 +26,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -58,11 +59,26 @@ def _write(path: Path, data: np.ndarray, subtype: str = "PCM_24") -> Path:
 
 
 def _record_for(rec_id: str, wav: Path) -> dict:
-    """Analysis record carrying the contract payload for ``wav``."""
+    """Analysis record carrying the COMPLETE contract payload for ``wav``."""
+    blocks = np.asarray(continuity.measure_master_blocks(wav), dtype=np.float64)
+    si = {
+        name: [
+            [round(s * continuity.BLOCK_S, 3), round(e * continuity.BLOCK_S, 3)]
+            for s, e in continuity.silent_runs(blocks <= thr)
+        ]
+        for name, thr in (
+            ("digital_minus90", continuity.DIGITAL_DBFS),
+            ("low_level_minus60", continuity.LOW_LEVEL_DBFS),
+        )
+    }
     return {
         "recording_id": rec_id,
         "continuity_version": continuity.CONTINUITY_VERSION,
-        "block_rms_dbfs": [round(float(v), 2) for v in continuity.measure_master_blocks(wav)],
+        "block_ms": int(continuity.BLOCK_S * 1000),
+        "channels": "all_channels_rms",
+        "continuity_sr": MASTER_SR,
+        "block_rms_dbfs": [round(float(v), 2) for v in blocks],
+        "silence_intervals": si,
     }
 
 
@@ -365,6 +381,84 @@ CASE_BUILDERS = {
 }
 
 
+def _fixture_case(live: dict, prior: dict | None) -> dict:
+    """Fixture row for one live case — FNs become historical regression rows."""
+    outcome = live["outcome"]
+    row = {
+        "case": live["case"],
+        "category": live["category"],
+        "harness": live["harness"],
+        "predictor_pass": live.get("predictor_pass"),
+        "verifier_pass": live.get("verifier_pass"),
+        "outcome": outcome,
+    }
+    if outcome == "false_negative":
+        row["regression_fixture"] = True
+        row["historical"] = True
+    if outcome == "skipped_no_ffmpeg" and prior is not None:
+        # keep the last real measurement — no ffmpeg in this environment
+        for k in ("predictor_pass", "verifier_pass", "outcome", "regression_fixture", "historical"):
+            if k in prior:
+                row[k] = prior[k]
+    row["measured"] = {
+        "predicted_violations": live.get("predicted_violations"),
+        "digital": live.get("digital"),
+        "low_level": live.get("low_level"),
+    }
+    if live.get("silent_blocks_predicted") is not None:
+        row["measured"]["silent_blocks_predicted"] = live["silent_blocks_predicted"]
+    row["note"] = live.get("note")
+    return row
+
+
+def rechart_fixture(fixture_path: Path = FIXTURE_PATH) -> dict:
+    """Regenerate the divergence baseline — a DELIBERATE, reviewable act.
+
+    Run explicitly (``python tests/test_predictor_adversarial.py --rechart``)
+    after reviewing why the predictor/renderer drifted; never implicitly
+    from the test suite. Cases unmeasurable in this environment (no ffmpeg)
+    keep their previously recorded rows.
+    """
+    prior = {}
+    if fixture_path.exists():
+        prior = {
+            c["case"]: c for c in json.loads(fixture_path.read_text(encoding="utf-8"))["cases"]
+        }
+    with tempfile.TemporaryDirectory() as td:
+        results = run_cases(Path(td))
+    cases = [_fixture_case(r, prior.get(r["case"])) for r in results]
+    summary: dict[str, int] = {"cases": len(cases)}
+    for c in cases:
+        summary[c["outcome"]] = summary.get(c["outcome"], 0) + 1
+    summary["note"] = (
+        "FP = predictor flags a violation the verifier clears (conservative, "
+        "safe direction). FN = predictor PASS but verifier FAIL — recorded as "
+        "historical regression fixtures (regression_fixture + historical). "
+        "A recorded FN that stops reproducing means the predictor improved; "
+        "it does not fail the suite — re-chart this file deliberately via "
+        "--rechart after reviewing the change."
+    )
+    doc = {
+        "fixture": "predictor_divergence",
+        "card": "DJ-P2-CONTINUITY-002 / clause C4 (revised by DJ-P2-MINISET-G2B-001 / C4)",
+        "recorded_at": "2026-10-23",
+        "predictor": "ai_dj.continuity.find_master_violations (max-of-contributors bound)",
+        "verifier": "ai_dj.verify._silence_check (D12 two-tier gate on the real WAV)",
+        "baseline_policy": (
+            "Recorded outcomes are the historical baseline, not a frozen "
+            "contract: a live false_negative missing from this file is a hard "
+            "failure; a recorded false_negative that stops reproducing is "
+            "allowed predictor improvement but must be re-charted here "
+            "deliberately (--rechart) and reviewed. All other recorded "
+            "outcomes are pinned — unrelated drift still fails."
+        ),
+        "summary": summary,
+        "cases": cases,
+    }
+    fixture_path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return doc
+
+
 class TestAdversarialPredictor(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -391,30 +485,63 @@ class TestAdversarialPredictor(unittest.TestCase):
             self.assertIn(required, cats)
 
     def test_every_false_negative_is_a_recorded_fixture(self) -> None:
-        """C4: predictor-PASS + verifier-FAIL must exist as regression fixtures."""
+        """C4: a live predictor-PASS + verifier-FAIL must already be recorded.
+
+        The historical fixture set is NOT required to still contain a live
+        false-negative — the predictor may legitimately improve and shrink
+        it to zero. Only a NEW, unrecorded false-negative is a hard failure.
+        """
         recorded = {c["case"] for c in self._fixture()["cases"] if c.get("regression_fixture")}
         live_fn = {n for n, r in self.results.items() if r["outcome"] == "false_negative"}
-        self.assertTrue(live_fn, "expected at least one false-negative case")
         unrecorded = live_fn - recorded
         self.assertFalse(unrecorded, f"predictor-PASS/verifier-FAIL not recorded: {unrecorded}")
 
     def test_outcomes_match_recorded_fixtures(self) -> None:
-        """Regression pin: each recorded case still produces its outcome."""
+        """Regression pin vs baseline — recorded FNs may improve (see policy).
+
+        Every recorded case must still produce its recorded outcome, EXCEPT
+        historical false-negatives: a recorded FN resolving to any other
+        outcome means the predictor improved and is allowed (with a re-chart
+        warning). Unrelated outcome drift still fails.
+        """
         recorded = {c["case"]: c for c in self._fixture()["cases"]}
         self.assertEqual(set(recorded), set(self.results))
+        improved = []
         for name, live in self.results.items():
             if live["outcome"] == "skipped_no_ffmpeg":
                 continue  # unmeasured here — the recorded outcome stands
             rec = recorded[name]
-            self.assertEqual(
-                live["outcome"],
-                rec["outcome"],
+            if live["outcome"] == rec["outcome"]:
+                self.assertEqual(live["predictor_pass"], rec["predictor_pass"], name)
+                self.assertEqual(live["verifier_pass"], rec["verifier_pass"], name)
+                continue
+            if (
+                rec.get("regression_fixture")
+                and rec["outcome"] == "false_negative"
+                and live["outcome"] != "false_negative"
+            ):
+                improved.append(f"{name}: {rec['outcome']} -> {live['outcome']}")
+                continue
+            self.fail(
                 f"{name}: recorded {rec['outcome']} but live run gives "
-                f"{live['outcome']} — predictor/renderer drifted; re-chart the fixture",
+                f"{live['outcome']} — predictor/renderer drifted; re-chart the "
+                "fixture deliberately via --rechart after review"
             )
-            self.assertEqual(live["predictor_pass"], rec["predictor_pass"], name)
-            self.assertEqual(live["verifier_pass"], rec["verifier_pass"], name)
+        if improved:
+            warnings.warn(
+                "historical false-negative(s) no longer reproduce — the "
+                "predictor improved; re-chart the baseline deliberately: "
+                "python tests/test_predictor_adversarial.py --rechart\n  " + "\n  ".join(improved),
+                stacklevel=2,
+            )
 
 
 if __name__ == "__main__":
-    unittest.main()
+    if "--rechart" in sys.argv:
+        doc = rechart_fixture()
+        print(
+            f"re-charted {FIXTURE_PATH}: "
+            + ", ".join(f"{k}={v}" for k, v in sorted(doc["summary"].items()) if k != "note")
+        )
+    else:
+        unittest.main()

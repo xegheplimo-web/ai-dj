@@ -57,6 +57,11 @@ EDGE_GUARD_S = 2.0  # stay this far from file edges when guessing cues
 MIN_SEGMENT_S = 30.0  # == planner.MIN_DURATION_S * 0.5 — shortest played segment
 MIN_STRETCH = 1.0 / 1.06  # == 1/planner.MAX_STRETCH — worst-case run lengthening
 COVER_STRETCH = 1.06  # == planner.MAX_STRETCH — optimistic coverage reach
+# Block-count vs declared-duration drift bound (P1): the analyzer counts
+# blocks on the 48 kHz render-path decode while ``duration_s`` comes from the
+# 22.05 kHz analysis pass — a few blocks of decode/resample edge slack is
+# legitimate; a one-block or truncated map is not.
+MAX_BLOCK_COUNT_DRIFT = 4
 
 
 def block_rms_dbfs(data: np.ndarray, sr: int) -> np.ndarray:
@@ -92,15 +97,48 @@ def measure_master_blocks(path: str | Path) -> np.ndarray:
 
 
 def has_continuity_payload(rec: dict) -> bool:
-    """True when ``rec`` carries the current contract payload the planner needs.
+    """True when ``rec`` carries the COMPLETE current contract payload.
 
-    Same test ``assess_segment`` uses to mark a record ``unmeasured``: current
-    ``continuity_version`` plus a non-empty per-block level map. Records with
-    stale payloads are *missing data*, not audio-infeasible tracks — the CLI
-    ``plan`` input gate reports them as ANALYSIS_REQUIRED / CORPUS_UNMEASURED,
-    never PLAN_INFEASIBLE.
+    P1 (DJ-P2-MINISET-G2B-001): a bare ``continuity_version`` plus a non-empty
+    block list is not enough — a one-block map would pass that test while
+    describing almost nothing. A complete payload must also declare the block
+    grid (``block_ms`` == 50), the signal class (``channels`` ==
+    "all_channels_rms", ``continuity_sr`` == MASTER_SR), hold only finite
+    per-block levels, cover the stored audio duration within decode slack,
+    and carry the silence-interval map. This is the same completeness test
+    ``assess_segment``/the master simulation use to mark a record
+    ``unmeasured``/``unknown``. Records failing it are *missing data*, not
+    audio-infeasible tracks — the CLI ``plan`` input gate reports them as
+    ANALYSIS_REQUIRED / CORPUS_UNMEASURED, never PLAN_INFEASIBLE.
     """
-    return rec.get("continuity_version") == CONTINUITY_VERSION and bool(rec.get("block_rms_dbfs"))
+    if rec.get("continuity_version") != CONTINUITY_VERSION:
+        return False
+    blocks = rec.get("block_rms_dbfs")
+    if not isinstance(blocks, (list, tuple, np.ndarray)) or len(blocks) == 0:
+        return False
+    si = rec.get("silence_intervals")
+    grid_ok = (
+        rec.get("block_ms") == int(BLOCK_S * 1000)
+        and rec.get("continuity_sr") == MASTER_SR
+        and rec.get("channels") == "all_channels_rms"
+        and isinstance(si, dict)
+        and "digital_minus90" in si
+        and "low_level_minus60" in si
+    )
+    if not grid_ok:
+        return False
+    try:
+        arr = np.asarray(blocks, dtype=np.float64)
+    except (TypeError, ValueError):
+        return False
+    if arr.ndim != 1 or not np.all(np.isfinite(arr)):
+        return False
+    dur = rec.get("duration_s")
+    drift_ok = True
+    if isinstance(dur, (int, float)) and np.isfinite(float(dur)) and float(dur) > 0:
+        expected = int(float(dur) / BLOCK_S)
+        drift_ok = abs(int(arr.size) - expected) <= MAX_BLOCK_COUNT_DRIFT
+    return drift_ok
 
 
 def default_cue_points(rec: dict) -> tuple[float, float]:
@@ -304,8 +342,7 @@ def assess_segment(
     mid-lyric splice and not injected audio.
     """
     cue_in, cue_out = default_cue_points(rec)
-    block_db = rec.get("block_rms_dbfs")
-    if rec.get("continuity_version") != CONTINUITY_VERSION or not block_db:
+    if not has_continuity_payload(rec):
         return {
             "cue_in": cue_in,
             "cue_out": cue_out,
@@ -314,7 +351,7 @@ def assess_segment(
             "violations": [],
             "fatal": [],
         }
-    blocks = np.asarray(block_db, dtype=np.float64)
+    blocks = np.asarray(rec["block_rms_dbfs"], dtype=np.float64)
     default = (cue_in, cue_out)
     downbeats = rec.get("downbeat_times_s") or []
     runs: list[dict] = []
@@ -327,7 +364,9 @@ def assess_segment(
                 "cue_in": round(cue_in, 5),
                 "cue_out": round(cue_out, 5),
                 "status": "ok" if (cue_in, cue_out) == default else "adjusted",
-                "reason": "ok",
+                # the only force that moves a cue here is an uncovered run —
+                # report the reason, not a bare "ok"
+                "reason": "ok" if (cue_in, cue_out) == default else "uncovered_silence_run",
                 "violations": runs,
                 "fatal": [],
             }
@@ -360,6 +399,149 @@ def assess_segment(
         "reason": "uncoverable_silence",
         "violations": runs,
         "fatal": fatal,
+    }
+
+
+ANCHOR_ASSESS_MAX_EVALS = 256  # bound on the preserving cue search below
+
+
+def assess_anchor_segment(
+    rec: dict,
+    head_cov_s: float = 0.0,
+    tail_cov_s: float = 0.0,
+    gain_db: float = 0.0,
+) -> dict:
+    """Content-preserving cue for an anchor placed last (C1/G2B-001).
+
+    ``assess_segment`` walks to the first legal trim it finds; an anchor
+    under preservation instead enumerates every structurally legal placement
+    an offending run admits and keeps the cue retaining the MOST source
+    content (ties prefer the later cue-out — the musical ending stays):
+
+    * ``default`` — the landmark cue, kept when already legal;
+    * ``head_advance`` — enter on a downbeat past the run: the ending plays
+      intact, the entry is late;
+    * ``head_covered`` — cue_in on a downbeat where the run lies inside the
+      incoming transition's coverage zone;
+    * ``tail_covered`` — cue_out on a downbeat where the run lies inside the
+      master fade-out coverage zone (the set's own ending legitimately
+      masks it);
+    * ``tail_trim`` — cue_out on a downbeat before the run: the declared
+      fallback when nothing better survives.
+
+    This is a content-protection policy, not a D12 convenience: the chosen
+    cue is the content-maximal legal placement, never "the first trim that
+    passes". Every feasible placement considered is returned in ``options``
+    with the chosen one marked — the trim is audited, never hidden — and
+    ``status`` is ``infeasible`` when no placement keeps >= MIN_SEGMENT_S
+    of the source.
+    """
+    cue_in, cue_out = default_cue_points(rec)
+    if not has_continuity_payload(rec):
+        return {
+            "cue_in": cue_in,
+            "cue_out": cue_out,
+            "status": "unmeasured",
+            "reason": "no_continuity_data",
+            "violations": [],
+            "fatal": [],
+            "options": [],
+        }
+    blocks = np.asarray(rec["block_rms_dbfs"], dtype=np.float64)
+    downbeats = sorted(rec.get("downbeat_times_s") or [])
+    default = (round(cue_in, 5), round(cue_out, 5))
+    runs: list[dict] = []
+    fatal: list[dict] = []
+
+    def evaluate(ci: float, co: float) -> tuple[list[dict], list[dict]]:
+        r = _violating_runs(blocks, ci, co, gain_db)
+        return r, _uncovered_runs(r, ci, co, head_cov_s, tail_cov_s)
+
+    def expansions(ci: float, co: float, f: dict) -> list[tuple[str, float, float]]:
+        """Candidate cues neutralising one fatal run — all structural options."""
+        a, b = f["uncovered_s"]
+        slack = (
+            _n_min(DIGITAL_MIN_RUN_S if f["tier"] == "digital_minus90" else LOW_LEVEL_MIN_RUN_S)
+            * BLOCK_S
+        )
+        out: list[tuple[str, float, float]] = []
+        before = [d for d in downbeats if ci + MIN_SEGMENT_S <= d <= a - BLOCK_S]
+        if before:
+            out.append(("tail_trim", ci, before[-1]))
+        after = [d for d in downbeats if b + BLOCK_S <= d <= co - MIN_SEGMENT_S]
+        if after:
+            out.append(("head_advance", after[0], co))
+        for d in downbeats:
+            # cue_out at d puts the run inside (d - tail_cov_s, d) — masked
+            # by the set's ending fade; the bound keeps the uncovered stub
+            # provably below the run's minimum length.
+            if a - BLOCK_S < d <= min(co, a + slack + tail_cov_s) and d >= ci + MIN_SEGMENT_S:
+                out.append(("tail_covered", ci, d))
+            # cue_in at d puts the run inside (d, d + head_cov_s) — masked
+            # by the incoming transition.
+            if (
+                max(ci, b - head_cov_s - slack) <= d <= b
+                and d <= co - MIN_SEGMENT_S
+                and d > ci + BLOCK_S
+            ):
+                out.append(("head_covered", d, co))
+        return out
+
+    def key(ci: float, co: float) -> tuple[float, float]:
+        return (round(ci, 4), round(co, 4))
+
+    seen = {key(cue_in, cue_out)}
+    worklist = [(cue_in, cue_out, "default")]
+    feasible: list[dict] = []
+    evals = 0
+    while worklist and evals < ANCHOR_ASSESS_MAX_EVALS:
+        ci, co, mode = worklist.pop(0)
+        evals += 1
+        if co - ci < MIN_SEGMENT_S - 1e-9:
+            continue
+        runs, fatal = evaluate(ci, co)
+        if not fatal:
+            feasible.append(
+                {
+                    "mode": mode,
+                    "cue_in_s": round(ci, 5),
+                    "cue_out_s": round(co, 5),
+                    "retained_s": round(co - ci, 3),
+                    "violations": runs,
+                }
+            )
+            continue
+        for mode2, nci, nco in expansions(ci, co, fatal[0]):
+            if key(nci, nco) not in seen:
+                seen.add(key(nci, nco))
+                worklist.append((nci, nco, mode2))
+
+    if not feasible:
+        return {
+            "cue_in": round(cue_in, 5),
+            "cue_out": round(cue_out, 5),
+            "status": "infeasible",
+            "reason": "uncoverable_silence",
+            "violations": runs,
+            "fatal": fatal,
+            "options": [],
+        }
+    best = max(feasible, key=lambda f: (f["retained_s"], f["cue_out_s"]))
+    ci, co = best["cue_in_s"], best["cue_out_s"]
+    options = sorted(feasible, key=lambda f: (-f["retained_s"], -f["cue_out_s"], f["cue_in_s"]))
+    for o in options:
+        o["chosen"] = o["cue_in_s"] == ci and o["cue_out_s"] == co
+    return {
+        "cue_in": ci,
+        "cue_out": co,
+        "status": "ok" if (ci, co) == default else "adjusted",
+        "reason": "ok" if (ci, co) == default else "uncovered_silence_run",
+        "violations": best["violations"],
+        "fatal": [],
+        "preserved": True,
+        "mode": best["mode"],
+        "options": options,
+        "evals": evals,
     }
 
 
@@ -438,11 +620,10 @@ def _master_level_map(
         present_masks.append(pres)
         present_any |= pres
         rec = records_by_id.get(t["recording_id"]) or {}
-        blocks = rec.get("block_rms_dbfs")
-        if rec.get("continuity_version") != CONTINUITY_VERSION or not blocks:
+        if not has_continuity_payload(rec):
             unknown |= pres
             continue
-        blocks = np.asarray(blocks, dtype=np.float64)
+        blocks = np.asarray(rec["block_rms_dbfs"], dtype=np.float64)
         stretch = float(t.get("tempo_stretch") or 1.0)
         src_blk = np.floor(
             (float(t["cue_in_samples"]) + (centers - geom[i]["entry"]) * stretch) / blk

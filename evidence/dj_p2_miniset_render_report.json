@@ -1,0 +1,106 @@
+{
+  "out_wav": "evidence\\dj_p2_miniset_master.wav",
+  "master_sr": 48000,
+  "total_samples_planned": 44668965,
+  "total_samples_actual": 44668964,
+  "duration_s": 930.603,
+  "true_peak_dbtp": -1.2,
+  "integrated_lufs": -17.0,
+  "loudness_range_lu": 9.9,
+  "true_peak_measured_by": "ffmpeg ebur128=peak=true",
+  "peak_protection": "sample-peak pre-scale + ffmpeg true-peak re-measure",
+  "peak_limit_dbtp": -1.0,
+  "peak_scale_applied_db": -1.893,
+  "clipping_count": 0,
+  "underflows": 0,
+  "segments": [
+    {
+      "index": 0,
+      "recording_id": "rec-798dc7ccde6f2433",
+      "tempo_stretch": 1.0,
+      "planned_samples": 6006352,
+      "actual_samples": 6006352
+    },
+    {
+      "index": 1,
+      "recording_id": "rec-d92d5b9fbbc9024e",
+      "tempo_stretch": 0.944447,
+      "planned_samples": 17837466,
+      "actual_samples": 17837466
+    },
+    {
+      "index": 2,
+      "recording_id": "rec-793608aaeb5b6242",
+      "tempo_stretch": 1.0,
+      "planned_samples": 4711741,
+      "actual_samples": 4711741
+    },
+    {
+      "index": 3,
+      "recording_id": "rec-36bd9cb09f26f5b8",
+      "tempo_stretch": 1.0,
+      "planned_samples": 17010382,
+      "actual_samples": 17010381
+    }
+  ],
+  "transitions": [
+    {
+      "index": 0,
+      "type": "beat_crossfade",
+      "overlap_planned_samples": 320976,
+      "window": [
+        5704307,
+        6006352
+      ],
+      "track_start_sample": 5704307
+    },
+    {
+      "index": 1,
+      "type": "crossfade",
+      "overlap_planned_samples": 288000,
+      "window": [
+        23234842,
+        23522842
+      ],
+      "track_start_sample": 23234842
+    },
+    {
+      "index": 2,
+      "type": "crossfade",
+      "overlap_planned_samples": 288000,
+      "window": [
+        27658583,
+        27946583
+      ],
+      "track_start_sample": 27658583
+    }
+  ],
+  "transitions_planned": 3,
+  "beat_deviation": [
+    {
+      "index": 0,
+      "type": "beat_crossfade",
+      "beat_check": "measured_on_master",
+      "grid_points": 16,
+      "onsets": 26,
+      "matched": 12,
+      "coverage": 0.75,
+      "median_abs_dev_ms": 27.694,
+      "p95_abs_dev_ms": 96.935,
+      "ibi_diagnostic_ms": 183.292,
+      "within_threshold": false
+    },
+    {
+      "index": 1,
+      "type": "crossfade",
+      "beat_check": "not_beat_aligned"
+    },
+    {
+      "index": 2,
+      "type": "crossfade",
+      "beat_check": "not_beat_aligned"
+    }
+  ],
+  "beat_deviation_within_threshold": false,
+  "beat_deviation_note": "coverage/p95 = nearest-onset distance to the planned grid; the hard 20 ms contract is verified on synthetic click tracks (timing.py); real-music onset offsets are diagnostics."
+}

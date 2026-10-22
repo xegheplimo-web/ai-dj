@@ -77,6 +77,9 @@ def _record(
     }
     if with_continuity:
         rec["continuity_version"] = continuity.CONTINUITY_VERSION
+        rec["block_ms"] = int(continuity.BLOCK_S * 1000)
+        rec["channels"] = "all_channels_rms"
+        rec["continuity_sr"] = MASTER_SR
         rec["block_rms_dbfs"] = _stereo_blocks(duration_s, silent_spans)
         rec["silence_intervals"] = {
             "digital_minus90": [[a, z] for a, z in silent_spans],
@@ -296,7 +299,7 @@ class TestG8CurrentContract(unittest.TestCase):
 
 
 class TestCueTrimReporting(unittest.TestCase):
-    """D17: a cue moved to satisfy D12 must report what was dropped and why."""
+    """D17/P2: EVERY track reports kept vs removed content — and why."""
 
     def test_adjusted_cue_carries_trim_report(self) -> None:
         records = _records()
@@ -323,10 +326,27 @@ class TestCueTrimReporting(unittest.TestCase):
             places=3,
         )
 
-    def test_unadjusted_cue_has_no_trim_report(self) -> None:
+    def test_every_track_reports_source_vs_retained(self) -> None:
+        """P2 (G2B-001): default cues also report — the intro/outro trims are
+        declared, not hidden behind default semantics."""
         plan = plan_set(_records(), n_tracks=3, set_name="t")
         for t in plan["tracks"]:
-            self.assertNotIn("cue_report", t)
+            rep = t["cue_report"]
+            self.assertEqual(rep["status"], "ok")
+            self.assertEqual(rep["cue_in_s"], rep["default_cue_in_s"])
+            self.assertEqual(rep["cue_out_s"], rep["default_cue_out_s"])
+            self.assertEqual(rep["removed_head_s"], 0.0)
+            self.assertEqual(rep["removed_tail_s"], 0.0)
+            self.assertEqual(rep["removed_total_s"], 0.0)
+            # totals vs the original file: the default cue itself trims
+            self.assertAlmostEqual(rep["head_trim_vs_source_s"], rep["default_cue_in_s"], places=3)
+            self.assertAlmostEqual(
+                rep["tail_trim_vs_source_s"],
+                rep["source_duration_s"] - rep["default_cue_out_s"],
+                places=3,
+            )
+            self.assertAlmostEqual(rep["retained_s"], rep["cue_out_s"] - rep["cue_in_s"], places=3)
+            self.assertIn("removed_tail_s", rep["note"])
 
 
 def _tone(path: Path, dur_s: float, *, gaps=()) -> Path:

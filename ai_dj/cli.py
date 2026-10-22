@@ -63,7 +63,7 @@ def cmd_scan(args: argparse.Namespace) -> int:
     if args.out:
         out = Path(args.out)
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        out.write_bytes((json.dumps(report, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
         report["written_to"] = str(out)
     _emit(report)
     return 0
@@ -151,6 +151,11 @@ def cmd_plan(args: argparse.Namespace) -> int:
     data_error = unmeasured_corpus_error(records, include_ineligible=args.include_ineligible)
     if data_error is not None:
         return _fail(data_error, 5)
+    if args.anchor_last and not args.include_track:
+        return _fail(
+            {"error": "--anchor-last requires --include-track <recording_id>"},
+            2,
+        )
     include_ids = [args.include_track] if args.include_track else None
     try:
         plan = plan_set(
@@ -161,6 +166,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
             energy_target=args.energy_target,
             include_ineligible=args.include_ineligible,
             include_ids=include_ids,
+            anchor_last=args.anchor_last,
         )
     except PlanInfeasible as exc:
         return _fail(exc.payload, 4)
@@ -287,6 +293,16 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="RECORDING_ID",
         default=None,
         help="guarantee this recording_id appears in the plan (anchor-aware planning)",
+    )
+    pl.add_argument(
+        "--anchor-last",
+        action="store_true",
+        help=(
+            "with --include-track: place the anchor at the END of the set and "
+            "preserve its content — the cue is the content-maximal D12-legal "
+            "placement (C1/G2B-001); infeasible -> PLAN_INFEASIBLE, never a "
+            "silent cut"
+        ),
     )
     pl.set_defaults(func=cmd_plan)
 

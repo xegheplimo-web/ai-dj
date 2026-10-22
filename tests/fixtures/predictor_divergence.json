@@ -1,16 +1,17 @@
 {
   "fixture": "predictor_divergence",
-  "card": "DJ-P2-CONTINUITY-002 / clause C4",
+  "card": "DJ-P2-CONTINUITY-002 / clause C4 (revised by DJ-P2-MINISET-G2B-001 / C4)",
   "recorded_at": "2026-10-23",
   "predictor": "ai_dj.continuity.find_master_violations (max-of-contributors bound)",
   "verifier": "ai_dj.verify._silence_check (D12 two-tier gate on the real WAV)",
+  "baseline_policy": "Recorded outcomes are the historical baseline, not a frozen contract: a live false_negative missing from this file is a hard failure; a recorded false_negative that stops reproducing is allowed predictor improvement but must be re-charted here deliberately (python tests/test_predictor_adversarial.py --rechart) and reviewed. All other recorded outcomes are pinned — unrelated drift still fails.",
   "summary": {
     "cases": 6,
     "agreement_clean": 1,
     "agreement_violation": 0,
     "false_positive": 3,
     "false_negative": 2,
-    "note": "FP = predictor flags a violation the verifier clears (conservative, safe direction). FN = predictor PASS but verifier FAIL — recorded as regression fixtures (regression_fixture: true)."
+    "note": "FP = predictor flags a violation the verifier clears (conservative, safe direction). FN = predictor PASS but verifier FAIL — recorded as historical regression fixtures (regression_fixture + historical). A recorded FN that stops reproducing means the predictor improved; it does not fail the suite — re-chart this file deliberately via --rechart after reviewing the change."
   },
   "cases": [
     {
@@ -21,6 +22,7 @@
       "verifier_pass": false,
       "outcome": "false_negative",
       "regression_fixture": true,
+      "historical": true,
       "measured": {
         "predicted_violations": [],
         "digital": {"ok": false, "max_run_s": 4.0, "violating_runs_s": [[16.0, 20.0]]},
@@ -50,6 +52,7 @@
       "verifier_pass": false,
       "outcome": "false_negative",
       "regression_fixture": true,
+      "historical": true,
       "measured": {
         "predicted_violations": [],
         "digital": {"ok": true, "max_run_s": 0.0, "violating_runs_s": []},

@@ -1,0 +1,181 @@
+{
+  "set_name": "dj-p2-miniset",
+  "card": "DJ-P2-MINISET-G2B-001",
+  "master_wav": "evidence/dj_p2_miniset_master.wav",
+  "plan_json": "evidence/dj_p2_miniset_plan.json",
+  "verification_json": "evidence/dj_p2_miniset_verification.json",
+  "render_report_json": "evidence/dj_p2_miniset_render_report.json",
+  "cue_report_json": "evidence/dj_p2_miniset_cue_report.json",
+  "technical_verdict": "PASS",
+  "duration_s": 930.603,
+  "duration_min": 15.5,
+  "track_count": 4,
+  "transition_count": 3,
+  "artifact_binding": {
+    "plan_json": "evidence\\dj_p2_miniset_plan.json",
+    "plan_sha256": "287048f33a4ea4000cdf1535e867689a3ee775fbb491124a4318c85d09f22fdf",
+    "master_wav": "evidence\\dj_p2_miniset_master.wav",
+    "master_sha256": "185e6243841ccafa298d718036f52466b81f7a808a63651deb9a12069ca8b39e"
+  },
+  "technical_pass": {
+    "artifact": true,
+    "duration_matches_plan": true,
+    "true_peak_under_neg1dbtp": true,
+    "clipping_count_0": true,
+    "samplerate_48k": true,
+    "d12_digital_silence_gate": true,
+    "d12_low_level_silence_gate": true,
+    "synthetic_alignment_0_0ms": true
+  },
+  "diagnostics_not_gates": {
+    "beat_deviation_within_threshold": false,
+    "beat_deviation_note": "per-transition onset offsets on real music are diagnostics (D6); the synthetic ground-truth check PASSES at 0.0ms"
+  },
+  "tracks": [
+    {
+      "index": 0,
+      "recording_id": "rec-798dc7ccde6f2433",
+      "title": "Khóa Ly Biệt (Cover Duy)",
+      "master_start_s": 0.0,
+      "cue_in_s": 24.26485,
+      "cue_out_s": 149.39719,
+      "retained_s": 125.132,
+      "cue_reason": "ok"
+    },
+    {
+      "index": 1,
+      "recording_id": "rec-d92d5b9fbbc9024e",
+      "title": "Untitled Session 6_mixdown",
+      "master_start_s": 118.45,
+      "cue_in_s": 1.69506,
+      "cue_out_s": 352.66467,
+      "retained_s": 350.97,
+      "cue_reason": "uncovered_silence_run"
+    },
+    {
+      "index": 2,
+      "recording_id": "rec-793608aaeb5b6242",
+      "title": "vô thường và buông xả(1)",
+      "master_start_s": 484.06,
+      "cue_in_s": 0.60372,
+      "cue_out_s": 98.765,
+      "retained_s": 98.161,
+      "cue_reason": "ok"
+    },
+    {
+      "index": 3,
+      "recording_id": "rec-36bd9cb09f26f5b8",
+      "title": "Sao Lòng Còn Thương - Trọng Hải",
+      "master_start_s": 576.22,
+      "cue_in_s": 0.48762,
+      "cue_out_s": 354.87057,
+      "retained_s": 354.383,
+      "cue_reason": "uncovered_silence_run"
+    }
+  ],
+  "transitions": [
+    {
+      "index": 0,
+      "from_title": "Khóa Ly Biệt (Cover Duy)",
+      "to_title": "Untitled Session 6_mixdown",
+      "type": "beat_crossfade",
+      "duration_s": 6.687,
+      "confidence": 0.635,
+      "reasons": [
+        "bpm_matched",
+        "key_compatible",
+        "bpm_diff_5.9%"
+      ],
+      "master_window_s": [
+        115.11,
+        121.79
+      ],
+      "listening_verdict": null,
+      "listening_notes": null
+    },
+    {
+      "index": 1,
+      "from_title": "Untitled Session 6_mixdown",
+      "to_title": "vô thường và buông xả(1)",
+      "type": "crossfade",
+      "duration_s": 6.0,
+      "confidence": 0.63,
+      "reasons": [
+        "key_compatible",
+        "bpm_diff_6.3%"
+      ],
+      "master_window_s": [
+        481.06,
+        487.06
+      ],
+      "listening_verdict": null,
+      "listening_notes": null
+    },
+    {
+      "index": 2,
+      "from_title": "vô thường và buông xả(1)",
+      "to_title": "Sao Lòng Còn Thương - Trọng Hải",
+      "type": "crossfade",
+      "duration_s": 6.0,
+      "confidence": 0.63,
+      "reasons": [
+        "key_marginal_2st",
+        "bpm_diff_0.0%"
+      ],
+      "master_window_s": [
+        573.22,
+        579.22
+      ],
+      "listening_verdict": null,
+      "listening_notes": null
+    }
+  ],
+  "anchor_coda_decision": {
+    "anchor_recording_id": "rec-36bd9cb09f26f5b8",
+    "anchor_title": "Sao Lòng Còn Thương - Trọng Hải",
+    "anchor_source_path": "F:\\DỮ LIỆU\\ok\\Sao Lòng Còn Thương - Trọng Hải.wav",
+    "source_duration_s": 389.397,
+    "planned_cue_s": [
+      0.48762,
+      354.87057
+    ],
+    "retained_s": 354.383,
+    "retained_vs_source": 0.9101,
+    "tail_trim_vs_source_s": 34.526,
+    "what_is_preserved": "full song body + entrance of the voiced reprise (coda); the internal digital hole (source ~352.05-352.6s) sits inside the master fade-out so the set can end THROUGH it",
+    "what_is_trimmed": "the reprise tail: source ~354.87s -> end (~30.5s of voiced melodic coda + ~4s of tail silence). No legal single-segment cue can keep both the song body and the full coda - the internal hole would be an uncovered D12 violation mid-track. All alternatives are audited in plan anchor_resolution.anchors[0].preservation.options.",
+    "ab_material": {
+      "original_source_345s_to_end": "evidence/dj_p2_miniset_ab_anchor_original_345s_to_end.wav",
+      "original_hole_zoom_345s_358s": "evidence/dj_p2_miniset_ab_anchor_hole_zoom_345s_358s.wav",
+      "master_ending_920s_to_end": "evidence/dj_p2_miniset_ab_master_ending_920s_to_end.wav"
+    },
+    "question_for_listener": "The master fades out across the internal hole and the first ~2s of the reprise; the remaining ~30.5s of reprise is not in the master. Is this an acceptable set ending (musically honest fade vs losing the full coda)? Hard-fail rule applies: if cutting the ending short is unacceptable, verdict is FAIL.",
+    "listening_verdict": null,
+    "listening_notes": null
+  },
+  "listening_instructions": {
+    "playback": "Play evidence/dj_p2_miniset_master.wav (or the A/B excerpts for focused comparison)",
+    "focus_points": [
+      "Transition 0 (~118.45s): beat_crossfade, 6.687s - bpm_matched; key_compatible; bpm_diff_5.9%",
+      "Transition 1 (~484.06s): crossfade, 6.0s - key_compatible; bpm_diff_6.3%",
+      "Transition 2 (~576.22s): crossfade, 6.0s into the anchor - key_marginal_2st; bpm_diff_0.0%",
+      "Anchor ending (~926-930.6s): master fade sweeps through the digital hole and the reprise entrance - compare with original source 345s->end",
+      "Any track that feels cut mid-phrase, any vocal line that stops early"
+    ],
+    "error_log": [
+      {
+        "time_s": null,
+        "description": null,
+        "severity": null
+      }
+    ],
+    "verdict_options": [
+      "GOOD",
+      "ACCEPTABLE",
+      "REVISION_REQUIRED",
+      "UNUSABLE"
+    ],
+    "overall_verdict": null,
+    "overall_notes": null
+  }
+}

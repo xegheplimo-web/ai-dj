@@ -23,10 +23,22 @@ import json
 from pathlib import Path
 
 VERDICT_SUFFIX = ".verify.json"
+_HASH_CHUNK = 1 << 20  # 1 MiB — never hold a multi-hundred-MB WAV in RAM
 
 
 def sha256_file(path: str | Path) -> str:
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    """SHA-256 of the file on disk, streamed in 1 MiB chunks (P3).
+
+    Binds a verdict to the exact artifact bytes measured at verify time. It
+    is *binding*, not anti-forgery evidence: it carries no signature and does
+    not prove the WAV was rendered from the plan — a chunked read keeps that
+    binding cheap for hour-long masters (G3).
+    """
+    h = hashlib.sha256()
+    with Path(path).open("rb") as f:
+        for chunk in iter(lambda: f.read(_HASH_CHUNK), b""):
+            h.update(chunk)
+    return h.hexdigest()
 
 
 def verdict_path(master_wav: str | Path) -> Path:
@@ -63,17 +75,30 @@ def write_verdict(
     if report_path:
         rp = Path(report_path)
         rp.parent.mkdir(parents=True, exist_ok=True)
-        rp.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        rp.write_bytes((json.dumps(report, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
     if Path(master_wav).exists():
         doc = {
             "verdict": report.get("verdict"),
             "pass": report.get("pass"),
             "verify_report": str(report_path) if report_path else None,
             "verified_by": "ai_dj.verify",
+            "provenance": {
+                "binding": (
+                    "sha256 over the bytes of plan.json + master.wav measured at verify time"
+                ),
+                "limits": (
+                    "binds this verdict to the exact artifact bytes — it is "
+                    "NOT anti-forgery evidence, does not prove the WAV was "
+                    "rendered from this plan, and carries no signature; "
+                    "D12 permits plan-declared allowed_silent_gaps_s — the "
+                    "planner emits none, and any exempt regions are listed "
+                    "in the verify report"
+                ),
+            },
             **binding,
         }
-        verdict_path(master_wav).write_text(
-            json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        verdict_path(master_wav).write_bytes(
+            (json.dumps(doc, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
         )
     return binding
 

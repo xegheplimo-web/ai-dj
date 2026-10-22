@@ -396,7 +396,7 @@ def _artifact_fail_report(
     if out_path:
         op = Path(out_path)
         op.parent.mkdir(parents=True, exist_ok=True)
-        op.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        op.write_bytes((json.dumps(report, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
     return report
 
 
@@ -514,5 +514,5 @@ def verify_master(plan: dict, master_wav: str | Path, out_path: str | Path | Non
     if out_path:
         op = Path(out_path)
         op.parent.mkdir(parents=True, exist_ok=True)
-        op.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        op.write_bytes((json.dumps(report, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
     return report

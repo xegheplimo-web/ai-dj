@@ -68,6 +68,9 @@ def _record(
     }
     if with_continuity:
         rec["continuity_version"] = continuity.CONTINUITY_VERSION
+        rec["block_ms"] = int(continuity.BLOCK_S * 1000)
+        rec["channels"] = "all_channels_rms"
+        rec["continuity_sr"] = MASTER_SR
         rec["block_rms_dbfs"] = _stereo_blocks(duration_s, silent_spans)
         rec["silence_intervals"] = {
             "digital_minus90": [[a, z] for a, z in silent_spans],
@@ -391,6 +394,172 @@ class TestPlannerHardConstraint(unittest.TestCase):
         first = plan["tracks"][0]
         if first["recording_id"] == "rec-2":
             self.assertGreaterEqual(first["cue_in_s"], 12.0)
+
+
+class TestPayloadCompleteness(unittest.TestCase):
+    """P1 (G2B-001): the payload gate is a completeness check, not a version
+    check — a one-block, malformed, or duration-inconsistent map fails
+    closed exactly like missing data."""
+
+    def _measured(self) -> dict:
+        return _record("rec-p", "w", 100.0, "A minor", 0.5)
+
+    def test_complete_payload_passes(self) -> None:
+        self.assertTrue(continuity.has_continuity_payload(self._measured()))
+
+    def test_single_block_fails(self) -> None:
+        rec = self._measured()
+        rec["block_rms_dbfs"] = [-20.0]
+        self.assertFalse(continuity.has_continuity_payload(rec))
+
+    def test_missing_grid_fields_fail(self) -> None:
+        for field in ("block_ms", "continuity_sr", "channels", "silence_intervals"):
+            rec = self._measured()
+            rec.pop(field)
+            self.assertFalse(continuity.has_continuity_payload(rec), field)
+
+    def test_wrong_grid_values_fail(self) -> None:
+        rec = self._measured()
+        rec["block_ms"] = 25
+        self.assertFalse(continuity.has_continuity_payload(rec))
+        rec = self._measured()
+        rec["continuity_sr"] = 44100
+        self.assertFalse(continuity.has_continuity_payload(rec))
+        rec = self._measured()
+        rec["channels"] = "left_only"
+        self.assertFalse(continuity.has_continuity_payload(rec))
+
+    def test_nonfinite_blocks_fail(self) -> None:
+        for bad in (float("nan"), float("inf"), float("-inf")):
+            rec = self._measured()
+            rec["block_rms_dbfs"][100] = bad
+            self.assertFalse(continuity.has_continuity_payload(rec), bad)
+
+    def test_duration_inconsistent_map_fails(self) -> None:
+        rec = self._measured()
+        rec["block_rms_dbfs"] = rec["block_rms_dbfs"][:100]  # truncated map
+        self.assertFalse(continuity.has_continuity_payload(rec))
+        rec = self._measured()
+        rec["block_rms_dbfs"] = rec["block_rms_dbfs"] * 3  # over-long map
+        self.assertFalse(continuity.has_continuity_payload(rec))
+
+    def test_incomplete_payload_reads_as_unmeasured(self) -> None:
+        # the planner-side status stays the honest "unmeasured" — missing
+        # data is never conflated with audio infeasibility
+        rec = self._measured()
+        rec.pop("block_ms")
+        a = continuity.assess_segment(rec, 0.0, 0.0, 0.0)
+        self.assertEqual(a["status"], "unmeasured")
+
+
+class TestAnchorPreservation(unittest.TestCase):
+    """C1 (G2B-001): --anchor-last puts the anchor at the END and the
+    preserving assessment picks the content-maximal legal cue."""
+
+    def _anchor_like_real(self, rec_id: str = "anchor", work_id: str = "work-a") -> dict:
+        """Synthetic anchor mirroring the real G2B anchor: a ~0.7 s digital
+        hole at ~90 s inside a longer low-level fade, then content to ~116 s
+        and silence at the very tail."""
+        rec = _record(
+            rec_id,
+            work_id,
+            100.0,
+            "A minor",
+            0.6,
+            duration_s=120.0,
+            silent_spans=[(89.9, 90.6), (116.0, 119.95)],
+            intro_end_s=0.0,
+        )
+        blocks = np.asarray(rec["block_rms_dbfs"], dtype=np.float64)
+        for i in range(int(88.5 / 0.05), int(89.9 / 0.05)):
+            blocks[i] = -65.0  # fade tail → low-level run into the hole
+        rec["block_rms_dbfs"] = [round(float(v), 4) for v in blocks]
+        return rec
+
+    def test_preserving_assessment_keeps_max_content(self) -> None:
+        rec = self._anchor_like_real()
+        a = continuity.assess_anchor_segment(rec, 6.36, 3.18, 0.0)
+        self.assertEqual(a["status"], "adjusted")
+        # the hole is masked by the set's own ending fade — the cue keeps
+        # the body AND the start of the post-hole section
+        self.assertEqual(a["mode"], "tail_covered")
+        self.assertGreater(a["cue_out"], 90.6)
+        plain = continuity.assess_segment(rec, 6.36, 3.18, 0.0)
+        self.assertGreater(a["cue_out"] - a["cue_in"], plain["cue_out"] - plain["cue_in"])
+        # every feasible placement is audited — the trim is never hidden
+        self.assertTrue(any(o["mode"] == "tail_trim" for o in a["options"]))
+        self.assertTrue(sum(1 for o in a["options"] if o.get("chosen")) == 1)
+
+    def test_preserving_default_cue_stays(self) -> None:
+        rec = _record("anchor", "work-a", 100.0, "A minor", 0.6)
+        a = continuity.assess_anchor_segment(rec, 6.36, 3.18, 0.0)
+        self.assertEqual(a["status"], "ok")
+        self.assertEqual(a["mode"], "default")
+
+    def test_preserving_infeasible_without_downbeats(self) -> None:
+        rec = _record(
+            "anchor",
+            "work-a",
+            100.0,
+            "A minor",
+            0.6,
+            silent_spans=[(10.0, 100.0)],
+            downbeat_times_s=[],
+            beat_times_s=[],
+        )
+        a = continuity.assess_anchor_segment(rec, 6.36, 3.18, 0.0)
+        self.assertEqual(a["status"], "infeasible")
+
+    def test_anchor_last_places_anchor_at_end(self) -> None:
+        records = _records()
+        records[2] = self._anchor_like_real("rec-3", "work-3")
+        plan = plan_set(records, n_tracks=3, set_name="t", include_ids=["rec-3"], anchor_last=True)
+        ids = [t["recording_id"] for t in plan["tracks"]]
+        self.assertEqual(ids[-1], "rec-3")
+        self.assertEqual(ids.count("rec-3"), 1)
+        res = plan["anchor_resolution"]
+        self.assertTrue(res["anchor_last"])
+        entry = res["anchors"][0]
+        self.assertEqual(entry["position"], "last")
+        self.assertEqual(entry["slot_index"], len(ids) - 1)
+        pres = entry["preservation"]
+        self.assertIn("options", pres)
+        self.assertGreater(pres["retained_s"], 0.0)
+        self.assertTrue(plan["request"]["content_preservation"])
+
+    def test_anchor_last_reports_preserved_trim(self) -> None:
+        records = _records()
+        records[2] = self._anchor_like_real("rec-3", "work-3")
+        plan = plan_set(records, n_tracks=3, set_name="t", include_ids=["rec-3"], anchor_last=True)
+        anchor = plan["tracks"][-1]
+        rep = anchor["cue_report"]
+        self.assertTrue(rep["preserved"])
+        self.assertEqual(rep["mode"], "tail_covered")
+        self.assertGreater(rep["tail_trim_vs_source_s"], rep["removed_tail_s"])
+        self.assertGreater(rep["removed_tail_s"], 0.0)
+        self.assertTrue(any(o["mode"] == "tail_trim" for o in rep["options"]))
+
+    def test_anchor_last_infeasible_raises_structured(self) -> None:
+        records = _records()
+        records[2] = _record(
+            "rec-3",
+            "work-3",
+            130.0,
+            "F# minor",
+            0.60,
+            silent_spans=[(10.0, 100.0)],
+            downbeat_times_s=[],
+            beat_times_s=[],
+        )
+        with self.assertRaises(PlanInfeasible) as ctx:
+            plan_set(records, n_tracks=3, set_name="t", include_ids=["rec-3"], anchor_last=True)
+        exc = ctx.exception
+        self.assertEqual(exc.payload["error"], "PLAN_INFEASIBLE")
+        self.assertIn(exc.reason, ("anchor_content_infeasible", "anchor_last_infeasible"))
+
+    def test_anchor_last_requires_include(self) -> None:
+        with self.assertRaises(ValueError):
+            plan_set(_records(), n_tracks=3, set_name="t", anchor_last=True)
 
 
 class TestMasterSimulation(unittest.TestCase):
