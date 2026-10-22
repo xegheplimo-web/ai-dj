@@ -3,7 +3,7 @@
 [![CI](https://github.com/xegheplimo-web/ai-dj/actions/workflows/ci.yml/badge.svg)](https://github.com/xegheplimo-web/ai-dj/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/xegheplimo-web/ai-dj/actions/workflows/codeql.yml/badge.svg)](https://github.com/xegheplimo-web/ai-dj/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
 
 Autonomous AI DJ engine for **Windows 11**: the AI decides the music (track order,
 transition type, cue points, energy arc), and a deterministic engine executes the
@@ -61,7 +61,11 @@ python -m venv .venv
 ```
 
 `ffmpeg` with the `rubberband` filter must be on `PATH` for the timing gate
-(the probe skips with a clear message when it is absent).
+(the probe skips with a clear message when it is absent). CI supplies it through
+`imageio-ffmpeg`, whose bundled gyan.dev build includes `rubberband`.
+
+`librosa>=1.0` requires Python 3.12 or newer; that is why the test matrix starts
+at 3.12.
 
 ## CI
 
