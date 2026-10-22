@@ -18,8 +18,16 @@ import threading
 from pathlib import Path
 
 import numpy as np
-import sounddevice as sd
 import soundfile as sf
+
+try:
+    import sounddevice as sd
+except OSError:
+    # PortAudio shared library not installed (e.g. CI runners without
+    # libportaudio2). Audio output is optional: all other CLI commands
+    # (scan/analyze/plan/render/verify) and their tests must work without it
+    # (D11 principle: optional external dependency must not be fatal at import).
+    sd = None
 
 BLOCK_FRAMES = 4096
 QUEUE_DEPTH = 8
@@ -91,6 +99,11 @@ def play_master(
     master_wav = Path(master_wav)
     if not master_wav.exists():
         raise FileNotFoundError(f"master not found: {master_wav}")
+    if sd is None:
+        raise RuntimeError(
+            "sounddevice/PortAudio is not available on this system — "
+            "install libportaudio2 to use playback"
+        )
 
     with sf.SoundFile(str(master_wav)) as f:
         sr, channels, total_frames = f.samplerate, f.channels, len(f)
