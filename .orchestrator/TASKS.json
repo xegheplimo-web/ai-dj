@@ -182,7 +182,9 @@
     "priority": 1,
     "card": ".orchestrator/cards/DJ-P2-CONTINUITY-001.md",
     "verified_by": "hermes",
-    "blocked_by": [],
+    "blocked_by": [
+      "DJ-P2-CONTINUITY-002"
+    ],
     "origin": "GPT verdict 2026-10-22 (docs/gpt-review-continuity-2026-10-22.md) — VERDICT HOLD",
     "acceptance": [
       "G1 analyzer emits continuity_version + multi-threshold silence_intervals + opener (non-null) on re-analyze",
@@ -196,7 +198,30 @@
       "G9 verify.py thresholds UNCHANGED (D10/D12 not softened)",
       "G10 64+ tests PASS, ruff check clean, ruff format clean"
     ],
-    "note": "G1–G10 PASS under Hermes independent re-run (2026-10-23). 85 tests / ruff clean / format clean / G8 sha bd125eaf / G7 master PASS D12. Pending GPT architecture verdict (continuity contract acceptance).",
+    "note": "GPT HOLD -> hardening task DJ-P2-CONTINUITY-002 created. Decision A+C+F+(a).",
     "last_update": "2026-10-23"
+  },
+  {
+    "id": "DJ-P2-CONTINUITY-002",
+    "title": "P0: Final Contract Hardening (fail-closed + verify-by-render + D17 limitation + G8 v3)",
+    "assignee": "devin-cli",
+    "status": "todo",
+    "priority": 1,
+    "card": ".orchestrator/cards/DJ-P2-CONTINUITY-002.md",
+    "verified_by": "hermes",
+    "blocked_by": [],
+    "origin": "GPT decision 2026-10-23 (docs/gpt-decision-hardening-2026-10-23.md) — A+C+F+(a)",
+    "acceptance": [
+      "H1-H2 plan refuses missing continuity data with exit 5 + structured error",
+      "H3 plan works after re-analyze",
+      "H4 G8: same v3 snapshot -> byte-identical plan.json",
+      "H5 play refuses master without valid PASS verdict",
+      "H6 verify verdict bound to SHA-256 of plan.json + WAV",
+      "H7 adversarial predictor tests (phase/gain/fade/stretch/boundary) + regression fixtures",
+      "H8 DECISIONS.md D17 complete",
+      "H9 all tests pass, ruff clean",
+      "H10 verify.py thresholds unchanged"
+    ],
+    "note": "No .devin/ writes. No commit/push. No verify.py threshold change. NO --allow-unmeasured waiver (GPT rejected)."
   }
 ]
