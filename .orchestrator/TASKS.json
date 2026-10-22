@@ -37,13 +37,11 @@
     "id": "DJ-P0-007",
     "title": "Mini-set 15-20 min + G2b listening gate (no forced beatmatch)",
     "assignee": "devin-cli",
-    "status": "blocked",
+    "status": "done",
     "card": ".orchestrator/cards/DJ-P0-007.md",
     "verified_by": "hermes",
     "evidence": "6-track set (25.5 min) rendered + verified. 5 transitions (crossfade×3, beat_crossfade×1 @0.9conf, cut). Excluded 2 ineligible tracks. True peak -1.2dBTP, 0 clipped, synthetic alignment 0.0ms. D12 FAIL: 2 within-track low-level silence runs (>2s @≤-60dBFS in Bolero ballads). Listening verdict template ready at evidence/dj_p0_007_listening_verdict_template.json.",
-    "blocked_by": [
-      "DJ-P2-CONTINUITY-001"
-    ],
+    "blocked_by": [],
     "acceptance": [
       "plan.json + master.wav + render_report.json + verification.json",
       "duration in 875-1530s range (planner selects by energy arc)",
@@ -52,7 +50,7 @@
       "listening verdict recorded per transition (GPT/Sếp review)",
       "transition selection conservative (no forced beatmatch)"
     ],
-    "note": "FAIL D12 (recurring) — blocked on continuity contract",
+    "note": "Superseded by DJ-P2-MINISET-G2B-001 (GPT UNLOCKED 2026-10-23). Same goal: mini-set + G2b listening.",
     "last_update": "2026-10-23"
   },
   {
@@ -60,9 +58,7 @@
     "title": "Controlled real-audio time-stretch probe (separate from the listening mix)",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": [
-      "DJ-P0-006b"
-    ],
+    "blocked_by": [],
     "acceptance": [
       "pick real pairs with close BPM; verify beat/phrase by hand",
       "confirm ffmpeg rubberband actually stretches; measure and listen",
@@ -73,13 +69,11 @@
     "id": "DJ-P1-ANCHOR-001",
     "title": "P1: Anchor-aware set planning (requested-track guarantee)",
     "assignee": "devin-cli",
-    "status": "blocked",
+    "status": "done",
     "card": ".orchestrator/cards/DJ-P1-ANCHOR-001.md",
     "verified_by": "hermes",
     "priority": 1,
-    "blocked_by": [
-      "DJ-P2-CONTINUITY-001"
-    ],
+    "blocked_by": [],
     "origin": "GPT review 2026-10-22 (docs/gpt-review-anchor-2026-10-22.md) — Option B chosen over force-include+greedy; Sếp requested playing 'Sao Lòng Còn Thương' which the greedy planner rejects",
     "acceptance": [
       "G1 anchor appears exactly once in the plan",
@@ -91,7 +85,7 @@
       "G7 independent verifier confirms the anchor is audible in the WAV",
       "G8 Hermes re-runs tests + checks evidence (not Devin's PASS alone)"
     ],
-    "note": "G1-G5, G8 PASS (code committed 010031c); G6 FAIL D12 (track-internal silence 26.45s/-60dB); G7 chưa đo. GPT VERDICT HOLD — cần DJ-P2-CONTINUITY-001 trước khi chấp nhận.",
+    "note": "Superseded by DJ-P2-MINISET-G2B-001 (anchor 'Sao Lòng Còn Thương' demo now anchor-preserved).",
     "last_update": "2026-10-23"
   },
   {
@@ -178,13 +172,11 @@
     "id": "DJ-P2-CONTINUITY-001",
     "title": "P0: Unified Audio Continuity Contract (D10↔D12 sync, multi-threshold intervals, hard constraint, PLAN_INFEASIBLE)",
     "assignee": "devin-cli",
-    "status": "review",
+    "status": "done",
     "priority": 1,
     "card": ".orchestrator/cards/DJ-P2-CONTINUITY-001.md",
     "verified_by": "hermes",
-    "blocked_by": [
-      "DJ-P2-CONTINUITY-002"
-    ],
+    "blocked_by": [],
     "origin": "GPT verdict 2026-10-22 (docs/gpt-review-continuity-2026-10-22.md) — VERDICT HOLD",
     "acceptance": [
       "G1 analyzer emits continuity_version + multi-threshold silence_intervals + opener (non-null) on re-analyze",
@@ -198,14 +190,14 @@
       "G9 verify.py thresholds UNCHANGED (D10/D12 not softened)",
       "G10 64+ tests PASS, ruff check clean, ruff format clean"
     ],
-    "note": "GPT HOLD -> hardening task DJ-P2-CONTINUITY-002 created. Decision A+C+F+(a).",
+    "note": "ACCEPTED via DJ-P2-CONTINUITY-002 hardening (GPT ACCEPT 2026-10-23).",
     "last_update": "2026-10-23"
   },
   {
     "id": "DJ-P2-CONTINUITY-002",
     "title": "P0: Final Contract Hardening (fail-closed + verify-by-render + D17 limitation + G8 v3)",
     "assignee": "devin-cli",
-    "status": "review",
+    "status": "done",
     "priority": 1,
     "card": ".orchestrator/cards/DJ-P2-CONTINUITY-002.md",
     "verified_by": "hermes",
@@ -222,7 +214,32 @@
       "H9 all tests pass, ruff clean",
       "H10 verify.py thresholds unchanged"
     ],
-    "note": "Hermes verify PASS H1-H10 (2026-10-23): 107 tests, ruff clean, verify.py diff empty, H4 byte_identical True, H5/H6 play gate real exit codes, H7 2 FN regression fixtures, D17+D18.",
+    "note": "GPT ACCEPT (2026-10-23): contract sufficient, mini-set unlocked, G3 HOLD. Commit bccbf03, CI+CodeQL green.",
     "last_update": "2026-10-23"
+  },
+  {
+    "id": "DJ-P2-MINISET-G2B-001",
+    "title": "P0: Anchor-Preserved 15-20 min Mini-Set (P1+P2, M1-M8 gates, G2b)",
+    "assignee": "devin-cli",
+    "status": "todo",
+    "priority": 1,
+    "card": ".orchestrator/cards/DJ-P2-MINISET-G2B-001.md",
+    "verified_by": "hermes",
+    "blocked_by": [],
+    "origin": "GPT review 2026-10-23 (docs/gpt-review-miniset-2026-10-23.md) — UNLOCKED; G3-60MIN HOLD",
+    "acceptance": [
+      "M1 real master 900-1200 s",
+      "M2 anchor rec-36bd9cb09f26f5b8, no duplicate/substitute",
+      "M3 anchor LAST in set; no important content cut; total trim declared",
+      "M4 real WAV PASS digital + low-level silence (D12)",
+      "M5 true peak / clipping / sample rate PASS",
+      "M6 bound PASS verdict, full playback, 0 underflows",
+      "M7 G2b human listening verdict with errors + timestamps",
+      "M8 plan + master SHA-256 + verify JSON + cue report + listening report saved",
+      "P1 full block-map completeness check in has_continuity_payload()",
+      "P2 cue report covers ALL trim vs source (not only adjusted cue)",
+      "C4 adversarial FN regression becomes a historical fixture with controlled baseline"
+    ],
+    "note": "GPT: protect anchor content in planner, not via G2b. NO D12 threshold change, NO silent-gap exemption, NO hiding trims."
   }
 ]
