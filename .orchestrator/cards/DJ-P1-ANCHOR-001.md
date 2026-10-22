@@ -1,6 +1,6 @@
 # DJ-P1-ANCHOR-001 — Anchor-Aware Set Planning
 
-**Status:** todo · **Priority:** P1 · **Assignee:** devin-cli · **Verified by:** hermes
+**Status:** in-review · **Priority:** P1 · **Assignee:** devin-cli · **Verified by:** hermes
 **Source:** GPT review 2026-10-22 → `docs/gpt-review-anchor-2026-10-22.md`
 **Ref:** HEAD b22eeb6 · **GPT verdict:** GO — "0/8 gate được xác nhận"
 
@@ -61,11 +61,11 @@ chỉ vì kế hoạch đạt điểm thấp.
 
 ## Acceptance gates (8) — GPT: "0/8 gate được xác nhận"
 
-- [ ] **G1** Bài Sao Lòng Còn Thương xuất hiện **đúng một lần** trong plan
-- [ ] **G2** Planner chủ động đánh giá ĐOẠN TUYỆT và các hàng xóm tương thích
-- [ ] **G3** Cùng input/seed/nguồn → kết quả **deterministic**
-- [ ] **G4** Không anchor → **legacy regression không đổi**
-- [ ] **G5** Anchor không tồn tại hoặc bị exclude → **lỗi rõ ràng**
+- [x] **G1** Bài Sao Lòng Còn Thương xuất hiện **đúng một lần** trong plan
+- [x] **G2** Planner chủ động đánh giá ĐOẠN TUYỆT và các hàng xóm tương thích
+- [x] **G3** Cùng input/seed/nguồn → kết quả **deterministic**
+- [x] **G4** Không anchor → **legacy regression không đổi**
+- [x] **G5** Anchor không tồn tại hoặc bị exclude → **lỗi rõ ràng**
 - [ ] **G6** Render thành công, **không** silence/dropout/clip bất thường
 - [ ] **G7** Verifier độc lập xác nhận nội dung bài anchor **thực sự nghe được**
 - [ ] **G8** Hermes tự chạy lại tests + kiểm tra bằng chứng (không chỉ nhận PASS của Devin)
