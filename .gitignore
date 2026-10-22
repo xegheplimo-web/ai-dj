@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+# Analysis cache / large artifacts
+.cache/
+analysis_cache.sqlite*
+*.wav.bak
+# Evidence (keep structure, ignore bulky media)
+evidence/**/*.wav
+evidence/**/*.mp3
+# OS / editor
+Thumbs.db
+.DS_Store
+*.swp
