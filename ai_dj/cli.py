@@ -3,7 +3,9 @@
 Every command prints a JSON result on stdout (or a JSON error on stderr).
 Exit codes: 0 = success/PASS, 1 = gate/logic failure/FAIL, 3 = INCONCLUSIVE
 (a required measurement is missing; verify only), 2 = usage/environment
-errors (no verdict is ever emitted on a usage error).
+errors (no verdict is ever emitted on a usage error), 4 = PLAN_INFEASIBLE
+(plan only: no ordering satisfies the D12 continuity hard constraint —
+structured violation ranges ride on the error JSON).
 """
 
 from __future__ import annotations
@@ -15,7 +17,7 @@ from pathlib import Path
 
 from ai_dj.analysis.analyzer import DEFAULT_CACHE, AnalysisCache, analyze_corpus
 from ai_dj.analysis.corpus import TrackRef, duplicate_report, scan_corpus
-from ai_dj.planner import load_plan, plan_set, write_plan
+from ai_dj.planner import PlanInfeasible, load_plan, plan_set, write_plan
 from ai_dj.player import play_master
 from ai_dj.render import render_plan
 from ai_dj.verify import verify_master
@@ -144,6 +146,8 @@ def cmd_plan(args: argparse.Namespace) -> int:
             include_ineligible=args.include_ineligible,
             include_ids=include_ids,
         )
+    except PlanInfeasible as exc:
+        return _fail(exc.payload, 4)
     except ValueError as exc:
         return _fail({"error": str(exc)}, 1)
     out = write_plan(plan, args.out)

@@ -1,0 +1,70 @@
+{
+  "anchor_recording_id": "rec-36bd9cb09f26f5b8",
+  "anchor_title": "Sao Lòng Còn Thương - Trọng Hải",
+  "source": "F:\\DỮ LIỆU\\ok\\Sao Lòng Còn Thương - Trọng Hải.wav",
+  "measurement": {
+    "signal": "all-channel RMS, 50 ms blocks, 48 kHz (renderer decode path)",
+    "continuity_version": 1,
+    "block_ms": 50,
+    "channels": "all_channels_rms",
+    "continuity_sr": 48000,
+    "silence_intervals": {
+      "digital_minus90": [
+        [
+          352.05,
+          352.6
+        ],
+        [
+          385.45,
+          389.35
+        ]
+      ],
+      "low_level_minus60": [
+        [
+          351.05,
+          352.65
+        ],
+        [
+          385.4,
+          389.35
+        ]
+      ]
+    },
+    "opener": {
+      "audibility_ok": true,
+      "cue_in_s": 0.48762,
+      "max_digital_run_s": 0.0,
+      "max_low_level_run_s": 0.0,
+      "window_s": 30
+    },
+    "n_blocks": 7787
+  },
+  "plan_cue_applied": {
+    "cue_in_s": 0.48762,
+    "cue_out_s": 351.75909,
+    "note": "cue_out trimmed to a downbeat before the 352.05s digital run"
+  },
+  "master_opener_30s": {
+    "window_s": 30.0,
+    "measured_on": "evidence/dj_p2_continuity_master.wav",
+    "measured_with": "verify._block_rms_dbfs/_silent_runs (D12 block logic)",
+    "blocks": 600,
+    "tiers": {
+      "digital_minus90": {
+        "threshold_dbfs": -90.0,
+        "min_run_s": 0.5,
+        "max_run_s": 0.0,
+        "violating_runs_s": [],
+        "ok": true
+      },
+      "low_level_minus60": {
+        "threshold_dbfs": -60.0,
+        "min_run_s": 2.0,
+        "max_run_s": 0.65,
+        "violating_runs_s": [],
+        "ok": true
+      }
+    },
+    "audibility_ok": true
+  }
+}

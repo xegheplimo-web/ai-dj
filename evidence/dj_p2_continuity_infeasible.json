@@ -1,0 +1,27 @@
+{
+  "gate": "G5",
+  "command": "plan --include-track rec-lowbed",
+  "fixture": "120 s WAV at -80 dBFS (D10-eligible, D12-fatal everywhere) + 2 real corpus records",
+  "exit_code": 4,
+  "stderr_payload": {
+    "error": "PLAN_INFEASIBLE",
+    "reason": "anchor_infeasible",
+    "message": "no feasible plan found containing anchor 'rec-lowbed': the anchor cannot be placed in any slot without violating the D12 continuity contract (uncoverable_silence)",
+    "violations": [
+      {
+        "tier": "low_level_minus60",
+        "range_s": [
+          0.05,
+          118.0
+        ],
+        "uncovered_s": [
+          0.07,
+          118.0
+        ],
+        "reason": "uncovered_silence_run"
+      }
+    ],
+    "anchor_id": "rec-lowbed",
+    "assessment_status": "infeasible"
+  }
+}

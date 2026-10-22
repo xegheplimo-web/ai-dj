@@ -30,7 +30,9 @@ from pathlib import Path
 import librosa
 import numpy as np
 
-ANALYSIS_VERSION = 2
+from ai_dj import continuity
+
+ANALYSIS_VERSION = 3  # v3: + Unified Audio Continuity Contract payload fields
 ANALYSIS_SR = 22050
 DEFAULT_CACHE = "analysis_cache.sqlite"
 
@@ -227,6 +229,23 @@ def analyze_track(path: str | Path) -> dict:
     s_ratio, s_longest = silence_metrics(y, sr)
     eligible = bool(s_ratio <= MAX_SILENCE_RUN_FRACTION)
 
+    # Unified Audio Continuity Contract (DJ-P2-CONTINUITY-001): the silence
+    # picture the D12 gate will see is measured on the renderer's own decode
+    # path — all channels at MASTER_SR — not on the 22.05 kHz mono analysis
+    # mixdown used for BPM/key/energy above. Two different signal classes is
+    # precisely why thresholds alone could not close the D10<->D12 gap.
+    block_db = continuity.measure_master_blocks(path)
+    cont = continuity.continuity_fields(
+        block_db,
+        {
+            "duration_s": duration_s,
+            "intro_end_s": intro_end_s,
+            "outro_start_s": outro_start_s,
+            "downbeat_times_s": downbeat_times.tolist(),
+            "beat_times_s": beat_times.tolist(),
+        },
+    )
+
     return {
         "analysis_version": ANALYSIS_VERSION,
         "analysis_sr": sr,
@@ -254,6 +273,7 @@ def analyze_track(path: str | Path) -> dict:
         "silence_run_ratio": round(s_ratio, 4),
         "longest_silence_run_s": round(s_longest, 3),
         "eligible": eligible,
+        **cont,
         "exclusion_reason": (
             None if eligible else f"silence_run_ratio {s_ratio:.3f} > {MAX_SILENCE_RUN_FRACTION}"
         ),
@@ -290,7 +310,17 @@ class AnalysisCache:
             "SELECT payload FROM tracks WHERE recording_id = ? AND analysis_version = ?",
             (recording_id, ANALYSIS_VERSION),
         ).fetchone()
-        return json.loads(row[0]) if row else None
+        if not row:
+            return None
+        payload = json.loads(row[0])
+        # Continuity contract staleness: an ok-status payload whose
+        # continuity_version is missing or older than the contract's is a
+        # cache miss — re-analyze, never silently reuse (DJ-P2-CONTINUITY-001).
+        if payload.get("status") == "ok" and (
+            payload.get("continuity_version") != continuity.CONTINUITY_VERSION
+        ):
+            return None
+        return payload
 
     def put(self, record: dict) -> None:
         self._conn.execute(
