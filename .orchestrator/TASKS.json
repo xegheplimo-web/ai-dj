@@ -178,7 +178,7 @@
     "id": "DJ-P2-CONTINUITY-001",
     "title": "P0: Unified Audio Continuity Contract (D10↔D12 sync, multi-threshold intervals, hard constraint, PLAN_INFEASIBLE)",
     "assignee": "devin-cli",
-    "status": "todo",
+    "status": "review",
     "priority": 1,
     "card": ".orchestrator/cards/DJ-P2-CONTINUITY-001.md",
     "verified_by": "hermes",
@@ -196,6 +196,7 @@
       "G9 verify.py thresholds UNCHANGED (D10/D12 not softened)",
       "G10 64+ tests PASS, ruff check clean, ruff format clean"
     ],
-    "note": "No .devin/ writes. No commit/push. No threshold softening. No in-song cut or bg music to cheat D12. No SQLite schema change — version payload JSON only."
+    "note": "G1–G10 PASS under Hermes independent re-run (2026-10-23). 85 tests / ruff clean / format clean / G8 sha bd125eaf / G7 master PASS D12. Pending GPT architecture verdict (continuity contract acceptance).",
+    "last_update": "2026-10-23"
   }
 ]
