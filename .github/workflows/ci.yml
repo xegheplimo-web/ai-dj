@@ -24,7 +24,7 @@ jobs:
           python-version: "3.12"
       - name: Install ruff
         run: |
-          python -m pip install --quiet --only-binary :all: ruff==0.17.0
+          python -m pip install --quiet --only-binary :all: ruff==0.17.1
       - name: Ruff lint
         run: ruff check --output-format=github .
       - name: Ruff format check
@@ -100,7 +100,7 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Upload evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: timing-evidence
           path: evidence/timing_probe.json

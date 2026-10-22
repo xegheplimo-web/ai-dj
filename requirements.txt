@@ -1,5 +1,5 @@
 # Core runtime dependencies (verified on Windows 11 / Python 3.13)
-numpy>=2.0
+numpy>=2.4.6
 librosa>=1.0.0
-soundfile>=0.13
-sounddevice>=0.5
+soundfile>=0.14.0
+sounddevice>=0.5.6
