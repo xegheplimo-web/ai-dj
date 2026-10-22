@@ -133,6 +133,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
         )
         for r in flagged:
             print(f"  - {r.get('title')}: {r.get('exclusion_reason')}", file=sys.stderr)
+    include_ids = [args.include_track] if args.include_track else None
     try:
         plan = plan_set(
             records,
@@ -141,40 +142,44 @@ def cmd_plan(args: argparse.Namespace) -> int:
             seed=args.seed,
             energy_target=args.energy_target,
             include_ineligible=args.include_ineligible,
+            include_ids=include_ids,
         )
     except ValueError as exc:
         return _fail({"error": str(exc)}, 1)
     out = write_plan(plan, args.out)
-    _emit(
-        {
-            "written_to": str(out),
-            "set_name": plan["set_name"],
-            "eligibility": plan["eligibility"],
-            "track_count": plan["track_count"],
-            "total_duration_s": plan["timeline"]["total_duration_s"],
-            "tracks": [
-                {
-                    "index": t["index"],
-                    "title": t["title"],
-                    "bpm": t["bpm"],
-                    "key": t["key"],
-                    "tempo_stretch": t["tempo_stretch"],
-                    "gain_db": t["gain_db"],
-                }
-                for t in plan["tracks"]
-            ],
-            "transitions": [
-                {
-                    "index": t["index"],
-                    "type": t["type"],
-                    "duration_s": t["duration_s"],
-                    "confidence": t["confidence"],
-                    "reasons": t["reasons"],
-                }
-                for t in plan["transitions"]
-            ],
-        }
-    )
+    result = {
+        "written_to": str(out),
+        "set_name": plan["set_name"],
+        "eligibility": plan["eligibility"],
+        "track_count": plan["track_count"],
+        "total_duration_s": plan["timeline"]["total_duration_s"],
+        "tracks": [
+            {
+                "index": t["index"],
+                "title": t["title"],
+                "bpm": t["bpm"],
+                "key": t["key"],
+                "tempo_stretch": t["tempo_stretch"],
+                "gain_db": t["gain_db"],
+            }
+            for t in plan["tracks"]
+        ],
+        "transitions": [
+            {
+                "index": t["index"],
+                "type": t["type"],
+                "duration_s": t["duration_s"],
+                "confidence": t["confidence"],
+                "reasons": t["reasons"],
+            }
+            for t in plan["transitions"]
+        ],
+    }
+    if "planner" in plan:
+        result["request"] = plan["request"]
+        result["planner"] = plan["planner"]
+        result["anchor_resolution"] = plan["anchor_resolution"]
+    _emit(result)
     return 0
 
 
@@ -251,6 +256,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--include-ineligible",
         action="store_true",
         help="allow tracks that failed the eligibility rule (escape hatch)",
+    )
+    pl.add_argument(
+        "--include-track",
+        metavar="RECORDING_ID",
+        default=None,
+        help="guarantee this recording_id appears in the plan (anchor-aware planning)",
     )
     pl.set_defaults(func=cmd_plan)
 

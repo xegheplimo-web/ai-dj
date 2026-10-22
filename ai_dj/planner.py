@@ -44,6 +44,7 @@ MIN_BEAT_XFADE_S = 4.0
 MAX_BEAT_XFADE_S = 16.0
 BEAT_XFADE_BARS = 4  # 4 bars (16 beats) overlap for a beatmix
 EDGE_GUARD_S = 2.0  # stay this far from file edges when guessing cues
+ANCHOR_BEAM_WIDTH = 64  # states kept per slot in anchored beam search
 
 _SEMITONES = {
     "C": 0,
@@ -246,6 +247,152 @@ def _choose_transition(a: dict, b: dict) -> dict:
     }
 
 
+def _transition_cost(prev: dict, cand: dict) -> float:
+    """Soft pairwise risk reused by both selectors: BPM jump + key clash."""
+    bpm_p = prev.get("bpm_corrected") or 0.0
+    bpm_c = cand.get("bpm_corrected") or 0.0
+    rel = abs(bpm_c - bpm_p) / bpm_p if bpm_p > 0 and bpm_c > 0 else 1.0
+    jump = max(0.0, rel - BEATMATCH_BPM_TOL)
+    kd = key_distance(prev.get("key", "UNKNOWN"), cand.get("key", "UNKNOWN"))
+    clash = 1.0 if kd is None else (0.0 if kd <= 1 else kd / 6.0)
+    return 0.8 * jump + 0.25 * clash
+
+
+def _resolve_anchor(anchor_id: str, records: list[dict], pool: list[dict]) -> dict:
+    """Return the anchor's pool record, or raise a structured refusal.
+
+    No silent fallback: a requested track that is missing, failed, too short,
+    D10-excluded, or deduplicated out is a hard error with the reason named.
+    """
+    by_id = {r["recording_id"]: r for r in pool}
+    if anchor_id in by_id:
+        return by_id[anchor_id]
+    rec = next((r for r in records if r.get("recording_id") == anchor_id), None)
+    if rec is None:
+        raise ValueError(f"requested anchor {anchor_id!r} not found in analysis records")
+    if rec.get("status") != "ok":
+        raise ValueError(
+            f"requested anchor {anchor_id!r} is unusable: "
+            f"status={rec.get('status')!r} ({rec.get('error')})"
+        )
+    if (rec.get("duration_s") or 0) < MIN_DURATION_S:
+        raise ValueError(
+            f"requested anchor {anchor_id!r} is too short: "
+            f"{rec.get('duration_s')}s < {MIN_DURATION_S}s minimum"
+        )
+    if rec.get("eligible") is not True:
+        raise ValueError(
+            f"requested anchor {anchor_id!r} is excluded by the eligibility rule: "
+            f"{rec.get('exclusion_reason') or 'not eligible'}"
+        )
+    winner = next((r for r in pool if r["work_id"] == rec.get("work_id")), None)
+    raise ValueError(
+        f"requested anchor {anchor_id!r} was deduplicated out in favor of "
+        f"{winner['recording_id'] if winner else 'a stronger recording'} "
+        f"(work_id {rec.get('work_id')!r})"
+    )
+
+
+def _anchored_order(pool: list[dict], arc: list[float], anchor: dict) -> list[dict]:
+    """Beam-search the lowest-cost ordering containing ``anchor`` exactly once.
+
+    Every slot is tried as the anchor position; within a position the anchor
+    is the only candidate for that slot and is withheld from all others. A
+    state's score is the accumulated ``J(S)`` prefix cost — arc fit plus
+    pairwise transition risk — and ties break on the track-id sequence, so
+    the result is deterministic. States violating hard constraints (track
+    repeats, anchor displaced) are never expanded.
+    """
+    anchor_id = anchor["recording_id"]
+    others = [r for r in pool if r["recording_id"] != anchor_id]
+    by_id = {r["recording_id"]: r for r in pool}
+    n = len(arc)
+
+    def step_cost(prev: dict | None, cand: dict, slot: int) -> float:
+        c = abs((cand.get("energy_mean") or 0.0) - arc[slot])
+        if prev is not None:
+            c += _transition_cost(prev, cand)
+        return c
+
+    best: tuple[float, tuple[str, ...]] | None = None
+    for anchor_pos in range(n):
+        beam: list[tuple[float, tuple[str, ...]]] = [(0.0, ())]
+        for slot in range(n):
+            candidates = (anchor,) if slot == anchor_pos else others
+            expanded: list[tuple[float, tuple[str, ...]]] = []
+            for cost_so_far, ids in beam:
+                used = set(ids)
+                prev = by_id[ids[-1]] if ids else None
+                for cand in candidates:
+                    if cand["recording_id"] in used:
+                        continue
+                    expanded.append(
+                        (
+                            round(cost_so_far + step_cost(prev, cand, slot), 6),
+                            (*ids, cand["recording_id"]),
+                        )
+                    )
+            beam = sorted(expanded, key=lambda e: (e[0], e[1]))[:ANCHOR_BEAM_WIDTH]
+            if not beam:
+                break
+        if beam and (best is None or beam[0] < best):
+            best = beam[0]
+    if best is None:
+        raise ValueError(f"no feasible plan found containing anchor {anchor_id!r}")
+    return [by_id[i] for i in best[1]]
+
+
+def _greedy_order(pool: list[dict], arc: list[float]) -> list[dict]:
+    """P0 selector: each slot greedily takes the cheapest remaining track."""
+    chosen: list[dict] = []
+    remaining = list(pool)
+
+    def cost(cand: dict, slot: int, prev: dict | None) -> tuple:
+        c_energy = abs((cand.get("energy_mean") or 0.0) - arc[slot])
+        if prev is None:
+            return (round(c_energy, 6), cand["recording_id"])
+        return (round(c_energy + _transition_cost(prev, cand), 6), cand["recording_id"])
+
+    for slot in range(len(arc)):
+        prev = chosen[-1] if chosen else None
+        best = min(remaining, key=lambda c: cost(c, slot, prev))
+        chosen.append(best)
+        remaining.remove(best)
+    return chosen
+
+
+def _anchor_metadata(anchor: dict, chosen: list[dict], seed: int) -> dict:
+    """Additive plan.json metadata for an anchored run (request + provenance)."""
+    anchor_id = anchor["recording_id"]
+    return {
+        "request": {
+            "request_type": "include_track",
+            "include_track_ids": [anchor_id],
+        },
+        "planner": {
+            "algorithm": "anchored_beam_v1",
+            "beam_width": ANCHOR_BEAM_WIDTH,
+            "seed": seed,
+        },
+        "anchor_resolution": {
+            "requested_count": 1,
+            "included_count": 1,
+            "all_included": True,
+            "anchors": [
+                {
+                    "recording_id": anchor_id,
+                    "work_id": anchor.get("work_id"),
+                    "title": anchor.get("title"),
+                    "slot_index": next(
+                        i for i, t in enumerate(chosen) if t["recording_id"] == anchor_id
+                    ),
+                    "source_sha256": anchor.get("sha256"),
+                }
+            ],
+        },
+    }
+
+
 def plan_set(
     records: list[dict],
     *,
@@ -254,6 +401,7 @@ def plan_set(
     seed: int = 0,
     energy_target: float | None = None,
     include_ineligible: bool = False,
+    include_ids: list[str] | None = None,
 ) -> dict:
     """Build a deterministic plan for an n-track mini-set.
 
@@ -263,7 +411,17 @@ def plan_set(
     ``include_ineligible`` disables the D10 corpus eligibility filter; the
     plan records which tracks the rule excluded — or would have, when the
     escape hatch is on.
+
+    ``include_ids`` switches to anchor-aware planning: a beam search over the
+    whole sequence that guarantees the requested recording appears exactly
+    once. Exactly one anchor is supported for now.
     """
+    include_ids = list(include_ids or [])
+    if len(include_ids) > 1:
+        raise ValueError(
+            "anchor-aware planning supports exactly one include id, "
+            f"got {len(include_ids)}: {sorted(include_ids)}"
+        )
     eligible_records, flagged = _eligible(records, include_ineligible=include_ineligible)
     pool = _dedup_works(eligible_records)
     if len(pool) < 2:
@@ -272,6 +430,7 @@ def plan_set(
             + (f" ({len(flagged)} excluded by eligibility rule)" if flagged else "")
         )
     n = max(2, min(n_tracks, len(pool)))
+    anchor = _resolve_anchor(include_ids[0], records, pool) if include_ids else None
 
     energies = [r.get("energy_mean") or 0.0 for r in pool]
     e_lo, e_hi = min(energies), max(energies)
@@ -282,26 +441,7 @@ def plan_set(
 
     median_rms = sorted(r.get("rms_db") or -30.0 for r in pool)[len(pool) // 2]
 
-    chosen: list[dict] = []
-    remaining = list(pool)
-
-    def cost(cand: dict, slot: int, prev: dict | None) -> tuple:
-        c_energy = abs((cand.get("energy_mean") or 0.0) - arc[slot])
-        if prev is None:
-            return (round(c_energy, 6), cand["recording_id"])
-        bpm_p = prev.get("bpm_corrected") or 0.0
-        bpm_c = cand.get("bpm_corrected") or 0.0
-        rel = abs(bpm_c - bpm_p) / bpm_p if bpm_p > 0 and bpm_c > 0 else 1.0
-        jump = max(0.0, rel - BEATMATCH_BPM_TOL)
-        kd = key_distance(prev.get("key", "UNKNOWN"), cand.get("key", "UNKNOWN"))
-        clash = 1.0 if kd is None else (0.0 if kd <= 1 else kd / 6.0)
-        return (round(c_energy + 0.8 * jump + 0.25 * clash, 6), cand["recording_id"])
-
-    for slot in range(n):
-        prev = chosen[-1] if chosen else None
-        best = min(remaining, key=lambda c: cost(c, slot, prev))
-        chosen.append(best)
-        remaining.remove(best)
+    chosen = _anchored_order(pool, arc, anchor) if anchor is not None else _greedy_order(pool, arc)
 
     tracks: list[dict] = []
     for i, rec in enumerate(chosen):
@@ -373,7 +513,7 @@ def plan_set(
         tr["overlap_start_sample"] = end - tr["duration_samples"]
         tr["overlap_end_sample"] = end
 
-    return {
+    plan = {
         "plan_version": PLAN_VERSION,
         "set_name": set_name,
         "seed": seed,
@@ -418,6 +558,10 @@ def plan_set(
             "total_duration_s": round(cursor / MASTER_SR, 3),
         },
     }
+
+    if anchor is not None:
+        plan.update(_anchor_metadata(anchor, chosen, seed))
+    return plan
 
 
 def write_plan(plan: dict, out_path: str | Path) -> Path:

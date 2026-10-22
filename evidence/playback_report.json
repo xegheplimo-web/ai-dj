@@ -1,0 +1,13 @@
+{
+  "master_wav": "evidence\\dj_p1_anchor_master.wav",
+  "total_frames": 87280299,
+  "frames_emitted": 87280299,
+  "frames_matched": true,
+  "underflows": 0,
+  "block_frames": 4096,
+  "queue_depth": 8,
+  "stopped_early": false,
+  "device_index": 4,
+  "samplerate": 48000,
+  "channels": 2
+}
