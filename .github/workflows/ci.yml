@@ -79,16 +79,18 @@ jobs:
           python -m pip install --quiet --only-binary :all: -r requirements.txt
       - name: Provide rubberband-capable ffmpeg
         run: |
-          # The runner image ships no ffmpeg; imageio-ffmpeg bundles a
-          # gyan.dev "essentials" build that includes the rubberband filter.
+          # The runner image ships no ffmpeg. GITHUB_PATH only takes effect in
+          # LATER steps, so the shim must also be exported in this one.
           python -m pip install --quiet --only-binary :all: imageio-ffmpeg
           bin=$(python -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())")
           shim=/tmp/ffbin
           mkdir -p "$shim"
-          ln -s "$bin" "$shim/ffmpeg"
+          ln -sf "$bin" "$shim/ffmpeg"
+          export PATH="$shim:$PATH"
           echo "$shim" >> "$GITHUB_PATH"
           hash -r
           which ffmpeg
+          ffmpeg -version | head -1
           ffmpeg -hide_banner -filters | grep -q rubberband && echo "rubberband: present"
       - name: Run timing probe (gate G2a)
         run: |
