@@ -32,10 +32,19 @@ phát liên tục set 60 phút, có bằng chứng đo được để nghiệm t
 | D6 | Synthetic click là ground truth; onset nhạc thật là diagnostic | CHỐT |
 | D8 | `corpus.py` có `recording_id`/`work_id` | CHỐT |
 | D10 | Corpus eligibility: im lặng trong run > 2s ≤ 2% (đo: bài thật 0.0–0.2%, file rác 21.8–31.9%) | CHỐT — đang triển khai (DJ-P0-002) |
-| D11 | ffmpeg optional, không fatal; không báo 0.0 giả | CHỐT — đang triển khai (DJ-P0-002) |
+| D11 | ffmpeg optional, không fatal; không báo 0.0 giả | CHỐT — xong (DJ-P0-002) |
+| D12 | Verifier phải đo **toàn bộ** master, không chỉ vùng transition (im lặng giữa track phải FAIL) | CHỐT — đang triển khai (DJ-P0-006) |
+| D13 | Đo không được ⇒ `pass: null` + `verdict: INCONCLUSIVE`, không bao giờ PASS | CHỐT — đang triển khai (DJ-P0-006) |
+| D14 | Recovery (DJ-P0-005) định nghĩa lại: pre-render không bị ảnh hưởng bởi file nguồn biến mất giữa phát | CHỐT |
+| D15 | Thứ tự: DJ-P0-006 → mini-set chất lượng → G3 60 phút → G1/G5 phát+recovery → G2b/G6 nghe → P1 | CHỐT (theo GPT, đối chiếu độc lập) |
 
 ## Đang chạy
-- **DJ-P0-003** (next): set 60 phút từ corpus đã lọc
+- **DJ-P0-006** (Devin CLI): verifier full-master continuity gate (D12) + INCONCLUSIVE (D13)
+
+## Đối chiếu bên ngoài
+- Đánh giá kiến trúc độc lập bởi GPT: `docs/gpt-assessment-2026-10-22.md`
+- Hermes đối chiếu từng claim với repo: `docs/gpt-crosscheck-2026-10-22.md`
+- Claim nặng nhất GPT bắt được (mà Devin + Hermes đều bỏ sót): verifier false PASS — master im lặng 29.45 s vẫn `pass: true`.
 
 ## Lỗi đã xác nhận
 1. **Wheel thiếu `ai_dj/analysis/`** → `pip install ai-dj` crash khi `ai_dj analyze`. Sửa `pyproject.toml` (`packages`) — đã verify wheel chứa đủ 10 module. *Lỗi scaffolding của Hermes.*

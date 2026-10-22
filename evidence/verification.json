@@ -1,6 +1,6 @@
 {
   "plan_set_name": "mini",
-  "master_wav": "evidence\\hermes_set.wav",
+  "master_wav": "C:\\Users\\atton\\AppData\\Local\\hermes\\cache\\scratch\\old_buggy.wav",
   "checks": {
     "duration_matches_plan": {
       "planned_s": 1307.266,

@@ -1,32 +1,32 @@
 {
-  "out_wav": "C:\\Users\\atton\\AppData\\Local\\hermes\\cache\\scratch\\set_v2.wav",
+  "out_wav": "C:\\Users\\atton\\AppData\\Local\\hermes\\cache\\scratch\\old_buggy.wav",
   "master_sr": 48000,
-  "total_samples_planned": 73305534,
-  "total_samples_actual": 73305294,
-  "duration_s": 1527.194,
+  "total_samples_planned": 62748787,
+  "total_samples_actual": 62748547,
+  "duration_s": 1307.261,
   "true_peak_dbtp": -1.2,
-  "integrated_lufs": -19.7,
-  "loudness_range_lu": 8.9,
+  "integrated_lufs": -20.1,
+  "loudness_range_lu": 8.8,
   "true_peak_measured_by": "ffmpeg ebur128=peak=true",
   "peak_protection": "sample-peak pre-scale + ffmpeg true-peak re-measure",
   "peak_limit_dbtp": -1.0,
-  "peak_scale_applied_db": -4.352,
+  "peak_scale_applied_db": -4.152,
   "clipping_count": 0,
   "underflows": 0,
   "segments": [
     {
       "index": 0,
-      "recording_id": "rec-093e6c9bf8c742f0",
+      "recording_id": "rec-cdb8894fb3bf79df",
       "tempo_stretch": 1.0,
-      "planned_samples": 13625470,
-      "actual_samples": 13625470
+      "planned_samples": 11977039,
+      "actual_samples": 11977038
     },
     {
       "index": 1,
-      "recording_id": "rec-1633439077ecc118",
+      "recording_id": "rec-a7612bd3ecbc7b80",
       "tempo_stretch": 1.0,
-      "planned_samples": 18529917,
-      "actual_samples": 18529917
+      "planned_samples": 9029772,
+      "actual_samples": 9029772
     },
     {
       "index": 2,
@@ -51,83 +51,83 @@
     },
     {
       "index": 5,
-      "recording_id": "rec-52ef1d309f22398a",
+      "recording_id": "rec-093e6c9bf8c742f0",
       "tempo_stretch": 1.0,
-      "planned_samples": 13069305,
-      "actual_samples": 13069305
+      "planned_samples": 13625470,
+      "actual_samples": 13625470
     }
   ],
   "transitions": [
     {
       "index": 0,
-      "type": "crossfade",
-      "overlap_planned_samples": 288000,
+      "type": "beat_crossfade",
+      "overlap_planned_samples": 267504,
       "window": [
-        13337470,
-        13625470
+        11710660,
+        11977039
       ],
-      "track_start_sample": 13337470
+      "track_start_sample": 11710660
     },
     {
       "index": 1,
-      "type": "beat_crossfade",
-      "overlap_planned_samples": 303168,
+      "type": "crossfade",
+      "overlap_planned_samples": 288000,
       "window": [
-        31574980,
-        31867387
+        20451307,
+        20739307
       ],
-      "track_start_sample": 31574980
+      "track_start_sample": 20451307
     },
     {
       "index": 2,
       "type": "crossfade",
       "overlap_planned_samples": 288000,
       "window": [
-        49806136,
-        50094136
+        38693224,
+        38981224
       ],
-      "track_start_sample": 49806136
+      "track_start_sample": 38693224
     },
     {
       "index": 3,
       "type": "crossfade",
       "overlap_planned_samples": 288000,
       "window": [
-        54229877,
-        54517877
+        43116965,
+        43404965
       ],
-      "track_start_sample": 54229877
+      "track_start_sample": 43116965
     },
     {
       "index": 4,
       "type": "cut",
       "overlap_planned_samples": 0,
       "window": [
-        60235989,
-        60236469
+        49123077,
+        49123557
       ],
-      "track_start_sample": 60235989
+      "track_start_sample": 49123077
     }
   ],
   "transitions_planned": 5,
   "beat_deviation": [
     {
       "index": 0,
-      "type": "crossfade",
-      "beat_check": "not_beat_aligned"
-    },
-    {
-      "index": 1,
       "type": "beat_crossfade",
       "beat_check": "measured_on_master",
       "grid_points": 16,
-      "onsets": 31,
-      "matched": 15,
-      "coverage": 0.938,
-      "median_abs_dev_ms": 20.799,
-      "p95_abs_dev_ms": 80.648,
-      "ibi_diagnostic_ms": 192.073,
+      "onsets": 22,
+      "matched": 10,
+      "coverage": 0.625,
+      "median_abs_dev_ms": 38.965,
+      "p95_abs_dev_ms": 60.507,
+      "ibi_diagnostic_ms": 156.299,
       "within_threshold": false
+    },
+    {
+      "index": 1,
+      "type": "crossfade",
+      "beat_check": "not_beat_aligned"
     },
     {
       "index": 2,
