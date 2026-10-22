@@ -1,8 +1,8 @@
 {
   "root": "F:\\DỮ LIỆU\\ok",
-  "file_count": 41,
-  "recording_count": 40,
-  "work_count": 31,
+  "file_count": 42,
+  "recording_count": 41,
+  "work_count": 32,
   "duplicate_recordings": {
     "rec-793608aaeb5b6242": [
       "OK VIDEO\\vô thường và buông xả\\vô thường và buông xả(1).MP3",
@@ -593,6 +593,20 @@
       "size_bytes": 2497823,
       "sha256": "793608aaeb5b6242138caaab472366854f52b4c4d22b1d56159bd5ee69c93eca",
       "duration_s": 104.232,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "path": "F:\\DỮ LIỆU\\ok\\Sao Lòng Còn Thương - Trọng Hải.wav",
+      "relpath": "Sao Lòng Còn Thương - Trọng Hải.wav",
+      "title": "Sao Lòng Còn Thương - Trọng Hải",
+      "recording_id": "rec-36bd9cb09f26f5b8",
+      "work_id": "work-fbaa2c6a791c",
+      "normalized_title": "sao long con thuong trong hai",
+      "format": "wav",
+      "size_bytes": 74764366,
+      "sha256": "36bd9cb09f26f5b8e469a70964907a72a7c1b6084debfb0ae4f79b19e42b6d35",
+      "duration_s": 389.397,
       "status": "ok",
       "error": null
     },

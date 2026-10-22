@@ -64,6 +64,28 @@
     ]
   },
   {
+    "id": "DJ-P1-ANCHOR-001",
+    "title": "P1: Anchor-aware set planning (requested-track guarantee)",
+    "assignee": "devin-cli",
+    "status": "todo",
+    "card": ".orchestrator/cards/DJ-P1-ANCHOR-001.md",
+    "verified_by": "hermes",
+    "priority": 1,
+    "blocked_by": [],
+    "origin": "GPT review 2026-10-22 (docs/gpt-review-anchor-2026-10-22.md) — Option B chosen over force-include+greedy; Sếp requested playing 'Sao Lòng Còn Thương' which the greedy planner rejects",
+    "acceptance": [
+      "G1 anchor appears exactly once in the plan",
+      "G2 planner evaluates compatible neighbours (e.g. DOAN TUYET, kd=0)",
+      "G3 same input/seed/source -> deterministic",
+      "G4 no anchor -> legacy greedy output byte-identical",
+      "G5 nonexistent/excluded anchor -> clear structured error",
+      "G6 render succeeds, no abnormal silence/dropout/clip",
+      "G7 independent verifier confirms the anchor is audible in the WAV",
+      "G8 Hermes re-runs tests + checks evidence (not Devin's PASS alone)"
+    ],
+    "note": "GPT: '0/8 gate duoc xac nhan'. Do NOT change global key_clash weight. Do NOT write under .devin/. Devin must not commit."
+  },
+  {
     "id": "DJ-P0-003",
     "title": "G3: 60-minute set (3600 s +/-1 %)",
     "assignee": "devin-cli",
