@@ -5,30 +5,23 @@
     "assignee": "devin-cli",
     "status": "done",
     "merged_commit": "a52099a",
-    "verified_by": "hermes",
-    "evidence": "36 tests green; analyze idempotent; plan+render deterministic (sha256 identical); master 1307.261s true peak -1.2 dBFS / 0 clipped / -20.1 LUFS (ffmpeg ebur128); verify pass; play 96000/96000 frames 0 underflows"
+    "verified_by": "hermes"
   },
   {
     "id": "DJ-P0-002",
     "title": "Corpus eligibility rule (D10) + ffmpeg-optional render (D11)",
     "assignee": "devin-cli",
-    "status": "in_progress",
-    "card": ".orchestrator/cards/DJ-P0-002.md",
-    "acceptance": [
-      "exactly the 2 measured non-songs excluded on the real corpus",
-      "planner never selects an ineligible track (asserted by test)",
-      "--include-ineligible restores old behaviour with a warning",
-      "re-rendered master has no silent run > 2 s",
-      "render_plan does not raise when ffmpeg is absent; report says unavailable",
-      "CI Test jobs green with zero errors"
-    ]
+    "status": "done",
+    "merged_commit": "604da3a",
+    "verified_by": "hermes",
+    "evidence": "44 tests green; analyze excludes exactly the 2 measured non-songs (0.218, 0.319); plan selects no ineligible track; re-rendered master has NO silent run > 2 s (positive control: old master measures 29.45 s); ffmpeg-less suite 38 tests OK and render_plan does not raise; CI 5/5 green"
   },
   {
     "id": "DJ-P0-003",
     "title": "G3: render a full 60-minute set from the eligible corpus",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-002"],
+    "blocked_by": [],
     "acceptance": [
       "master duration within 1 % of 3600 s",
       "no silent run > 2 s",
@@ -41,7 +34,6 @@
     "title": "G1: unattended playback of a 20-track set",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-002"],
     "acceptance": [
       "playback runs to EOF without intervention",
       "0 underflows over the whole run",
@@ -53,7 +45,6 @@
     "title": "G5: recovery — one corrupt/missing track must not stop playback",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-002"],
     "acceptance": [
       "removing one track mid-set does not raise; set continues with the next eligible track",
       "test covers the failure path"
@@ -64,7 +55,6 @@
     "title": "G4: mood / genre / energy adaptation",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-002"],
     "acceptance": [
       "energy_arc is honoured end to end",
       "LLM rerank only behind a deterministic validator (D3)"

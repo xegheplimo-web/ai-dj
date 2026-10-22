@@ -13,7 +13,7 @@ phát liên tục set 60 phút, có bằng chứng đo được để nghiệm t
 ## Trạng thái gate
 - [x] **G0 Khởi động + CLI** — `ai_dj {scan,analyze,plan,render,play,verify}`, 36 test xanh, ruff sạch
 - [ ] **G1** Phát liên tục 20 bài không can thiệp
-- [~] **G2** Đo được: lệch beat < 20ms (**0.0 ms** trên synthetic ground truth ✓) · không khoảng lặng (**CHƯA — DJ-P0-002**) · RMS liên tục (**CHƯA**)
+- [~] **G2** Đo được: lệch beat < 20ms (**0.0 ms** trên synthetic ground truth ✓) · không khoảng lặng (**✓** master không còn run > 2s) · RMS liên tục (**CHƯA**)
 - [~] **G3** Set 60 phút tự chọn bài — hiện render được **22 phút**; còn 60 phút
 - [ ] **G4** Thích nghi (đổi mood/thể loại/energy theo yêu cầu)
 - [ ] **G5** Recovery (lỗi 1 track không ngắt tiếng)
@@ -35,7 +35,7 @@ phát liên tục set 60 phút, có bằng chứng đo được để nghiệm t
 | D11 | ffmpeg optional, không fatal; không báo 0.0 giả | CHỐT — đang triển khai (DJ-P0-002) |
 
 ## Đang chạy
-- **DJ-P0-002** (Devin CLI): luật eligibility corpus (D10) + ffmpeg-optional render (D11)
+- **DJ-P0-003** (next): set 60 phút từ corpus đã lọc
 
 ## Lỗi đã xác nhận
 1. **Wheel thiếu `ai_dj/analysis/`** → `pip install ai-dj` crash khi `ai_dj analyze`. Sửa `pyproject.toml` (`packages`) — đã verify wheel chứa đủ 10 module. *Lỗi scaffolding của Hermes.*
