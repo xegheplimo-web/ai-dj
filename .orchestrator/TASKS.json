@@ -37,11 +37,13 @@
     "id": "DJ-P0-007",
     "title": "Mini-set 15-20 min + G2b listening gate (no forced beatmatch)",
     "assignee": "devin-cli",
-    "status": "running",
+    "status": "blocked",
     "card": ".orchestrator/cards/DJ-P0-007.md",
     "verified_by": "hermes",
     "evidence": "6-track set (25.5 min) rendered + verified. 5 transitions (crossfade×3, beat_crossfade×1 @0.9conf, cut). Excluded 2 ineligible tracks. True peak -1.2dBTP, 0 clipped, synthetic alignment 0.0ms. D12 FAIL: 2 within-track low-level silence runs (>2s @≤-60dBFS in Bolero ballads). Listening verdict template ready at evidence/dj_p0_007_listening_verdict_template.json.",
-    "blocked_by": [],
+    "blocked_by": [
+      "DJ-P2-CONTINUITY-001"
+    ],
     "acceptance": [
       "plan.json + master.wav + render_report.json + verification.json",
       "duration in 875-1530s range (planner selects by energy arc)",
@@ -49,14 +51,18 @@
       "synthetic beat alignment 0.0 ms (ground truth)",
       "listening verdict recorded per transition (GPT/Sếp review)",
       "transition selection conservative (no forced beatmatch)"
-    ]
+    ],
+    "note": "FAIL D12 (recurring) — blocked on continuity contract",
+    "last_update": "2026-10-23"
   },
   {
     "id": "DJ-P0-007b",
     "title": "Controlled real-audio time-stretch probe (separate from the listening mix)",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-006b"],
+    "blocked_by": [
+      "DJ-P0-006b"
+    ],
     "acceptance": [
       "pick real pairs with close BPM; verify beat/phrase by hand",
       "confirm ffmpeg rubberband actually stretches; measure and listen",
@@ -67,11 +73,13 @@
     "id": "DJ-P1-ANCHOR-001",
     "title": "P1: Anchor-aware set planning (requested-track guarantee)",
     "assignee": "devin-cli",
-    "status": "todo",
+    "status": "blocked",
     "card": ".orchestrator/cards/DJ-P1-ANCHOR-001.md",
     "verified_by": "hermes",
     "priority": 1,
-    "blocked_by": [],
+    "blocked_by": [
+      "DJ-P2-CONTINUITY-001"
+    ],
     "origin": "GPT review 2026-10-22 (docs/gpt-review-anchor-2026-10-22.md) — Option B chosen over force-include+greedy; Sếp requested playing 'Sao Lòng Còn Thương' which the greedy planner rejects",
     "acceptance": [
       "G1 anchor appears exactly once in the plan",
@@ -83,14 +91,18 @@
       "G7 independent verifier confirms the anchor is audible in the WAV",
       "G8 Hermes re-runs tests + checks evidence (not Devin's PASS alone)"
     ],
-    "note": "GPT: '0/8 gate duoc xac nhan'. Do NOT change global key_clash weight. Do NOT write under .devin/. Devin must not commit."
+    "note": "G1-G5, G8 PASS (code committed 010031c); G6 FAIL D12 (track-internal silence 26.45s/-60dB); G7 chưa đo. GPT VERDICT HOLD — cần DJ-P2-CONTINUITY-001 trước khi chấp nhận.",
+    "last_update": "2026-10-23"
   },
   {
     "id": "DJ-P0-003",
     "title": "G3: 60-minute set (3600 s +/-1 %)",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-007", "DJ-P0-007b"],
+    "blocked_by": [
+      "DJ-P0-007",
+      "DJ-P0-007b"
+    ],
     "note": "GPT: do not open the 60-min master until the mini-set transition quality is accepted by listening",
     "acceptance": [
       "duration 3600 s within 1 %",
@@ -104,7 +116,9 @@
     "title": "G1: unattended playback soak on real audio hardware",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-006b"],
+    "blocked_by": [
+      "DJ-P0-006b"
+    ],
     "acceptance": [
       "plays to EOF without intervention",
       "0 underflows across the whole run",
@@ -117,7 +131,9 @@
     "title": "G5: recovery — six independently testable failure classes",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-006b"],
+    "blocked_by": [
+      "DJ-P0-006b"
+    ],
     "acceptance": [
       "F1 input/analysis/plan: skip corrupt/missing track and re-plan; no eligible corpus -> FAIL",
       "F2 render/ffmpeg: never publish an incomplete master; keep the previous valid one; atomic publish via os.replace()",
@@ -133,7 +149,10 @@
     "title": "G6: release acceptance",
     "assignee": "hermes",
     "status": "todo",
-    "blocked_by": ["DJ-P0-004", "DJ-P0-005"],
+    "blocked_by": [
+      "DJ-P0-004",
+      "DJ-P0-005"
+    ],
     "acceptance": [
       "final listening verdict",
       "replay checksum",
@@ -146,11 +165,37 @@
     "title": "P1: reference-mix understanding — style_profile.json",
     "assignee": "devin-cli",
     "status": "todo",
-    "blocked_by": ["DJ-P0-008"],
+    "blocked_by": [
+      "DJ-P0-008"
+    ],
     "acceptance": [
       "extract BPM trajectory, transition positions, overlap durations, phrase structure, energy arc from a reference DJ mix",
       "style_profile.json consumed by the planner",
       "deterministic validator gates any LLM rerank (D3)"
     ]
+  },
+  {
+    "id": "DJ-P2-CONTINUITY-001",
+    "title": "P0: Unified Audio Continuity Contract (D10↔D12 sync, multi-threshold intervals, hard constraint, PLAN_INFEASIBLE)",
+    "assignee": "devin-cli",
+    "status": "todo",
+    "priority": 1,
+    "card": ".orchestrator/cards/DJ-P2-CONTINUITY-001.md",
+    "verified_by": "hermes",
+    "blocked_by": [],
+    "origin": "GPT verdict 2026-10-22 (docs/gpt-review-continuity-2026-10-22.md) — VERDICT HOLD",
+    "acceptance": [
+      "G1 analyzer emits continuity_version + multi-threshold silence_intervals + opener (non-null) on re-analyze",
+      "G2 stale cache (no version) rejected -> re-analyze; no silent fallback",
+      "G3 continuity metric measured on multi-channel signal matching verify.py (48kHz all_channels_rms); delta documented",
+      "G4 planner uses hard constraint to prune infeasible candidates (not just penalty)",
+      "G5 PLAN_INFEASIBLE w/ structured violation + reason + distinct exit code for forced-infeasible anchor",
+      "G6 opener audibility gate: no D12 run in first 30s of rendered master",
+      "G7 anchor demo plan+render+verify PASSES D12",
+      "G8 legacy (no include_ids) plan byte-identical before/after",
+      "G9 verify.py thresholds UNCHANGED (D10/D12 not softened)",
+      "G10 64+ tests PASS, ruff check clean, ruff format clean"
+    ],
+    "note": "No .devin/ writes. No commit/push. No threshold softening. No in-song cut or bg music to cheat D12. No SQLite schema change — version payload JSON only."
   }
 ]
