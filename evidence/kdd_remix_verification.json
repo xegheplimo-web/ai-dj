@@ -1,0 +1,130 @@
+{
+  "plan_set_name": "kdd_remix",
+  "master_wav": "evidence\\kdd_remix_master.wav",
+  "checks": {
+    "artifact": {
+      "path": "evidence\\kdd_remix_master.wav",
+      "exists": true,
+      "decodable": true,
+      "channels": 2,
+      "frames": 43168119,
+      "ok": true
+    },
+    "duration_matches_plan": {
+      "planned_s": 899.336,
+      "actual_s": 899.336,
+      "tolerance_s": 1.0,
+      "ok": true
+    },
+    "true_peak": {
+      "dbtp": -1.2,
+      "limit_dbtp": -1.0,
+      "measured_by": "ffmpeg ebur128=peak=true",
+      "integrated_lufs": -15.0,
+      "ok": true
+    },
+    "clipping": {
+      "count": 0,
+      "ok": true
+    },
+    "silence": {
+      "block_s": 0.05,
+      "digital_silence": {
+        "threshold_dbfs": -90.0,
+        "min_run_s": 0.5,
+        "min_run_samples": 24000,
+        "silent_blocks": 0,
+        "max_run_s": 0.0,
+        "worst_region_s": null,
+        "violating_runs_s": [],
+        "ok": true
+      },
+      "low_level": {
+        "threshold_dbfs": -60.0,
+        "min_run_s": 2.0,
+        "min_run_samples": 96000,
+        "silent_blocks": 0,
+        "max_run_s": 0.0,
+        "worst_region_s": null,
+        "violating_runs_s": [],
+        "ok": true
+      },
+      "channel_rms_dbfs": [
+        -17.67,
+        -17.76
+      ],
+      "dead_channels": [],
+      "short_term_3s": {
+        "min_dbfs": -24.18,
+        "at_s": 337.05
+      },
+      "max_silent_run_ms": 0.0,
+      "worst_region_s": null,
+      "silent_hops_total": 0,
+      "allowed_silent_regions_s": [
+        [
+          0.0,
+          0.05
+        ],
+        [
+          896.336,
+          899.336
+        ]
+      ],
+      "transition_windows": {
+        "max_silent_run_in_transitions_ms": 0.0,
+        "worst_region_s": null
+      },
+      "silence_ok": true
+    },
+    "beat_deviation_transitions": [
+      {
+        "index": 0,
+        "type": "beat_crossfade",
+        "beat_check": "measured_on_master",
+        "grid_points": 16,
+        "onsets": 29,
+        "matched": 13,
+        "coverage": 0.812,
+        "median_abs_dev_ms": 42.515,
+        "p95_abs_dev_ms": 79.201,
+        "ibi_diagnostic_ms": 335.493,
+        "within_threshold": false
+      },
+      {
+        "index": 1,
+        "type": "crossfade",
+        "beat_check": "not_beat_aligned"
+      }
+    ],
+    "beat_deviation_within_threshold": false,
+    "synthetic_alignment_check": {
+      "probe": "synthetic_click_tracks_through_render_plan",
+      "bpm_a": 100.0,
+      "bpm_b": 104.0,
+      "stretch_factor": 0.961538,
+      "detected_beats_in_overlap": 10,
+      "render_true_peak_dbtp": -2.5,
+      "measured_ibi_ms": 600.0,
+      "target_ibi_ms": 600.0,
+      "deviation_ms": 0.0,
+      "within_threshold": true,
+      "threshold_ms": 20.0
+    },
+    "samplerate_matches": {
+      "expected": 48000,
+      "actual": 48000,
+      "ok": true
+    }
+  },
+  "pass": true,
+  "verdict": "PASS",
+  "unmeasured_checks": [],
+  "notes": "synthetic_alignment_check is the ground-truth beat contract (timing.py on rendered click tracks); per-transition onset numbers on real music are diagnostics, not the gate. silence_ok is a two-tier full-master continuity gate on 50 ms multi-channel RMS blocks: <= -90 dBFS for >= 0.5 s or <= -60 dBFS for >= 2.0 s fails (D12); dead_channels and short_term_3s are diagnostics. An absent/corrupt/undecodable required artifact is a measured FAIL; a required check that cannot be measured yields INCONCLUSIVE, never PASS, and never masks a measured FAIL (D13).",
+  "artifact_binding": {
+    "plan_json": "evidence\\kdd_remix_plan.json",
+    "plan_sha256": "7888c4c3865505652d7e4376aedaaaf9b77b2a8b2161337a52c764bb4847e373",
+    "master_wav": "evidence\\kdd_remix_master.wav",
+    "master_sha256": "ccf1201c40b2da69d6fd18013106babfa4eb563fa0fb111234a7dbf9de192dd9"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS",
+  "pass": true,
+  "verify_report": "evidence\\verification.json",
+  "verified_by": "ai_dj.verify",
+  "provenance": {
+    "binding": "sha256 over the bytes of plan.json + master.wav measured at verify time",
+    "limits": "binds this verdict to the exact artifact bytes — it is NOT anti-forgery evidence, does not prove the WAV was rendered from this plan, and carries no signature; D12 permits plan-declared allowed_silent_gaps_s — the planner emits none, and any exempt regions are listed in the verify report"
+  },
+  "plan_json": "evidence\\kdd_remix_plan.json",
+  "plan_sha256": "7888c4c3865505652d7e4376aedaaaf9b77b2a8b2161337a52c764bb4847e373",
+  "master_wav": "evidence\\kdd_remix_master.wav",
+  "master_sha256": "ccf1201c40b2da69d6fd18013106babfa4eb563fa0fb111234a7dbf9de192dd9"
+}

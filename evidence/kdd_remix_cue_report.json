@@ -1,0 +1,80 @@
+{
+  "set_name": "kdd_remix",
+  "plan_json": "evidence/kdd_remix_plan.json",
+  "plan_sha256": "7888c4c3865505652d7e4376aedaaaf9b77b2a8b2161337a52c764bb4847e373",
+  "total_duration_s": 899.336,
+  "tracks": [
+    {
+      "index": 0,
+      "recording_id": "rec-4abe167c7f9c8ea3",
+      "title": "Gõ Cửa - Bolero Cover – Duy",
+      "master_start_s": 0.0,
+      "tempo_stretch": 1.0,
+      "cue_report": {
+        "status": "ok",
+        "source_duration_s": 310.776,
+        "default_cue_in_s": 3.06503,
+        "default_cue_out_s": 308.776,
+        "cue_in_s": 3.06503,
+        "cue_out_s": 308.776,
+        "retained_s": 305.711,
+        "retained_vs_source": 0.9837,
+        "head_trim_vs_source_s": 3.065,
+        "tail_trim_vs_source_s": 2.0,
+        "removed_head_s": 0.0,
+        "removed_tail_s": 0.0,
+        "removed_total_s": 0.0,
+        "reason": "ok",
+        "note": "removed_head_s/removed_tail_s = the EXTRA trim vs the default cue; head_trim_vs_source_s/tail_trim_vs_source_s = total removed vs the original file including the default intro/outro trims"
+      }
+    },
+    {
+      "index": 1,
+      "recording_id": "kdd",
+      "title": "DUY MANH - Kiep Do Den",
+      "master_start_s": 295.308,
+      "tempo_stretch": 1.035711,
+      "cue_report": {
+        "status": "adjusted",
+        "source_duration_s": 335.203,
+        "default_cue_in_s": 1.43964,
+        "default_cue_out_s": 334.703,
+        "cue_in_s": 1.43964,
+        "cue_out_s": 316.30222,
+        "retained_s": 314.863,
+        "retained_vs_source": 0.9393,
+        "head_trim_vs_source_s": 1.44,
+        "tail_trim_vs_source_s": 18.901,
+        "removed_head_s": 0.0,
+        "removed_tail_s": 18.401,
+        "removed_total_s": 18.401,
+        "reason": "uncovered_silence_run",
+        "note": "removed_head_s/removed_tail_s = the EXTRA trim vs the default cue; head_trim_vs_source_s/tail_trim_vs_source_s = total removed vs the original file including the default intro/outro trims"
+      }
+    },
+    {
+      "index": 2,
+      "recording_id": "rec-f313e4624a307ca2",
+      "title": "Khóc Thầm",
+      "master_start_s": 593.314,
+      "tempo_stretch": 1.0,
+      "cue_report": {
+        "status": "ok",
+        "source_duration_s": 314.5,
+        "default_cue_in_s": 6.47837,
+        "default_cue_out_s": 312.5,
+        "cue_in_s": 6.47837,
+        "cue_out_s": 312.5,
+        "retained_s": 306.022,
+        "retained_vs_source": 0.973,
+        "head_trim_vs_source_s": 6.478,
+        "tail_trim_vs_source_s": 2.0,
+        "removed_head_s": 0.0,
+        "removed_tail_s": 0.0,
+        "removed_total_s": 0.0,
+        "reason": "ok",
+        "note": "removed_head_s/removed_tail_s = the EXTRA trim vs the default cue; head_trim_vs_source_s/tail_trim_vs_source_s = total removed vs the original file including the default intro/outro trims"
+      }
+    }
+  ]
+}

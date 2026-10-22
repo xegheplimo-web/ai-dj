@@ -22,3 +22,6 @@ Thumbs.db
 # Devin CLI tooling artifacts
 .serena/
 .devin/
+
+# Corpus source media (tracks live outside the repo, like evidence/**/*.wav)
+library/
