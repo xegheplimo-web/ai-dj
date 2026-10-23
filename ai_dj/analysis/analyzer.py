@@ -10,6 +10,16 @@ for Bolero where the true beat can sit an octave away. The fix applied here:
   in double-time, ratio ≈0.5 -> half-time, ≈1 -> agreement;
 * both ``bpm_raw`` and ``bpm_corrected`` are stored, plus ``octave_diagnosis``.
 
+v4 (DJ-P2-BEAT-GRID-001): the onset/beat stage runs at ``BEAT_HOP_LENGTH = 128``
+(5.80 ms frame period, was 512 -> 23.22 ms) and the inter-beat interval is the
+least-squares slope over the whole detected beat series — the shipped
+``beat_times_s`` grid is the fitted line ``a*i + b``, off the frame raster.
+``bpm_ibi_median`` keeps the old median-IBI estimator for comparison;
+``bpm_refined`` is the LS value; ``bpm_resolution`` is the BPM-equivalent of
+the quantization bound; ``beat_quality`` carries the residual/coverage/drift
+metrics plus the quality-gate verdict — a fit alone cannot prove the detector
+found the right beats (D25: quality gate, no hard frame-period rejection).
+
 Confidence is honest: fields that cannot be estimated reliably are explicitly
 ``UNKNOWN``/low-confidence (D6 — no fabricated key/downbeat confidence). The
 downbeat grid is marked ``estimated: true`` because it assumes 4/4 from the
@@ -31,8 +41,9 @@ import librosa
 import numpy as np
 
 from ai_dj import continuity
+from ai_dj.analysis import beatgrid
 
-ANALYSIS_VERSION = 3  # v3: + Unified Audio Continuity Contract payload fields
+ANALYSIS_VERSION = 4  # v4: refined beat grid (hop 128 + LS tempo) + beat_quality
 ANALYSIS_SR = 22050
 DEFAULT_CACHE = "analysis_cache.sqlite"
 
@@ -177,26 +188,120 @@ def _energy_regions(
     return float(times[intro_idx]), float(times[min(outro_idx, times.size - 1)])
 
 
+def _beat_grid_fields(
+    y: np.ndarray, sr: int, active_span_s: float
+) -> tuple[np.ndarray, np.ndarray, dict]:
+    """Detect beats at the fine hop, fit the refined grid, report quality.
+
+    Returns ``(beat_times, detected_times, fields)`` where ``fields`` carries
+    every beat-grid payload entry. The onset/beat stage runs at
+    ``BEAT_HOP_LENGTH`` (5.80 ms frames, was 512 -> 23.22 ms): the old raster
+    snapped every beat time, so a median IBI could only take integer-frame
+    values and ``bpm_ibi`` sat on a ~10 BPM-spaced ladder.
+    """
+    beat_hop = beatgrid.BEAT_HOP_LENGTH
+    frame_period_s = beat_hop / float(sr)
+    onset_env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=beat_hop)
+    tempo, beat_frames = librosa.beat.beat_track(
+        onset_envelope=onset_env, sr=sr, hop_length=beat_hop
+    )
+    bpm_raw = float(np.atleast_1d(tempo)[0])
+    detected_times = librosa.frames_to_time(beat_frames, sr=sr, hop_length=beat_hop).astype(
+        np.float64
+    )
+    n_detected = int(detected_times.size)
+
+    # Fabrication check: does the envelope carry real transient strength at
+    # the detected beat frames? On music beats land on peaks (ratio ~4-10);
+    # on a flat envelope (sustained tone) beat_track emits a regular grid
+    # anyway and the ratio sits near 1 — self-consistency metrics cannot
+    # distinguish that from real tracking.
+    env_med = float(np.median(onset_env)) if onset_env.size else 0.0
+    if n_detected >= 2:
+        beat_fr = np.clip(np.asarray(beat_frames, dtype=int), 0, onset_env.size - 1)
+        beat_env_ratio = float(np.median(onset_env[beat_fr]) / (env_med + 1e-9))
+    else:
+        beat_env_ratio = None
+
+    fit = beatgrid.fit_beat_grid(detected_times)
+    ibi_refined = fit["ibi_s"] if fit is not None else float("nan")
+    bpm_refined = 60.0 / ibi_refined if ibi_refined > 0 else float("nan")
+    if fit is not None:
+        # The shipped grid is the fitted line — the same constant-tempo model
+        # the renderer projects into beat_crossfade overlaps — not the raw
+        # frame-snapped detections.
+        beat_times = beatgrid.refined_grid(ibi_refined, fit["phase_s"], n_detected)
+    else:
+        beat_times = detected_times
+    median_ibi = float(np.median(np.diff(beat_times))) if beat_times.size >= 2 else float("nan")
+
+    if n_detected >= 2:
+        detected_ibis = np.diff(detected_times)
+        median_ibi_detected = float(np.median(detected_ibis))
+        bpm_ibi_median = 60.0 / median_ibi_detected if median_ibi_detected > 0 else float("nan")
+        ibi_cv = (
+            float(detected_ibis.std() / detected_ibis.mean())
+            if detected_ibis.mean() > 0
+            else float("nan")
+        )
+    else:
+        median_ibi_detected, bpm_ibi_median, ibi_cv = (
+            float("nan"),
+            float("nan"),
+            float("nan"),
+        )
+
+    bpm_corrected, octave_diag = resolve_octave(bpm_raw, bpm_refined)
+
+    if fit is not None:
+        beat_quality = beatgrid.assess_quality(
+            detected_times,
+            fit,
+            active_span_s=active_span_s,
+            octave_diagnosis=octave_diag,
+            beat_env_ratio=beat_env_ratio,
+        )
+        bpm_resolution = beatgrid.bpm_resolution(ibi_refined, n_detected, frame_period_s)
+    else:
+        beat_quality = {
+            "status": "insufficient_beats",
+            "reasons": [f"n_beats {n_detected} < 2"],
+            "beat_env_ratio": (round(beat_env_ratio, 3) if beat_env_ratio is not None else None),
+            "octave_suspect": octave_diag in ("raw_double_time", "raw_half_time", "raw_off_grid"),
+        }
+        bpm_resolution = float("nan")
+
+    fields = {
+        "beat_grid_version": beatgrid.BEAT_GRID_VERSION,
+        "beat_hop_length": beat_hop,
+        "beat_frame_period_ms": round(frame_period_s * 1000.0, 4),
+        "bpm_raw": round(bpm_raw, 3),
+        "bpm_ibi_median": round(bpm_ibi_median, 3) if np.isfinite(bpm_ibi_median) else None,
+        "bpm_refined": round(bpm_refined, 4) if np.isfinite(bpm_refined) else None,
+        "bpm_resolution": (round(bpm_resolution, 5) if np.isfinite(bpm_resolution) else None),
+        "bpm_corrected": round(bpm_corrected, 3),
+        "octave_diagnosis": octave_diag,
+        "median_ibi_s": round(median_ibi, 6) if np.isfinite(median_ibi) else None,
+        "median_ibi_detected_s": (
+            round(median_ibi_detected, 6) if np.isfinite(median_ibi_detected) else None
+        ),
+        "ibi_cv": round(ibi_cv, 4) if np.isfinite(ibi_cv) else None,
+        "beat_quality": beat_quality,
+        "tempo_confidence": tempo_confidence(ibi_cv, n_detected),
+        "n_beats": int(beat_times.size),
+        "beat_times_s": [round(t, 5) for t in beat_times.tolist()],
+        "beat_times_detected_s": [round(t, 5) for t in detected_times.tolist()],
+        "downbeat_times_s": [round(t, 5) for t in beat_times[::_BEATS_PER_BAR].tolist()],
+        "downbeat_estimated": True,
+        "meter": "4/4-assumed",
+    }
+    return beat_times, detected_times, fields
+
+
 def analyze_track(path: str | Path) -> dict:
     """Analyze one audio file; raise on failure (caller records the error)."""
     y, sr = librosa.load(str(path), sr=ANALYSIS_SR, mono=True)
     duration_s = len(y) / float(sr)
-
-    onset_env = librosa.onset.onset_strength(y=y, sr=sr)
-    tempo, beat_frames = librosa.beat.beat_track(onset_envelope=onset_env, sr=sr)
-    bpm_raw = float(np.atleast_1d(tempo)[0])
-    beat_times = librosa.frames_to_time(beat_frames, sr=sr).astype(np.float64)
-
-    if beat_times.size >= 2:
-        ibis = np.diff(beat_times)
-        median_ibi = float(np.median(ibis))
-        bpm_ibi = 60.0 / median_ibi if median_ibi > 0 else float("nan")
-        ibi_cv = float(ibis.std() / ibis.mean()) if ibis.mean() > 0 else float("nan")
-    else:
-        median_ibi, bpm_ibi, ibi_cv = float("nan"), float("nan"), float("nan")
-
-    bpm_corrected, octave_diag = resolve_octave(bpm_raw, bpm_ibi)
-    conf = tempo_confidence(ibi_cv, beat_times.size)
 
     chroma = librosa.feature.chroma_cqt(y=y, sr=sr)
     key, key_conf = estimate_key(chroma.mean(axis=1))
@@ -224,7 +329,11 @@ def analyze_track(path: str | Path) -> dict:
     rms_db = float(20.0 * np.log10(max(float(active.mean()), 1e-9))) if active.size else -120.0
     peak_db = float(20.0 * np.log10(max(float(np.abs(y).max()), 1e-9)))
 
-    downbeat_times = beat_times[::_BEATS_PER_BAR]
+    # Coverage denominator for beat quality: the sounding span (first..last
+    # active second) — beats are expected only where the track is sounding.
+    active_idx = np.flatnonzero(energy_norm > 0.10)
+    active_span_s = float(active_idx[-1] - active_idx[0] + 1) if active_idx.size else 0.0
+    _beat_times, _detected, beat_fields = _beat_grid_fields(y, sr, active_span_s)
 
     s_ratio, s_longest = silence_metrics(y, sr)
     eligible = bool(s_ratio <= MAX_SILENCE_RUN_FRACTION)
@@ -241,8 +350,8 @@ def analyze_track(path: str | Path) -> dict:
             "duration_s": duration_s,
             "intro_end_s": intro_end_s,
             "outro_start_s": outro_start_s,
-            "downbeat_times_s": downbeat_times.tolist(),
-            "beat_times_s": beat_times.tolist(),
+            "downbeat_times_s": beat_fields["downbeat_times_s"],
+            "beat_times_s": beat_fields["beat_times_s"],
         },
     )
 
@@ -250,18 +359,7 @@ def analyze_track(path: str | Path) -> dict:
         "analysis_version": ANALYSIS_VERSION,
         "analysis_sr": sr,
         "duration_s": round(duration_s, 3),
-        "bpm_raw": round(bpm_raw, 3),
-        "bpm_ibi": round(bpm_ibi, 3) if np.isfinite(bpm_ibi) else None,
-        "bpm_corrected": round(bpm_corrected, 3),
-        "octave_diagnosis": octave_diag,
-        "median_ibi_s": round(median_ibi, 6) if np.isfinite(median_ibi) else None,
-        "ibi_cv": round(ibi_cv, 4) if np.isfinite(ibi_cv) else None,
-        "tempo_confidence": conf,
-        "n_beats": int(beat_times.size),
-        "beat_times_s": [round(t, 5) for t in beat_times.tolist()],
-        "downbeat_times_s": [round(t, 5) for t in downbeat_times.tolist()],
-        "downbeat_estimated": True,
-        "meter": "4/4-assumed",
+        **beat_fields,
         "key": key,
         "key_confidence": key_conf,
         "energy_curve": [round(float(e), 4) for e in energy_norm.tolist()],

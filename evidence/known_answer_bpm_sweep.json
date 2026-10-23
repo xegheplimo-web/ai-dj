@@ -1,0 +1,378 @@
+{
+  "frame_period_s": 0.023219954648526078,
+  "n_cases": 41,
+  "n_error_gt_2pct": 13,
+  "n_high_confidence_but_wrong": 13,
+  "max_rel_error_pct": 50.498,
+  "rows": [
+    {
+      "truth_bpm": 88.0,
+      "reported": 89.103,
+      "rel_error_pct": 1.253,
+      "ibi_frames": 29.0,
+      "nearest_frames": 29,
+      "octave_ratio": 1.0125340909090907,
+      "conf": 0.63
+    },
+    {
+      "truth_bpm": 92.0,
+      "reported": 92.285,
+      "rel_error_pct": 0.31,
+      "ibi_frames": 28.0,
+      "nearest_frames": 28,
+      "octave_ratio": 1.0030978260869565,
+      "conf": 0.63
+    },
+    {
+      "truth_bpm": 96.0,
+      "reported": 95.703,
+      "rel_error_pct": 0.309,
+      "ibi_frames": 27.0,
+      "nearest_frames": 27,
+      "octave_ratio": 0.99690625,
+      "conf": 0.63
+    },
+    {
+      "truth_bpm": 100.0,
+      "reported": 99.384,
+      "rel_error_pct": 0.616,
+      "ibi_frames": 26.0,
+      "nearest_frames": 26,
+      "octave_ratio": 0.9938400000000001,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 104.0,
+      "reported": 103.359,
+      "rel_error_pct": 0.616,
+      "ibi_frames": 25.0,
+      "nearest_frames": 25,
+      "octave_ratio": 0.9938365384615384,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 108.0,
+      "reported": 107.666,
+      "rel_error_pct": 0.309,
+      "ibi_frames": 24.0,
+      "nearest_frames": 24,
+      "octave_ratio": 0.9969074074074074,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 112.0,
+      "reported": 112.347,
+      "rel_error_pct": 0.31,
+      "ibi_frames": 23.0,
+      "nearest_frames": 23,
+      "octave_ratio": 1.0030982142857143,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 116.0,
+      "reported": 117.454,
+      "rel_error_pct": 1.253,
+      "ibi_frames": 22.0,
+      "nearest_frames": 22,
+      "octave_ratio": 1.0125344827586207,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 120.0,
+      "reported": 117.454,
+      "rel_error_pct": 2.122,
+      "ibi_frames": 22.0,
+      "nearest_frames": 22,
+      "octave_ratio": 0.9787833333333332,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 122.5,
+      "reported": 123.047,
+      "rel_error_pct": 0.447,
+      "ibi_frames": 21.0,
+      "nearest_frames": 21,
+      "octave_ratio": 1.0044653061224489,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 124.0,
+      "reported": 123.047,
+      "rel_error_pct": 0.769,
+      "ibi_frames": 21.0,
+      "nearest_frames": 21,
+      "octave_ratio": 0.9923145161290322,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 126.0,
+      "reported": 123.047,
+      "rel_error_pct": 2.344,
+      "ibi_frames": 21.0,
+      "nearest_frames": 21,
+      "octave_ratio": 0.976563492063492,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 128.0,
+      "reported": 129.199,
+      "rel_error_pct": 0.937,
+      "ibi_frames": 20.0,
+      "nearest_frames": 20,
+      "octave_ratio": 1.0093671875,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 130.0,
+      "reported": 129.199,
+      "rel_error_pct": 0.616,
+      "ibi_frames": 20.0,
+      "nearest_frames": 20,
+      "octave_ratio": 0.9938384615384617,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 132.0,
+      "reported": 129.199,
+      "rel_error_pct": 2.122,
+      "ibi_frames": 20.0,
+      "nearest_frames": 20,
+      "octave_ratio": 0.9787803030303032,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 134.0,
+      "reported": 135.999,
+      "rel_error_pct": 1.492,
+      "ibi_frames": 19.0,
+      "nearest_frames": 19,
+      "octave_ratio": 1.0149179104477613,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 136.0,
+      "reported": 135.999,
+      "rel_error_pct": 0.001,
+      "ibi_frames": 19.0,
+      "nearest_frames": 19,
+      "octave_ratio": 0.9999926470588235,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 138.0,
+      "reported": 135.999,
+      "rel_error_pct": 1.45,
+      "ibi_frames": 19.0,
+      "nearest_frames": 19,
+      "octave_ratio": 0.9854999999999999,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 140.0,
+      "reported": 143.555,
+      "rel_error_pct": 2.539,
+      "ibi_frames": 18.0,
+      "nearest_frames": 18,
+      "octave_ratio": 1.0253928571428572,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 142.0,
+      "reported": 143.555,
+      "rel_error_pct": 1.095,
+      "ibi_frames": 18.0,
+      "nearest_frames": 18,
+      "octave_ratio": 1.0109507042253523,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 144.0,
+      "reported": 143.555,
+      "rel_error_pct": 0.309,
+      "ibi_frames": 18.0,
+      "nearest_frames": 18,
+      "octave_ratio": 0.9969097222222223,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 146.0,
+      "reported": 143.555,
+      "rel_error_pct": 1.675,
+      "ibi_frames": 18.0,
+      "nearest_frames": 18,
+      "octave_ratio": 0.9832534246575343,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 148.0,
+      "reported": 151.999,
+      "rel_error_pct": 2.702,
+      "ibi_frames": 17.0,
+      "nearest_frames": 17,
+      "octave_ratio": 1.0270202702702702,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 150.0,
+      "reported": 151.999,
+      "rel_error_pct": 1.333,
+      "ibi_frames": 17.0,
+      "nearest_frames": 17,
+      "octave_ratio": 1.0133266666666667,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 152.0,
+      "reported": 151.999,
+      "rel_error_pct": 0.001,
+      "ibi_frames": 17.0,
+      "nearest_frames": 17,
+      "octave_ratio": 0.9999934210526316,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 154.0,
+      "reported": 151.999,
+      "rel_error_pct": 1.299,
+      "ibi_frames": 17.0,
+      "nearest_frames": 17,
+      "octave_ratio": 0.9870064935064935,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 156.0,
+      "reported": 151.999,
+      "rel_error_pct": 2.565,
+      "ibi_frames": 17.0,
+      "nearest_frames": 17,
+      "octave_ratio": 0.9743525641025641,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 158.0,
+      "reported": 161.499,
+      "rel_error_pct": 2.215,
+      "ibi_frames": 16.0,
+      "nearest_frames": 16,
+      "octave_ratio": 1.022145569620253,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 160.0,
+      "reported": 161.499,
+      "rel_error_pct": 0.937,
+      "ibi_frames": 16.0,
+      "nearest_frames": 16,
+      "octave_ratio": 1.00936875,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 161.484,
+      "reported": 161.499,
+      "rel_error_pct": 0.009,
+      "ibi_frames": 16.0,
+      "nearest_frames": 16,
+      "octave_ratio": 1.0000928884595377,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 162.0,
+      "reported": 161.499,
+      "rel_error_pct": 0.309,
+      "ibi_frames": 16.0,
+      "nearest_frames": 16,
+      "octave_ratio": 0.9969074074074074,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 164.0,
+      "reported": 161.499,
+      "rel_error_pct": 1.525,
+      "ibi_frames": 16.0,
+      "nearest_frames": 16,
+      "octave_ratio": 0.98475,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 166.0,
+      "reported": 83.354,
+      "rel_error_pct": 49.787,
+      "ibi_frames": 31.0,
+      "nearest_frames": 31,
+      "octave_ratio": 0.5021325301204819,
+      "conf": 0.63
+    },
+    {
+      "truth_bpm": 166.686,
+      "reported": 83.354,
+      "rel_error_pct": 49.993,
+      "ibi_frames": 31.0,
+      "nearest_frames": 31,
+      "octave_ratio": 0.500065992344888,
+      "conf": 0.63
+    },
+    {
+      "truth_bpm": 168.0,
+      "reported": 83.354,
+      "rel_error_pct": 50.385,
+      "ibi_frames": 31.0,
+      "nearest_frames": 31,
+      "octave_ratio": 0.4961547619047619,
+      "conf": 0.63
+    },
+    {
+      "truth_bpm": 170.0,
+      "reported": 172.266,
+      "rel_error_pct": 1.333,
+      "ibi_frames": 15.0,
+      "nearest_frames": 15,
+      "octave_ratio": 1.0133294117647058,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 172.267,
+      "reported": 172.266,
+      "rel_error_pct": 0.001,
+      "ibi_frames": 15.0,
+      "nearest_frames": 15,
+      "octave_ratio": 0.9999941950576721,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 174.0,
+      "reported": 172.266,
+      "rel_error_pct": 0.997,
+      "ibi_frames": 15.0,
+      "nearest_frames": 15,
+      "octave_ratio": 0.9900344827586206,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 176.0,
+      "reported": 172.266,
+      "rel_error_pct": 2.122,
+      "ibi_frames": 15.0,
+      "nearest_frames": 15,
+      "octave_ratio": 0.9787840909090909,
+      "conf": 0.9
+    },
+    {
+      "truth_bpm": 178.0,
+      "reported": 89.103,
+      "rel_error_pct": 49.942,
+      "ibi_frames": 29.0,
+      "nearest_frames": 29,
+      "octave_ratio": 0.5005786516853932,
+      "conf": 0.63
+    },
+    {
+      "truth_bpm": 180.0,
+      "reported": 89.103,
+      "rel_error_pct": 50.498,
+      "ibi_frames": 29.0,
+      "nearest_frames": 29,
+      "octave_ratio": 0.49501666666666666,
+      "conf": 0.63
+    }
+  ]
+}

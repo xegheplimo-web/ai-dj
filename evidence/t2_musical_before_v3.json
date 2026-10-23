@@ -1,0 +1,124 @@
+{
+  "tier": "T2_musical_synthetic",
+  "note": "Ground truth beat times are produced by the generator BEFORE the audio is written; the analyzer never contributes to its own answer.",
+  "n_cases": 8,
+  "n_error_gt_2pct": 5,
+  "n_octave_wrong": 5,
+  "rows": [
+    {
+      "case": "straight_120",
+      "truth_bpm": 120.0,
+      "truth_n_beats": 40,
+      "reported_bpm": 117.454,
+      "reported_bpm_refined": null,
+      "reported_status": null,
+      "octave_ratio": 0.9788,
+      "abs_error_bpm": 2.546,
+      "rel_error_pct": 2.122,
+      "confidence": 0.9,
+      "kwargs": {}
+    },
+    {
+      "case": "straight_128",
+      "truth_bpm": 128.0,
+      "truth_n_beats": 43,
+      "reported_bpm": 129.199,
+      "reported_bpm_refined": null,
+      "reported_status": null,
+      "octave_ratio": 1.0094,
+      "abs_error_bpm": 1.199,
+      "rel_error_pct": 0.937,
+      "confidence": 0.9,
+      "kwargs": {}
+    },
+    {
+      "case": "offladder_166_686",
+      "truth_bpm": 166.686,
+      "truth_n_beats": 56,
+      "reported_bpm": 83.354,
+      "reported_bpm_refined": null,
+      "reported_status": null,
+      "octave_ratio": 0.5001,
+      "abs_error_bpm": 83.332,
+      "rel_error_pct": 49.993,
+      "confidence": 0.63,
+      "kwargs": {}
+    },
+    {
+      "case": "offladder_128_5",
+      "truth_bpm": 128.5,
+      "truth_n_beats": 43,
+      "reported_bpm": 129.199,
+      "reported_bpm_refined": null,
+      "reported_status": null,
+      "octave_ratio": 1.0054,
+      "abs_error_bpm": 0.699,
+      "rel_error_pct": 0.544,
+      "confidence": 0.9,
+      "kwargs": {}
+    },
+    {
+      "case": "swing_120",
+      "truth_bpm": 120.0,
+      "truth_n_beats": 40,
+      "reported_bpm": 117.454,
+      "reported_bpm_refined": null,
+      "reported_status": null,
+      "octave_ratio": 0.9788,
+      "abs_error_bpm": 2.546,
+      "rel_error_pct": 2.122,
+      "confidence": 0.9,
+      "kwargs": {
+        "swing": 0.5
+      }
+    },
+    {
+      "case": "half_time_120",
+      "truth_bpm": 120.0,
+      "truth_n_beats": 40,
+      "reported_bpm": 117.454,
+      "reported_bpm_refined": null,
+      "reported_status": null,
+      "octave_ratio": 0.9788,
+      "abs_error_bpm": 2.546,
+      "rel_error_pct": 2.122,
+      "confidence": 0.9,
+      "kwargs": {
+        "backbeat": true,
+        "kick_every_beat": false,
+        "hats_on_eighths": false
+      }
+    },
+    {
+      "case": "four_on_floor_126",
+      "truth_bpm": 126.0,
+      "truth_n_beats": 43,
+      "reported_bpm": 83.354,
+      "reported_bpm_refined": null,
+      "reported_status": null,
+      "octave_ratio": 0.6615,
+      "abs_error_bpm": 42.646,
+      "rel_error_pct": 33.846,
+      "confidence": 0.63,
+      "kwargs": {
+        "kick_every_beat": true,
+        "backbeat": false
+      }
+    },
+    {
+      "case": "missing_every_4",
+      "truth_bpm": 128.0,
+      "truth_n_beats": 43,
+      "reported_bpm": 129.199,
+      "reported_bpm_refined": null,
+      "reported_status": null,
+      "octave_ratio": 1.0094,
+      "abs_error_bpm": 1.199,
+      "rel_error_pct": 0.937,
+      "confidence": 0.9,
+      "kwargs": {
+        "missing_every": 4
+      }
+    }
+  ]
+}
