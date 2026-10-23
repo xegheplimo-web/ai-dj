@@ -423,3 +423,74 @@ card riêng); nếu annotation cũng pha tán thì corpus không dùng được 
 
 **`beat_env_ratio` corpus = 3.4–9.7** (median 6.1) — xác nhận lại F2: trên synthetic nổ lên
 7.2×10⁹, trên corpus chỉ ~6. Khoảng cách ~9 bậc độ lớn.
+
+### D29 — Verify độc lập DJ-P2-OCTAVE-001: PASS B1–B7, phát hiện F3 (resolver NHÂN ĐÔI tempo chậm)
+
+Hermes chạy 3 probe độc lập từ ngoài worktree: harness known-answer, **probe đối kháng tempo
+thấp** (dải T1 của agent bắt đầu ở 88 BPM nên đầu thấp chưa từng được test), và **rescan toàn
+corpus 41 track** (cache v4 stale theo thiết kế dưới v5 nên không có cache v5 để đọc).
+Evidence: `evidence/orchestrator_verify_octave.{json,md}`, `orchestrator_adversarial_octave.json`,
+`orchestrator_corpus_v5_scan.json`, + 4 script harness.
+
+**PASS B1–B7 (Hermes tự đo):**
+
+| # | Đo được |
+|---|---|
+| B1 | 4 ca half-time nay resolve ×2 **đúng** — không còn ca 50% nào bị đánh dấu verified |
+| B2 | T1 **0/41** sai, max error **0.031%** |
+| B3 | T2 **0/8** sai, max error **0.058%** |
+| B4 | Negative **3/3** suspect |
+| B5 | `beat_env_score` bounded **[0.5009, 1.0]** (trước 7.2×10⁹–1.9×10¹⁰) |
+| B6 | **151 test OK** (skip 1) |
+| B7 | ruff sạch · probe **0.2037 ms** · stale cache **exit 5** |
+
+**Sửa đúng — 4 ca mục tiêu:** `click_168` 83.995→**167.991** · `174` 87.004→**174.008** ·
+`178` 88.997→**177.995** · `180` 90.003→**180.006**.
+
+**F2 đã sửa đúng cách:** `beat_env_score` = ảnh đơn điệu `r/(1+r)` của ratio cũ, bounded `[0,1)`,
+**scale-invariant chính xác**, ngưỡng cũ `≥2.0` ánh xạ **chính xác** sang `≥2/3`. Không phải
+đổi ngưỡng cho vừa — đây là bản sửa đúng.
+
+**F3 MỚI — resolver NHÂN ĐÔI vật liệu chậm, và không phải lúc nào cũng flag:**
+
+Synthetic (probe đối kháng 16 ca, 1 fail):
+
+| case | truth | detected | corrected | error | ambig |
+|---|---:|---:|---:|---:|---|
+| `slow_drum_70` | 70.0 | 139.9986 | **139.999** | **+99.999%** | True |
+
+`slow_click` 60–96 **đúng hết**; `slow_drum_80`/`90` đúng. Lỗi **phụ thuộc vật liệu**, không phải
+ngưỡng tempo sạch.
+
+Nhạc THẬT — **tệ hơn, và im lặng** (rescan 41 track):
+
+| track | detected | corrected | margin | ambig |
+|---|---:|---:|---:|---|
+| `Gõ Cửa - Bolero Cover – Duy` | 96.0743 | **192.149** | **0.1442** | **False** |
+
+Bolero ~96 BPM bị nhân đôi lên **192 BPM** với margin **dứt khoát** (0.1442 ≫ ngưỡng 0.08) → resolver
+**không báo ambiguous**. 192 BPM cho Bolero là vô nghĩa. Track có `status: suspect` nhưng flag đó
+đến từ **residual metric (D28)**, không phải từ octave resolver.
+
+**Rescan corpus v5:** 41/41 phân tích OK · **ambiguous 6/41 (14.6%)** · **nhân đôi 1/41** ·
+giữ ×1 40/41 · suspect 39/41 (do D28 residual, **không** do octave) · margin min 0.0097 / p25 0.1001 /
+**median 0.1448** / max 0.3234 · phân bố: **6 dưới 0.08 · 8 trong 0.08–0.12 (mong manh) · 27 trên 0.12** ·
+`residual_std_ms` median **137.8** (không đổi — D28 nguyên giá trị).
+
+**Root cause F3:** resolver chấm `{0.5, 1.0, 2.0}` bằng ACF onset-envelope + comb-tooth strength +
+tempo prior yếu (log-domain, centered 128 BPM, **weight 0.20**) − anti-penalty. Nó **chỉ dùng onset
+lattice**. Track chậm mà onset chia nhỏ beat (hi-hat mỗi móc đơn, hoặc kick/snare xen kẽ) trình ra
+lattice **giống hệt** tempo nhân đôi → lattice không tách được. Prior quá yếu để phá thế hoà, và
+**hoàn toàn không có thông tin bar/backbeat** — đúng thứ con người dùng để nói "Bolero này 96, không
+phải 192".
+
+**Tác động thực tế:** octave fix **không** làm corpus vô dụng (6/41 ambiguous, 1/41 doubled). Vấn đề
+corpus trội vẫn là **D28**. Nhưng **8 track nằm trong 0.08–0.12** → biên ambiguity mong manh, một thay
+đổi scoring nhỏ có thể đẩy chúng qua lại.
+
+**Kết luận:** card `DJ-P2-OCTAVE-001` **đạt tiêu chí B1–B7 như đã viết** → đóng card, ghi PASS kèm
+finding. **Hướng half-time (tempo nhanh bị chia đôi): ĐÃ SỬA.** **Hướng nhân đôi (tempo chậm bị gấp
+đôi): CHƯA SỬA** — phụ thuộc vật liệu, sống sót trên nhạc thật, và ở ca corpus **không hề bị flag
+ambiguous**. **O4/O3 tiếp tục HOLD.** Card kế tiếp: bổ sung **bằng chứng cấp bar/backbeat** cho resolver
++ hiệu chuẩn lại biên ambiguity trên corpus (8 track sát ngưỡng) trước khi planner tin tempo của vật
+liệu chậm.
