@@ -381,3 +381,45 @@ không", độ lớn không mang nghĩa. Báo cáo của agent hiệu chuẩn tr
 **Kết luận:** đóng D19 (quantization) — **đã sửa và kiểm chứng độc lập**. Card
 `DJ-P2-BEAT-GRID-001` **không được close**; mở card kế tiếp cho octave resolution + sửa
 `beat_env_ratio`. **O4/O3 tiếp tục HOLD** cho đến khi octave PASS.
+
+### D28 — Corpus KHÔNG có lưới nhịp tempo-không-đổi trên 39/41 track
+
+Hermes đọc chéo `evidence/beat_grid_before_after.json` (đo độc lập trên cache v4) sau khi thấy
+`tempo_unstable` bật 28/41. Định nghĩa trong `ai_dj/analysis/beatgrid.py`:
+`residual_std_ms` = std của LS-fit residual (thời điểm beat phát hiện vs đường tempo không đổi);
+ngưỡng `RESIDUAL_STD_WARN_MS = 20.0` → vượt thì `residual_loose`.
+
+**Đo được trên 41 track corpus:**
+
+| metric | min | p25 | **median** | p75 | max |
+|---|---|---|---|---|---|
+| `residual_std_ms` | 15.97 | 81.17 | **137.79** | 219.74 | 1182.09 |
+| `residual_max_ms` | — | — | — | — | **1182** |
+| `phase_drift_ms` | −230.3 | −25.35 | **3.63** | 63.87 | 801.40 |
+| `residual_growth_ratio` | 0.436 | 0.742 | **0.994** | 1.772 | 5.134 |
+| `ibi_drift_pct` | −3.85 | 0.00 | **0.00** | 0.00 | 3.49 |
+| `coverage_ratio` | 0.949 | 0.986 | 0.993 | 0.999 | 1.029 |
+| `beat_env_ratio` | 3.399 | 5.011 | 6.102 | 7.738 | 9.730 |
+
+**39/41 track `status: suspect`**; chỉ **2/41** sạch: `CÂU HẸN CÂU THỀ - COVER DUY`
+(residual 16.37 ms, drift −1.41 ms, growth 0.774) và `Thế Sự -. Cover Duywav`
+(residual 15.97 ms, drift 3.63 ms, growth 1.256).
+
+**Đọc kỹ — đừng kết luận quá mức:**
+- `residual_growth_ratio` median ≈ **1.0** và `ibi_drift_pct` median **0.00** → **không có drift
+  hệ thống** (đầu và cuối track tempo khớp nhau).
+- Nhưng `residual_std_ms` median **138 ms** → beat phát hiện bị **pha tán phi hệ thống** quanh đường
+  tempo không đổi. Tại 160 BPM một nhịp = 375 ms, 138 ms ≈ **37% nhịp** — quá lớn để gọi là "lệch
+  nhẹ".
+- **KHÔNG tách được** "detector sai" hay "bài không có tempo ổn định" chỉ từ metric nội tại — đúng
+  cảnh báo D26 (không có annotation độc lập). Giải thích khả dĩ nhất: corpus là **cover live có
+  rubato/tempo tự do** (Bolero, thu giọng), nên lưới tempo-không-đổi vốn không tồn tại.
+
+**Hệ quả kế hoạch:** đây là **chặn corpus suitability** cho PILOT 5 phút, độc lập với chặn thiếu
+nguồn (GPT đã BLOCKED vì 0 bài Việt Mix). Beatmatch giữa 2 track không có grid ổn định là không
+có nghĩa. **Cần annotation độc lập** (người đánh dấu beat trên vài track corpus) trước khi kết
+luận detector sai — nếu annotation cho thấy beat thật thì đó là lỗi detector thứ hai (F3, cần
+card riêng); nếu annotation cũng pha tán thì corpus không dùng được cho beatmatch.
+
+**`beat_env_ratio` corpus = 3.4–9.7** (median 6.1) — xác nhận lại F2: trên synthetic nổ lên
+7.2×10⁹, trên corpus chỉ ~6. Khoảng cách ~9 bậc độ lớn.
