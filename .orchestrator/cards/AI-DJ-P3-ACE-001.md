@@ -13,7 +13,7 @@ Prove **AI-generated Vinahouse remix** of one rights-cleared Bolero from `F:\D�
 1. Pick ONE eligible Bolero in `F:\DỸ LIỆU\ok` (88–110 BPM target; residual_std_ms small; NOT the 96→192 doubling case unless documented).
 2. Stem-split → **vocal stem** (demucs/spleeter; keep original vocalist).
 3. ACE-Step 1.5 generate a Vinahouse BGM (target ~128–135 BPM, key compatible with input).
-4. Align vocal stem to BGM: rubberband time-stretch (BPM) + pitch (key). **Do NOT use analyzer D28 grid** (39/41 suspect) — measure alignment on the OUTPUT.
+4. Align vocal stem to BGM: **librosa** time-stretch + pitch-shift as primary (librosa 1.0.0 already in ai-dj-venv) — **rubberband-cli / ffmpeg `rubberband` filter optional** quality boost if present. **Do NOT use analyzer D28 grid** (39/41 suspect) — measure alignment on the OUTPUT.
 5. Mix vocal + BGM → master.
 6. Master/verify: ffmpeg ebur128 (loudness, true peak, clipping), librosa BPM on OUTPUT, vocal-presence RMS on vocal stem, duration/structure, listening verdict (M7-style).
 
