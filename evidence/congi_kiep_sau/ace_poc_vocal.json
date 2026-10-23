@@ -1,0 +1,8 @@
+{
+  "vocals_wav": "F:\\ai-dj\\evidence\\congi_kiep_sau\\work\\demucs\\htdemucs\\excerpt\\vocals.wav",
+  "vocal_stem_rms_dbfs": -14.39,
+  "silence_floor_dbfs": -60.0,
+  "stem_duration_s": 60.0,
+  "excerpt_duration_s": 60.0,
+  "duration_within_5pct": true
+}

@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS",
+  "pass": true,
+  "verify_report": "F:\\ai-dj\\evidence\\congi_kiep_sau\\ace_poc_verification.json",
+  "verified_by": "ai_dj.verify",
+  "provenance": {
+    "binding": "sha256 over the bytes of plan.json + master.wav measured at verify time",
+    "limits": "binds this verdict to the exact artifact bytes — it is NOT anti-forgery evidence, does not prove the WAV was rendered from this plan, and carries no signature; D12 permits plan-declared allowed_silent_gaps_s — the planner emits none, and any exempt regions are listed in the verify report"
+  },
+  "plan_json": "F:\\ai-dj\\evidence\\congi_kiep_sau\\ace_poc_plan.json",
+  "plan_sha256": "c1e572854df63349dc4eb9ca82f25d557513173d714060abfbfc71fa16a95567",
+  "master_wav": "F:\\ai-dj\\evidence\\congi_kiep_sau\\ace_poc_master.wav",
+  "master_sha256": "9f0de5e3c0a5b7c88597930af4a9b88d9ffb79fe274a71dfe1cde43e208e8752"
+}

@@ -1,0 +1,55 @@
+{
+  "card": "AI-DJ-P3-ACE-002",
+  "architecture": "Option Y: demucs vocal stem + ACE-Step 1.5 generated Vinahouse BGM (D30)",
+  "plan_path": "F:\\ai-dj\\evidence\\congi_kiep_sau\\ace_poc_plan.json",
+  "input": {
+    "title": "Congi Gi Kiep Sau (GH x AI-Muzick)",
+    "path": "F:\\ai-dj\\evidence\\congi_kiep_sau\\source.wav",
+    "sha256": "d9701ae9657df86f027da6a56d8e8766ed7185804b886b6b98828c2c8ea60a9f",
+    "cached_bpm": 95.7,
+    "cached_key": "D minor",
+    "excerpt_start_s": 220.0,
+    "excerpt_s": 60.0,
+    "excerpt_note": "final chorus (peak RMS 12s window at 248s)",
+    "measured_bpm": {
+      "bpm": 96.15384615384616,
+      "bpm_median_ibi": 96.15384615384579,
+      "n_beats": 98
+    },
+    "measured_key": {
+      "key": "F minor",
+      "confidence": 0.6583
+    }
+  },
+  "stem": {
+    "tool": "demucs",
+    "model": "htdemucs",
+    "two_stems": "vocals"
+  },
+  "target_bpm": 130.0,
+  "bgm_duration_s": 60.0,
+  "seed": 42,
+  "caption": "Vinahouse remix instrumental, Vietnamese dance style, four-on-the-floor punchy kick, driving offbeat bassline, bright synth stabs and supersaw lead, energetic club groove, clean modern mix",
+  "checkpoints": "F:/ace-checkpoints",
+  "project_root": "F:\\ai-dj\\evidence\\congi_kiep_sau\\work",
+  "input_key": "F minor",
+  "cached_key": "D minor",
+  "bgm_key": "F minor",
+  "alignment": {
+    "method": "librosa.effects.time_stretch + first-onset -> BGM bar 4",
+    "src_bpm": 96.15384615384616,
+    "target_bpm": 130.0,
+    "stretch_rate": 1.352,
+    "pitch_shift_semitones": 0,
+    "vocal_first_onset_s": 0.0267,
+    "vocal_offset_s": 7.3579,
+    "note": "corpus beat grid NOT used (D28); alignment measured on output only"
+  },
+  "vocal_metrics": {
+    "vocal_offset_s": 7.358,
+    "vocal_gain_db": -3.189,
+    "vocal_to_bgm_db": -2.0,
+    "vocal_stem_rms_dbfs": -17.85,
+    "bgm_rms_dbfs": -19.04
+  }
+}

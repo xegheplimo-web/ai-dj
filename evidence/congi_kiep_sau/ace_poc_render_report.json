@@ -1,0 +1,38 @@
+{
+ "master_wav": "F:\\ai-dj\\evidence\\congi_kiep_sau\\ace_poc_master.wav",
+ "duration_s": 60.0,
+ "sample_rate": 48000,
+ "integrated_lufs": -10.9,
+ "true_peak_dbtp": -1.5,
+ "clipping_count": 0,
+ "underflows": 0,
+ "loudness_iterations": [
+  {
+   "integrated_lufs": -15.1,
+   "true_peak_dbtp": -0.9,
+   "available": true
+  },
+  {
+   "integrated_lufs": -11.2,
+   "true_peak_dbtp": -0.9,
+   "available": true
+  },
+  {
+   "integrated_lufs": -10.6,
+   "true_peak_dbtp": -0.9,
+   "available": true
+  },
+  {
+   "integrated_lufs": -10.9,
+   "true_peak_dbtp": -1.2,
+   "available": true
+  }
+ ],
+ "bgm_generation": {
+  "written_to": "F:\\ai-dj\\evidence\\congi_kiep_sau\\work\\bgm.wav",
+  "source_artifact": "F:\\ai-dj\\evidence\\congi_kiep_sau\\work\\7123c2f3-f677-ac19-2e4d-240335a58a6c.wav",
+  "init_status": "[OK] Model initialized successfully on cuda\nMain model: F:\\ace-checkpoints\\acestep-v15-turbo\nVAE: F:\\ace-checkpoints\\vae\nText encoder: F:\\ace-checkpoints\\Qwen3-Embedding-0.6B\nDtype: torch.bfloat16\nAttention: sdpa\nCompiled: False\nQuantization: Disabled\nOffload to CPU: False\nOffload DiT to CPU: False\nMLX DiT: Disabled\nMLX VAE: Disabled"
+ },
+ "loudness_range_lu": 2.7,
+ "master_postfix": "-0.5 dB gain trim (source TPK +0.8 clipping; loudnorm TP landed exactly -1.0, gate needs < -1.0)"
+}
