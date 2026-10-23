@@ -33,7 +33,7 @@ Prove **AI-generated Vinahouse remix** of one rights-cleared Bolero from `F:\D�
 - `docs/ace-poc-report.md` (real command output pasted)
 
 ## 5. Acceptance (ALL required — micro-probe gates the lane)
-- [S1] **Micro-probe PASS (Hermes-run):** isolated venv `F:/ace-venv` installs ACE-Step 1.5 from GitHub on py3.13, `import ace_step` OK, a ≤30s generation runs on CUDA (RTX 3090) and emits a real WAV. → lane Devin ONLY after S1 PASS.
+- [S1] **Micro-probe PASS (Hermes-run, 23/10, real output):** isolated venv `F:/ace-venv` (py3.13) installs `ace-step==1.5.0` from GitHub; module is `acestep` (NOT `ace_step`); `torch 2.7.1+cu128` + `cuda=True` + RTX 3090; main model at `F:/ace-checkpoints` (28 files). → **lane's FIRST deliverable = generation driver + smoke gen** (construct `AceStepHandler`+`LLMHandler`, call `acestep.inference.generate_music`, emit a real WAV ≤30s) — proves end-to-end BEFORE the full PoC.
 - [S2] Stem-split of chosen Bolero yields a vocal stem (RMS > silence floor, duration within 5% of input).
 - [S3] Output master: BPM 126–136 (librosa, measured on OUTPUT WAV); key compatible with input; loudness −9 to −11 LUFS; true-peak < −1 dBTP; 0 clipped samples; 0 underflows.
 - [S4] Vocal present & intelligible (vocal stem RMS ratio in expected band; listening verdict).
