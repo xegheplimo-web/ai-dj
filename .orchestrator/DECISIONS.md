@@ -496,3 +496,13 @@ finding. **Hướng half-time (tempo nhanh bị chia đôi): ĐÃ SỬA.** **Hư
 ambiguous**. **O4/O3 tiếp tục HOLD.** Card kế tiếp: bổ sung **bằng chứng cấp bar/backbeat** cho resolver
 + hiệu chuẩn lại biên ambiguity trên corpus (8 track sát ngưỡng) trước khi planner tin tempo của vật
 liệu chậm.
+
+
+## 2026-10-23 — Adopt ACE-Step 1.5 for AI-remix capability (GPT verdict verified)
+**Nguồn:** `docs/gpt-ace-step-remix-reply-2026-10-23.md` (GPT recommendation, dữ liệu kiểm chứng).
+
+- **D30 (GO — gated micro-probe):** Áp dụng **ACE-Step 1.5** (`git+https://github.com/ace-step/ACE-Step-1.5`, MIT) làm music-gen engine cho PoC remix. Kiến trúc **Option Y (stem + generated BGM)**: tách vocal stem của 1 bài Bolero trong `F:\DỸ LIỆU\ok` (rights-cleared) → ACE-Step sinh BGM Vinahouse (~128–135 BPM, key-compatible) → cân chỉnh BPM/key bằng `rubberband` (KHÔNG dùng analyzer D28 grid — 39/41 suspect) → mix vocal+BGM → master (ebur128) → verify (BPM librosa, true-peak, vocal clarity, structure, listening).
+- **Install cô lập:** venv `F:/ace-venv` (py3.13, KHÔNG --system-site-packages) vì ACE-Step pin `torch==2.7.1+cu128` trùng/xung đột vs `torch 2.8.0+cu129` của py3.13 hệ thống (do ai-dj). Không ăn vào `F:/ai-dj-venv`.
+- **Micro-probe (cổng đóng duy nhất):** cài đặt + sinh thử ≤30s trên RTX 3090 (CUDA) phải PASS trước khi dispatch lane Devin. Nếu fail → STOP, không cài ACE-Step; fallback offline-stretch (rubberband) — không phải remix thật (§20).
+- **Độc lập với D19/D28:** PoC không bao cấp tiếp beat grid corpus — BPM đo trên OUTPUT bằng librosa trực tiếp. Parallel & non-blocking vs P0 quantization fix.
+- **Lưu ý:** ACE-Step không bảo đảm giữ vocal gốc nếu dùng native cover mode → vì thế mới dùng stem-split (Option Y). Nếu stem separation làm mất điều khiển vocal, PoC chuyển sang Option X (native cover) với acceptance thu hẹp (không giữ vocal gốc).
