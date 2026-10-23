@@ -506,3 +506,19 @@ liệu chậm.
 - **Micro-probe (cổng đóng duy nhất):** cài đặt + sinh thử ≤30s trên RTX 3090 (CUDA) phải PASS trước khi dispatch lane Devin. Nếu fail → STOP, không cài ACE-Step; fallback offline-stretch (rubberband) — không phải remix thật (§20).
 - **Độc lập với D19/D28:** PoC không bao cấp tiếp beat grid corpus — BPM đo trên OUTPUT bằng librosa trực tiếp. Parallel & non-blocking vs P0 quantization fix.
 - **Lưu ý:** ACE-Step không bảo đảm giữ vocal gốc nếu dùng native cover mode → vì thế mới dùng stem-split (Option Y). Nếu stem separation làm mất điều khiển vocal, PoC chuyển sang Option X (native cover) với acceptance thu hẹp (không giữ vocal gốc).
+
+
+## 2026-10-23 — D31: AI-DJ-P3-ACE-001 PASS — ACE-Step 1.5 remix PoC complete (Option Y)
+**Nguồn:** lane Devin CLI (worktree `F:/ai-dj-worktrees/AI-DJ-P3-ACE-001`, branch `task/AI-DJ-P3-ACE-001-ace-remix-poc`); commits `b913f61` (lane output) + `75af22b` (reconciliation) trên `main`.
+
+- **D31 (PoC PASS — 9/9 gates):** Bolero `Đam Mê (Cover Duy)` (rec-1d80838e4a40f4cb, cached 99.38 BPM, excerpt 56–100 s, 44 s) → demucs `htdemucs` vocal stem → ACE-Step `acestep-v15-turbo` text2music instrumental Vinahouse BGM (130 BPM, seed 42, 8 steps, bfloat16 CUDA) → librosa time-stretch (100.45→130 BPM, rate 1.2942, onset-anchored to bar 4) → mix → ffmpeg `loudnorm` master → verify on OUTPUT.
+- **Measured on OUTPUT (librosa/ebur128; corpus grid never used):** BPM 129.31 (Hermes: 130.07 bar-period / 130.81 `rhythm.tempo`); loudness −10.7 LUFS; true peak −1.1 dBTP (Hermes −1.2); 0 clipped; 0 underflows; 44.0 s; 23 contiguous active bars; vocal stem RMS −19.8 dBFS (vocal/BGM −2.0 dB); key B minor↔F# minor (5th, compatible per D20-correct `key_compatible`).
+- **Gates:** S1 smoke gen (30.0 s PCM) ✅ · S2 stem ✅ · S3 BPM/key/loudness/TP/clip/underflow ✅ · S4 vocal present ✅ · S5 structure ✅ · S6 `ruff`+`format` clean, `150 passed, 1 skipped` + `11 passed` ✅ · S7 scope ⊆ whitelist ✅.
+- **Findings (not gate fails):**
+  1. **ACE-Step 1.5 `keyscale` adherence is approximate** — requested B minor, BGM measured F# minor. Compatible via dominant relation, but ACE-Step does NOT reliably honor the requested key. Future: pitch-shift the BGM to the vocal's key (or shift the vocal — a fidelity trade-off).
+  2. **Input key label inaccurate** — the lane's plan wrote "B minor"; independent measurement = C# minor (0.89).
+  3. **Mastering** — `alimiter` clamps sample peaks but overshoots inter-sample (+1.0 dBTP); `loudnorm` (true-peak-aware) nails −10.7 LUFS / −1.1 dBTP. LRA compressed 11.2 → 3.3 LU (dense; acceptable for Vinahouse).
+  4. **librosa 1.0 API** — `librosa.beat.tempo` removed; use `librosa.beat.beat_track` / `librosa.feature.rhythm.tempo`.
+  5. **ffmpeg 9.0.1** — `ebur128=framing=1` invalid; use `ebur128=peak=true`.
+- **Toolchain (durable):** venv `F:/ace-venv` (acestep 1.5.0 + torch 2.7.1+cu128 + librosa + soundfile + demucs 4.0.1); model `F:/ace-checkpoints` (`ACESTEP_CHECKPOINTS_DIR`); RTX 3090. Master WAV durable at `F:/ai-dj/evidence/ace_poc_master.wav` (gitignored).
+- **Next:** human listening review (S4 listening verdict not automated). Then (a) key-control experiment (pitch-shift BGM to vocal key); (b) integrate `ace_remixer` as a producer stage in the DJ pipeline; (c) D19 quantization P0 remains the DJ-engine blocker.
