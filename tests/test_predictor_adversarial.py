@@ -35,6 +35,7 @@ import soundfile as sf
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from ai_dj import continuity, verify
+from ai_dj.analysis import beatgrid
 from ai_dj.render import render_plan
 from ai_dj.timing import MASTER_SR
 
@@ -74,6 +75,7 @@ def _record_for(rec_id: str, wav: Path) -> dict:
     return {
         "recording_id": rec_id,
         "continuity_version": continuity.CONTINUITY_VERSION,
+        "beat_grid_version": beatgrid.BEAT_GRID_VERSION,
         "block_ms": int(continuity.BLOCK_S * 1000),
         "channels": "all_channels_rms",
         "continuity_sr": MASTER_SR,

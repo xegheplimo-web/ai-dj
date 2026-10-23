@@ -1,0 +1,17 @@
+{
+  "gate": "G2a",
+  "probe": "synthetic_click_track_rubberband",
+  "bpm_source": 120.0,
+  "tempo_factor": 1.08,
+  "target_bpm": 129.6,
+  "target_ibi_ms": 462.9629629629629,
+  "ffmpeg": "C:\\Users\\atton\\AppData\\Local\\Microsoft\\WinGet\\Links\\ffmpeg.EXE",
+  "measured_ibi_ms": 463.16666666666606,
+  "deviation_ms": 0.2037037037031837,
+  "within_threshold": true,
+  "threshold_ms": 20.0,
+  "detected_beats": 120,
+  "duration_s": 55.556,
+  "samplerate": 48000,
+  "ground_truth_beats": 120
+}

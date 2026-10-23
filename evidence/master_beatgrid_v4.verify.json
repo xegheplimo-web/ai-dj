@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS",
+  "pass": true,
+  "verify_report": "evidence/verification_beatgrid_v4.json",
+  "verified_by": "ai_dj.verify",
+  "provenance": {
+    "binding": "sha256 over the bytes of plan.json + master.wav measured at verify time",
+    "limits": "binds this verdict to the exact artifact bytes — it is NOT anti-forgery evidence, does not prove the WAV was rendered from this plan, and carries no signature; D12 permits plan-declared allowed_silent_gaps_s — the planner emits none, and any exempt regions are listed in the verify report"
+  },
+  "plan_json": "evidence\\plan_beatgrid_v4.json",
+  "plan_sha256": "2d331e6dc8ddd99ea3530de3e1725836ce1b5aa58d8a23d7a18361b05e4fec16",
+  "master_wav": "evidence\\master_beatgrid_v4.wav",
+  "master_sha256": "1747c86ad5de0d1a4b9b0e56e5e396c6946da7e28e13000e9ecfb34cd03a6cc0"
+}

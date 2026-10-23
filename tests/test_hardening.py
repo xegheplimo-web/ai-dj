@@ -25,7 +25,7 @@ import soundfile as sf
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from ai_dj import continuity, player, verdict
-from ai_dj.analysis import analyzer
+from ai_dj.analysis import analyzer, beatgrid
 from ai_dj.cli import main as cli_main
 from ai_dj.planner import plan_set
 from ai_dj.timing import MASTER_SR
@@ -77,6 +77,7 @@ def _record(
     }
     if with_continuity:
         rec["continuity_version"] = continuity.CONTINUITY_VERSION
+        rec["beat_grid_version"] = beatgrid.BEAT_GRID_VERSION
         rec["block_ms"] = int(continuity.BLOCK_S * 1000)
         rec["channels"] = "all_channels_rms"
         rec["continuity_sr"] = MASTER_SR

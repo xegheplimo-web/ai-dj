@@ -1,0 +1,1613 @@
+{
+  "generated_by": "tests/test_beatgrid.py --emit-evidence",
+  "caches": {
+    "v3": "F:\\ai-dj-worktrees\\DJ-P2-BEAT-GRID-001\\analysis_cache.sqlite",
+    "v4": "F:\\ai-dj-worktrees\\DJ-P2-BEAT-GRID-001\\evidence\\analysis_cache_v4.sqlite"
+  },
+  "frame_period_ms": {
+    "v3_hop512": 23.219954648526077,
+    "v4_hop128": 5.804988662131519
+  },
+  "summary": {
+    "tracks": 41,
+    "bpm_changed_gt_0p5": 38,
+    "delta_abs_median": 1.7381,
+    "delta_abs_max": 16.321,
+    "delta_histogram_0p5_bins": {
+      "0.0-0.5": 3,
+      "0.5-1.0": 4,
+      "1.0-1.5": 10,
+      "1.5-2.0": 5,
+      "2.0-2.5": 2,
+      "2.5-3.0": 5,
+      "3.0-3.5": 2,
+      "3.5-4.0": 1,
+      "4.0-4.5": 6,
+      "4.5-5.0": 1,
+      "6.0-6.5": 1,
+      "16.0-16.5": 1
+    }
+  },
+  "tracks": [
+    {
+      "recording_id": "rec-01ca119e72a121c6",
+      "title": "Gió Về Miền Xuôi (Duy Cover)",
+      "bpm_v3": 161.499,
+      "bpm_refined": 160.6588,
+      "bpm_ibi_median": 159.014,
+      "bpm_raw": 159.014,
+      "bpm_corrected": 160.659,
+      "bpm_resolution": 0.0001,
+      "n_beats": 867,
+      "beat_quality": {
+        "active_span_s": 327.0,
+        "beat_env_ratio": 6.092,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9902,
+        "detected_span_s": 323.564,
+        "ibi_drift_pct": 1.56,
+        "octave_suspect": false,
+        "phase_drift_ms": -46.33,
+        "reasons": [
+          "residual_std_ms 184.5 > 20.0",
+          "tempo_unstable growth 1.42 / drift -46.3 ms / ibi_drift 1.6%"
+        ],
+        "residual_growth_ratio": 1.416,
+        "residual_max_ms": 439.713,
+        "residual_std_ms": 184.459,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -0.8402,
+      "landmarks": {
+        "onset_landmarks": 1051,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 75.7,
+        "v3_within_20ms": 0.0023,
+        "v4_within_20ms": 0.1384
+      }
+    },
+    {
+      "recording_id": "rec-03cba80609bd1363",
+      "title": "Untitled Session 33_mixdown",
+      "bpm_v3": 151.999,
+      "bpm_refined": 149.8623,
+      "bpm_ibi_median": 149.796,
+      "bpm_raw": 149.796,
+      "bpm_corrected": 149.862,
+      "bpm_resolution": 0.00011,
+      "n_beats": 736,
+      "beat_quality": {
+        "active_span_s": 300.0,
+        "beat_env_ratio": 7.8,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9822,
+        "detected_span_s": 293.999,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -129.36,
+        "reasons": [
+          "residual_std_ms 130.1 > 20.0",
+          "tempo_unstable growth 1.58 / drift -129.4 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 1.576,
+        "residual_max_ms": 468.335,
+        "residual_std_ms": 130.112,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -2.1367,
+      "landmarks": {
+        "onset_landmarks": 909,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 93.69,
+        "v3_within_20ms": 0.0,
+        "v4_within_20ms": 0.1413
+      }
+    },
+    {
+      "recording_id": "rec-093e6c9bf8c742f0",
+      "title": "Untitled Session 32_mixdown",
+      "bpm_v3": 172.266,
+      "bpm_refined": 170.7804,
+      "bpm_ibi_median": 172.266,
+      "bpm_raw": 169.442,
+      "bpm_corrected": 170.78,
+      "bpm_resolution": 0.0001,
+      "n_beats": 942,
+      "beat_quality": {
+        "active_span_s": 330.0,
+        "beat_env_ratio": 5.253,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.0029,
+        "detected_span_s": 331.006,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -229.36,
+        "reasons": [
+          "residual_std_ms 192.1 > 20.0",
+          "tempo_unstable growth 3.98 / drift -229.4 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 3.985,
+        "residual_max_ms": 582.268,
+        "residual_std_ms": 192.122,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -1.4856,
+      "landmarks": {
+        "onset_landmarks": 651,
+        "v3_median_dist_ms": 92.88,
+        "v4_median_dist_ms": 138.7,
+        "v3_within_20ms": 0.0011,
+        "v4_within_20ms": 0.0743
+      }
+    },
+    {
+      "recording_id": "rec-0d43cfd24e250861",
+      "title": "Đoạn Tái Bút – Cover Duy (Sáng tác -Tú Nhi & Bằng Giang)",
+      "bpm_v3": 151.999,
+      "bpm_refined": 150.0433,
+      "bpm_ibi_median": 149.796,
+      "bpm_raw": 149.796,
+      "bpm_corrected": 150.043,
+      "bpm_resolution": 0.0001,
+      "n_beats": 769,
+      "beat_quality": {
+        "active_span_s": 307.0,
+        "beat_env_ratio": 7.738,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.0017,
+        "detected_span_s": 307.043,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 47.85,
+        "reasons": [
+          "residual_std_ms 43.3 > 20.0",
+          "tempo_unstable growth 3.64 / drift 47.9 ms / ibi_drift -0.0%"
+        ],
+        "residual_growth_ratio": 3.636,
+        "residual_max_ms": 187.452,
+        "residual_std_ms": 43.286,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -1.9557,
+      "landmarks": {
+        "onset_landmarks": 1072,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 47.1,
+        "v3_within_20ms": 0.0,
+        "v4_within_20ms": 0.2068
+      }
+    },
+    {
+      "recording_id": "rec-0f91e3ec4630b55a",
+      "title": "Mẹ Hiền Ơi - (Duy-Cover)",
+      "bpm_v3": 107.666,
+      "bpm_refined": 109.1348,
+      "bpm_ibi_median": 106.556,
+      "bpm_raw": 106.556,
+      "bpm_corrected": 109.135,
+      "bpm_resolution": 9e-05,
+      "n_beats": 549,
+      "beat_quality": {
+        "active_span_s": 309.0,
+        "beat_env_ratio": 5.741,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9768,
+        "detected_span_s": 301.743,
+        "ibi_drift_pct": -1.03,
+        "octave_suspect": false,
+        "phase_drift_ms": 69.77,
+        "reasons": [
+          "residual_std_ms 596.7 > 20.0",
+          "tempo_unstable growth 1.13 / drift 69.8 ms / ibi_drift -1.0%"
+        ],
+        "residual_growth_ratio": 1.133,
+        "residual_max_ms": 1420.996,
+        "residual_std_ms": 596.714,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 1.4688,
+      "landmarks": {
+        "onset_landmarks": 658,
+        "v3_median_dist_ms": 92.88,
+        "v4_median_dist_ms": 123.23,
+        "v3_within_20ms": 0.0037,
+        "v4_within_20ms": 0.102
+      }
+    },
+    {
+      "recording_id": "rec-1633439077ecc118",
+      "title": "BUỒN TRONG NỖI NHỚ (Cover- Duy)",
+      "bpm_v3": 151.999,
+      "bpm_refined": 156.076,
+      "bpm_ibi_median": 156.605,
+      "bpm_raw": 156.605,
+      "bpm_corrected": 156.076,
+      "bpm_resolution": 7e-05,
+      "n_beats": 1006,
+      "beat_quality": {
+        "active_span_s": 387.0,
+        "beat_env_ratio": 8.356,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9993,
+        "detected_span_s": 385.869,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 107.42,
+        "reasons": [
+          "residual_std_ms 103.9 > 20.0",
+          "tempo_unstable growth 4.84 / drift 107.4 ms / ibi_drift -0.0%"
+        ],
+        "residual_growth_ratio": 4.844,
+        "residual_max_ms": 395.414,
+        "residual_std_ms": 103.939,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 4.077,
+      "landmarks": {
+        "onset_landmarks": 1135,
+        "v3_median_dist_ms": 46.44,
+        "v4_median_dist_ms": 48.34,
+        "v3_within_20ms": 0.001,
+        "v4_within_20ms": 0.2167
+      }
+    },
+    {
+      "recording_id": "rec-1a32d2bd9d82ecbd",
+      "title": "Gió Về Miền Xuôi (Duy Cover)(1)",
+      "bpm_v3": 161.499,
+      "bpm_refined": 160.8616,
+      "bpm_ibi_median": 159.014,
+      "bpm_raw": 159.014,
+      "bpm_corrected": 160.862,
+      "bpm_resolution": 0.0001,
+      "n_beats": 870,
+      "beat_quality": {
+        "active_span_s": 327.0,
+        "beat_env_ratio": 6.102,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9924,
+        "detected_span_s": 323.913,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -125.22,
+        "reasons": [
+          "residual_std_ms 219.4 > 20.0",
+          "tempo_unstable growth 0.48 / drift -125.2 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 0.484,
+        "residual_max_ms": 531.861,
+        "residual_std_ms": 219.429,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -0.6374,
+      "landmarks": {
+        "onset_landmarks": 1070,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 79.83,
+        "v3_within_20ms": 0.0023,
+        "v4_within_20ms": 0.1402
+      }
+    },
+    {
+      "recording_id": "rec-1d80838e4a40f4cb",
+      "title": "Đam Mê (Cover Duy) ",
+      "bpm_v3": 99.384,
+      "bpm_refined": 115.705,
+      "bpm_ibi_median": 116.134,
+      "bpm_raw": 116.134,
+      "bpm_corrected": 115.705,
+      "bpm_resolution": 0.00012,
+      "n_beats": 487,
+      "beat_quality": {
+        "active_span_s": 252.0,
+        "beat_env_ratio": 9.73,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.0021,
+        "detected_span_s": 250.665,
+        "ibi_drift_pct": 3.49,
+        "octave_suspect": false,
+        "phase_drift_ms": 95.97,
+        "reasons": [
+          "residual_std_ms 348.3 > 20.0",
+          "tempo_unstable growth 0.65 / drift 96.0 ms / ibi_drift 3.5%"
+        ],
+        "residual_growth_ratio": 0.65,
+        "residual_max_ms": 1440.786,
+        "residual_std_ms": 348.312,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 16.321,
+      "landmarks": {
+        "onset_landmarks": 431,
+        "v3_median_dist_ms": 116.1,
+        "v4_median_dist_ms": 179.61,
+        "v3_within_20ms": 0.0024,
+        "v4_within_20ms": 0.0637
+      }
+    },
+    {
+      "recording_id": "rec-2a30b3deb9c1ac39",
+      "title": "ĐOẠN TUYỆT - COVER -DUY ",
+      "bpm_v3": 161.499,
+      "bpm_refined": 159.9908,
+      "bpm_ibi_median": 159.014,
+      "bpm_raw": 159.014,
+      "bpm_corrected": 159.991,
+      "bpm_resolution": 8e-05,
+      "n_beats": 1028,
+      "beat_quality": {
+        "active_span_s": 387.0,
+        "beat_env_ratio": 9.06,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9962,
+        "detected_span_s": 385.196,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -12.15,
+        "reasons": [
+          "tempo_unstable growth 2.57 / drift -12.2 ms / ibi_drift -0.0%"
+        ],
+        "residual_growth_ratio": 2.571,
+        "residual_max_ms": 69.023,
+        "residual_std_ms": 17.287,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -1.5082,
+      "landmarks": {
+        "onset_landmarks": 1656,
+        "v3_median_dist_ms": 46.44,
+        "v4_median_dist_ms": 46.38,
+        "v3_within_20ms": 0.0039,
+        "v4_within_20ms": 0.107
+      }
+    },
+    {
+      "recording_id": "rec-2b4db63934ea5f70",
+      "title": "Mẹ Hiền Ơi (Cover Duy)",
+      "bpm_v3": 107.666,
+      "bpm_refined": 109.1099,
+      "bpm_ibi_median": 106.556,
+      "bpm_raw": 106.556,
+      "bpm_corrected": 109.11,
+      "bpm_resolution": 9e-05,
+      "n_beats": 548,
+      "beat_quality": {
+        "active_span_s": 309.0,
+        "beat_env_ratio": 5.604,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9752,
+        "detected_span_s": 301.743,
+        "ibi_drift_pct": -1.03,
+        "octave_suspect": false,
+        "phase_drift_ms": 63.87,
+        "reasons": [
+          "residual_std_ms 592.5 > 20.0",
+          "tempo_unstable growth 1.13 / drift 63.9 ms / ibi_drift -1.0%"
+        ],
+        "residual_growth_ratio": 1.126,
+        "residual_max_ms": 1428.799,
+        "residual_std_ms": 592.54,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 1.4439,
+      "landmarks": {
+        "onset_landmarks": 768,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 107.98,
+        "v3_within_20ms": 0.0037,
+        "v4_within_20ms": 0.0858
+      }
+    },
+    {
+      "recording_id": "rec-3177f4d0d6cad1e4",
+      "title": "ĐỐI DIỆN NHÀ EM - DUY GỐC",
+      "bpm_v3": 135.999,
+      "bpm_refined": 142.2309,
+      "bpm_ibi_median": 141.588,
+      "bpm_raw": 139.675,
+      "bpm_corrected": 142.231,
+      "bpm_resolution": 0.00012,
+      "n_beats": 659,
+      "beat_quality": {
+        "active_span_s": 284.0,
+        "beat_env_ratio": 4.459,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9789,
+        "detected_span_s": 275.865,
+        "ibi_drift_pct": 1.43,
+        "octave_suspect": false,
+        "phase_drift_ms": 266.94,
+        "reasons": [
+          "residual_std_ms 410.2 > 20.0",
+          "tempo_unstable growth 0.67 / drift 266.9 ms / ibi_drift 1.4%"
+        ],
+        "residual_growth_ratio": 0.669,
+        "residual_max_ms": 1166.831,
+        "residual_std_ms": 410.154,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 6.2319,
+      "landmarks": {
+        "onset_landmarks": 479,
+        "v3_median_dist_ms": 139.32,
+        "v4_median_dist_ms": 186.23,
+        "v3_within_20ms": 0.0016,
+        "v4_within_20ms": 0.0683
+      }
+    },
+    {
+      "recording_id": "rec-36bd9cb09f26f5b8",
+      "title": "Sao Lòng Còn Thương - Trọng Hải",
+      "bpm_v3": 161.499,
+      "bpm_refined": 159.8838,
+      "bpm_ibi_median": 159.014,
+      "bpm_raw": 159.014,
+      "bpm_corrected": 159.884,
+      "bpm_resolution": 8e-05,
+      "n_beats": 1022,
+      "beat_quality": {
+        "active_span_s": 384.0,
+        "beat_env_ratio": 7.089,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9988,
+        "detected_span_s": 384.0,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -150.14,
+        "reasons": [
+          "residual_std_ms 120.9 > 20.0",
+          "tempo_unstable growth 2.27 / drift -150.1 ms / ibi_drift -0.0%"
+        ],
+        "residual_growth_ratio": 2.27,
+        "residual_max_ms": 569.954,
+        "residual_std_ms": 120.94,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -1.6152,
+      "landmarks": {
+        "onset_landmarks": 973,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 100.64,
+        "v3_within_20ms": 0.001,
+        "v4_within_20ms": 0.138
+      }
+    },
+    {
+      "recording_id": "rec-4416bd26d4db6844",
+      "title": "Vu Lan Nhớ Mẹ – Cover Duy (Sáng tác - Hoàng Duy)",
+      "bpm_v3": 135.999,
+      "bpm_refined": 136.3421,
+      "bpm_ibi_median": 135.999,
+      "bpm_raw": 132.512,
+      "bpm_corrected": 136.342,
+      "bpm_resolution": 0.00012,
+      "n_beats": 617,
+      "beat_quality": {
+        "active_span_s": 278.0,
+        "beat_env_ratio": 3.399,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9767,
+        "detected_span_s": 272.266,
+        "ibi_drift_pct": -3.85,
+        "octave_suspect": false,
+        "phase_drift_ms": -83.24,
+        "reasons": [
+          "residual_std_ms 398.5 > 20.0",
+          "tempo_unstable growth 0.75 / drift -83.2 ms / ibi_drift -3.8%"
+        ],
+        "residual_growth_ratio": 0.753,
+        "residual_max_ms": 1708.774,
+        "residual_std_ms": 398.488,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 0.3431,
+      "landmarks": {
+        "onset_landmarks": 606,
+        "v3_median_dist_ms": 92.88,
+        "v4_median_dist_ms": 109.44,
+        "v3_within_20ms": 0.0016,
+        "v4_within_20ms": 0.107
+      }
+    },
+    {
+      "recording_id": "rec-456190e736b3b9e0",
+      "title": "audio",
+      "bpm_v3": 161.499,
+      "bpm_refined": 160.3848,
+      "bpm_ibi_median": 161.499,
+      "bpm_raw": 154.268,
+      "bpm_corrected": 160.385,
+      "bpm_resolution": 0.00014,
+      "n_beats": 693,
+      "beat_quality": {
+        "active_span_s": 263.0,
+        "beat_env_ratio": 6.764,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9857,
+        "detected_span_s": 258.815,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -2.57,
+        "reasons": [
+          "residual_std_ms 278.4 > 20.0"
+        ],
+        "residual_growth_ratio": 1.004,
+        "residual_max_ms": 763.591,
+        "residual_std_ms": 278.438,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -1.1142,
+      "landmarks": {
+        "onset_landmarks": 693,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 107.42,
+        "v3_within_20ms": 0.0029,
+        "v4_within_20ms": 0.0967
+      }
+    },
+    {
+      "recording_id": "rec-4abe167c7f9c8ea3",
+      "title": "Gõ Cửa - Bolero Cover – Duy",
+      "bpm_v3": 92.285,
+      "bpm_refined": 96.0743,
+      "bpm_ibi_median": 93.117,
+      "bpm_raw": 93.117,
+      "bpm_corrected": 96.074,
+      "bpm_resolution": 9e-05,
+      "n_beats": 475,
+      "beat_quality": {
+        "active_span_s": 301.0,
+        "beat_env_ratio": 6.548,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9855,
+        "detected_span_s": 297.099,
+        "ibi_drift_pct": -0.45,
+        "octave_suspect": false,
+        "phase_drift_ms": -67.71,
+        "reasons": [
+          "residual_std_ms 380.0 > 20.0",
+          "tempo_unstable growth 0.59 / drift -67.7 ms / ibi_drift -0.5%"
+        ],
+        "residual_growth_ratio": 0.594,
+        "residual_max_ms": 1102.789,
+        "residual_std_ms": 380.038,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 3.7893,
+      "landmarks": {
+        "onset_landmarks": 1009,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 80.51,
+        "v3_within_20ms": 0.0065,
+        "v4_within_20ms": 0.1137
+      }
+    },
+    {
+      "recording_id": "rec-52ef1d309f22398a",
+      "title": "Untitled Session 35_mixdown",
+      "bpm_v3": 172.266,
+      "bpm_refined": 170.7837,
+      "bpm_ibi_median": 172.266,
+      "bpm_raw": 169.442,
+      "bpm_corrected": 170.784,
+      "bpm_resolution": 0.0001,
+      "n_beats": 942,
+      "beat_quality": {
+        "active_span_s": 330.0,
+        "beat_env_ratio": 5.277,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.0029,
+        "detected_span_s": 331.006,
+        "ibi_drift_pct": 1.67,
+        "octave_suspect": false,
+        "phase_drift_ms": -230.3,
+        "reasons": [
+          "residual_std_ms 190.0 > 20.0",
+          "tempo_unstable growth 4.02 / drift -230.3 ms / ibi_drift 1.7%"
+        ],
+        "residual_growth_ratio": 4.016,
+        "residual_max_ms": 585.223,
+        "residual_std_ms": 190.045,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -1.4823,
+      "landmarks": {
+        "onset_landmarks": 641,
+        "v3_median_dist_ms": 92.88,
+        "v4_median_dist_ms": 143.42,
+        "v3_within_20ms": 0.0011,
+        "v4_within_20ms": 0.0701
+      }
+    },
+    {
+      "recording_id": "rec-5511fe14e6c9f241",
+      "title": "Thiệp Hồng Sai Tên – Cover Duy",
+      "bpm_v3": 172.266,
+      "bpm_refined": 168.0038,
+      "bpm_ibi_median": 169.442,
+      "bpm_raw": 166.709,
+      "bpm_corrected": 168.004,
+      "bpm_resolution": 0.00013,
+      "n_beats": 760,
+      "beat_quality": {
+        "active_span_s": 279.0,
+        "beat_env_ratio": 5.011,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9728,
+        "detected_span_s": 271.093,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -1.17,
+        "reasons": [
+          "residual_std_ms 20.9 > 20.0"
+        ],
+        "residual_growth_ratio": 0.742,
+        "residual_max_ms": 175.26,
+        "residual_std_ms": 20.855,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -4.2622,
+      "landmarks": {
+        "onset_landmarks": 677,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 62.09,
+        "v3_within_20ms": 0.004,
+        "v4_within_20ms": 0.0724
+      }
+    },
+    {
+      "recording_id": "rec-5a84548057ad9e88",
+      "title": "TÌNH ANH - COVER DUY",
+      "bpm_v3": 172.266,
+      "bpm_refined": 169.6605,
+      "bpm_ibi_median": 169.442,
+      "bpm_raw": 169.442,
+      "bpm_corrected": 169.661,
+      "bpm_resolution": 0.00012,
+      "n_beats": 794,
+      "beat_quality": {
+        "active_span_s": 278.0,
+        "beat_env_ratio": 5.198,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.0101,
+        "detected_span_s": 280.503,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -125.65,
+        "reasons": [
+          "residual_std_ms 114.4 > 20.0",
+          "tempo_unstable growth 0.57 / drift -125.6 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 0.569,
+        "residual_max_ms": 392.36,
+        "residual_std_ms": 114.375,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -2.6055,
+      "landmarks": {
+        "onset_landmarks": 630,
+        "v3_median_dist_ms": 92.88,
+        "v4_median_dist_ms": 127.27,
+        "v3_within_20ms": 0.0013,
+        "v4_within_20ms": 0.0705
+      }
+    },
+    {
+      "recording_id": "rec-66c47384f35fab84",
+      "title": "CÂU HẸN CÂU THỀ - COVER DUY",
+      "bpm_v3": 172.266,
+      "bpm_refined": 171.0005,
+      "bpm_ibi_median": 172.266,
+      "bpm_raw": 169.442,
+      "bpm_corrected": 171.0,
+      "bpm_resolution": 0.00019,
+      "n_beats": 599,
+      "beat_quality": {
+        "active_span_s": 211.0,
+        "beat_env_ratio": 5.093,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9961,
+        "detected_span_s": 209.792,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -1.41,
+        "reasons": [],
+        "residual_growth_ratio": 0.774,
+        "residual_max_ms": 102.526,
+        "residual_std_ms": 16.372,
+        "status": "ok",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -1.2655,
+      "landmarks": {
+        "onset_landmarks": 464,
+        "v3_median_dist_ms": 92.88,
+        "v4_median_dist_ms": 78.61,
+        "v3_within_20ms": 0.0,
+        "v4_within_20ms": 0.0434
+      }
+    },
+    {
+      "recording_id": "rec-6a93ac2d52baefc6",
+      "title": "PHIM BA NGƯỜI (DUY COVER)",
+      "bpm_v3": 161.499,
+      "bpm_refined": 164.2726,
+      "bpm_ibi_median": 164.062,
+      "bpm_raw": 161.499,
+      "bpm_corrected": 164.273,
+      "bpm_resolution": 0.00011,
+      "n_beats": 823,
+      "beat_quality": {
+        "active_span_s": 305.0,
+        "beat_env_ratio": 4.761,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9856,
+        "detected_span_s": 300.275,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 142.1,
+        "reasons": [
+          "residual_std_ms 216.6 > 20.0",
+          "tempo_unstable growth 0.82 / drift 142.1 ms / ibi_drift -0.0%"
+        ],
+        "residual_growth_ratio": 0.822,
+        "residual_max_ms": 388.739,
+        "residual_std_ms": 216.628,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 2.7736,
+      "landmarks": {
+        "onset_landmarks": 784,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 91.71,
+        "v3_within_20ms": 0.0036,
+        "v4_within_20ms": 0.1264
+      }
+    },
+    {
+      "recording_id": "rec-7041a3ee40c1a78c",
+      "title": "âm thanh huấn luyện ok",
+      "bpm_v3": 143.555,
+      "bpm_refined": 144.022,
+      "bpm_ibi_median": 147.656,
+      "bpm_raw": 141.588,
+      "bpm_corrected": 144.022,
+      "bpm_resolution": 5e-05,
+      "n_beats": 1233,
+      "beat_quality": {
+        "active_span_s": 517.0,
+        "beat_env_ratio": 4.07,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9936,
+        "detected_span_s": 513.364,
+        "ibi_drift_pct": 1.43,
+        "octave_suspect": false,
+        "phase_drift_ms": 801.4,
+        "reasons": [
+          "residual_std_ms 1182.1 > 20.0",
+          "tempo_unstable growth 1.45 / drift 801.4 ms / ibi_drift 1.4%"
+        ],
+        "residual_growth_ratio": 1.447,
+        "residual_max_ms": 2391.69,
+        "residual_std_ms": 1182.094,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 0.467,
+      "landmarks": {
+        "onset_landmarks": 1244,
+        "v3_median_dist_ms": 92.88,
+        "v4_median_dist_ms": 119.54,
+        "v3_within_20ms": 0.0048,
+        "v4_within_20ms": 0.0957
+      }
+    },
+    {
+      "recording_id": "rec-793608aaeb5b6242",
+      "title": "vô thường và buông xả",
+      "bpm_v3": 161.499,
+      "bpm_refined": 160.9982,
+      "bpm_ibi_median": 159.014,
+      "bpm_raw": 156.605,
+      "bpm_corrected": 160.998,
+      "bpm_resolution": 0.00058,
+      "n_beats": 264,
+      "beat_quality": {
+        "active_span_s": 99.0,
+        "beat_env_ratio": 4.926,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9938,
+        "detected_span_s": 98.249,
+        "ibi_drift_pct": 1.56,
+        "octave_suspect": false,
+        "phase_drift_ms": 71.11,
+        "reasons": [
+          "residual_std_ms 193.5 > 20.0",
+          "tempo_unstable growth 0.45 / drift 71.1 ms / ibi_drift 1.6%"
+        ],
+        "residual_growth_ratio": 0.447,
+        "residual_max_ms": 517.832,
+        "residual_std_ms": 193.529,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -0.5008,
+      "landmarks": {
+        "onset_landmarks": 417,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 63.67,
+        "v3_within_20ms": 0.0038,
+        "v4_within_20ms": 0.178
+      }
+    },
+    {
+      "recording_id": "rec-798dc7ccde6f2433",
+      "title": "Khóa Ly Biệt (Cover Duy)",
+      "bpm_v3": 143.555,
+      "bpm_refined": 140.7021,
+      "bpm_ibi_median": 139.675,
+      "bpm_raw": 137.812,
+      "bpm_corrected": 140.702,
+      "bpm_resolution": 0.0003,
+      "n_beats": 346,
+      "beat_quality": {
+        "active_span_s": 145.0,
+        "beat_env_ratio": 3.551,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.0176,
+        "detected_span_s": 146.86,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 12.53,
+        "reasons": [
+          "residual_std_ms 137.8 > 20.0"
+        ],
+        "residual_growth_ratio": 0.958,
+        "residual_max_ms": 357.045,
+        "residual_std_ms": 137.79,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -2.8529,
+      "landmarks": {
+        "onset_landmarks": 320,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 121.55,
+        "v3_within_20ms": 0.0,
+        "v4_within_20ms": 0.104
+      }
+    },
+    {
+      "recording_id": "rec-85c045c8d752fcea",
+      "title": "ĐỐI DIỆN NHÀ EM - DUY COVER",
+      "bpm_v3": 161.499,
+      "bpm_refined": 158.2366,
+      "bpm_ibi_median": 159.014,
+      "bpm_raw": 156.605,
+      "bpm_corrected": 158.237,
+      "bpm_resolution": 0.0001,
+      "n_beats": 844,
+      "beat_quality": {
+        "active_span_s": 322.0,
+        "beat_env_ratio": 7.023,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9939,
+        "detected_span_s": 320.36,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -57.62,
+        "reasons": [
+          "residual_std_ms 113.1 > 20.0",
+          "tempo_unstable growth 0.47 / drift -57.6 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 0.472,
+        "residual_max_ms": 591.213,
+        "residual_std_ms": 113.101,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -3.2624,
+      "landmarks": {
+        "onset_landmarks": 1091,
+        "v3_median_dist_ms": 46.44,
+        "v4_median_dist_ms": 68.13,
+        "v3_within_20ms": 0.0024,
+        "v4_within_20ms": 0.16
+      }
+    },
+    {
+      "recording_id": "rec-87f38b799dcea6e2",
+      "title": "Untitled Session 19_mixdown",
+      "bpm_v3": 135.999,
+      "bpm_refined": 140.769,
+      "bpm_ibi_median": 143.555,
+      "bpm_raw": 137.812,
+      "bpm_corrected": 140.769,
+      "bpm_resolution": 4e-05,
+      "n_beats": 1344,
+      "beat_quality": {
+        "active_span_s": 577.0,
+        "beat_env_ratio": 4.319,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9928,
+        "detected_span_s": 572.558,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 225.88,
+        "reasons": [
+          "residual_std_ms 780.9 > 20.0",
+          "tempo_unstable growth 1.98 / drift 225.9 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 1.977,
+        "residual_max_ms": 2383.528,
+        "residual_std_ms": 780.895,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 4.77,
+      "landmarks": {
+        "onset_landmarks": 1519,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 106.29,
+        "v3_within_20ms": 0.0054,
+        "v4_within_20ms": 0.1004
+      }
+    },
+    {
+      "recording_id": "rec-91da690acb76ab21",
+      "title": "PHIM BA NGƯỜI - COVER - DUY",
+      "bpm_v3": 161.499,
+      "bpm_refined": 164.9479,
+      "bpm_ibi_median": 164.063,
+      "bpm_raw": 161.499,
+      "bpm_corrected": 164.948,
+      "bpm_resolution": 0.00061,
+      "n_beats": 266,
+      "beat_quality": {
+        "active_span_s": 102.0,
+        "beat_env_ratio": 4.417,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9486,
+        "detected_span_s": 96.583,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 0.42,
+        "reasons": [
+          "residual_std_ms 97.0 > 20.0"
+        ],
+        "residual_growth_ratio": 0.839,
+        "residual_max_ms": 221.183,
+        "residual_std_ms": 97.003,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": 3.4489,
+      "landmarks": {
+        "onset_landmarks": 289,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 82.51,
+        "v3_within_20ms": 0.0074,
+        "v4_within_20ms": 0.1203
+      }
+    },
+    {
+      "recording_id": "rec-9ff0e665425462d6",
+      "title": "TÌNH ANH – Cover Duy",
+      "bpm_v3": 172.266,
+      "bpm_refined": 169.566,
+      "bpm_ibi_median": 169.442,
+      "bpm_raw": 169.442,
+      "bpm_corrected": 169.566,
+      "bpm_resolution": 0.00016,
+      "n_beats": 674,
+      "beat_quality": {
+        "active_span_s": 238.0,
+        "beat_env_ratio": 4.911,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.0021,
+        "detected_span_s": 237.691,
+        "ibi_drift_pct": 1.67,
+        "octave_suspect": false,
+        "phase_drift_ms": 51.73,
+        "reasons": [
+          "residual_std_ms 81.2 > 20.0",
+          "tempo_unstable growth 0.44 / drift 51.7 ms / ibi_drift 1.7%"
+        ],
+        "residual_growth_ratio": 0.436,
+        "residual_max_ms": 431.053,
+        "residual_std_ms": 81.166,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -2.7,
+      "landmarks": {
+        "onset_landmarks": 591,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 95.06,
+        "v3_within_20ms": 0.0045,
+        "v4_within_20ms": 0.0549
+      }
+    },
+    {
+      "recording_id": "rec-a5fe22eb310f73fa",
+      "title": "Chuyện tình cô lái đò-Bolero(Cover Duy)",
+      "bpm_v3": 151.999,
+      "bpm_refined": 149.9836,
+      "bpm_ibi_median": 149.796,
+      "bpm_raw": 149.796,
+      "bpm_corrected": 149.984,
+      "bpm_resolution": 0.0001,
+      "n_beats": 777,
+      "beat_quality": {
+        "active_span_s": 314.0,
+        "beat_env_ratio": 7.04,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9899,
+        "detected_span_s": 310.399,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 2.02,
+        "reasons": [
+          "residual_std_ms 25.5 > 20.0"
+        ],
+        "residual_growth_ratio": 0.979,
+        "residual_max_ms": 114.224,
+        "residual_std_ms": 25.497,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -2.0154,
+      "landmarks": {
+        "onset_landmarks": 954,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 48.94,
+        "v3_within_20ms": 0.009,
+        "v4_within_20ms": 0.1828
+      }
+    },
+    {
+      "recording_id": "rec-a7612bd3ecbc7b80",
+      "title": "CHẲNG THỂ CẢM HÓA - COVER DUY",
+      "bpm_v3": 172.266,
+      "bpm_refined": 168.0187,
+      "bpm_ibi_median": 169.442,
+      "bpm_raw": 166.709,
+      "bpm_corrected": 168.019,
+      "bpm_resolution": 0.00023,
+      "n_beats": 528,
+      "beat_quality": {
+        "active_span_s": 190.0,
+        "beat_env_ratio": 5.369,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9924,
+        "detected_span_s": 188.186,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 2.7,
+        "reasons": [
+          "residual_std_ms 21.1 > 20.0"
+        ],
+        "residual_growth_ratio": 0.69,
+        "residual_max_ms": 109.163,
+        "residual_std_ms": 21.112,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -4.2473,
+      "landmarks": {
+        "onset_landmarks": 536,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 53.0,
+        "v3_within_20ms": 0.0076,
+        "v4_within_20ms": 0.1307
+      }
+    },
+    {
+      "recording_id": "rec-a9062c7c0a9f9ad1",
+      "title": "ĐOẠN TUYỆT - COVER -DUY ",
+      "bpm_v3": 161.499,
+      "bpm_refined": 159.9866,
+      "bpm_ibi_median": 159.014,
+      "bpm_raw": 159.014,
+      "bpm_corrected": 159.987,
+      "bpm_resolution": 0.0001,
+      "n_beats": 871,
+      "beat_quality": {
+        "active_span_s": 326.0,
+        "beat_env_ratio": 8.828,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.002,
+        "detected_span_s": 326.322,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -14.15,
+        "reasons": [
+          "tempo_unstable growth 2.47 / drift -14.1 ms / ibi_drift -0.0%"
+        ],
+        "residual_growth_ratio": 2.465,
+        "residual_max_ms": 69.086,
+        "residual_std_ms": 18.18,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -1.5124,
+      "landmarks": {
+        "onset_landmarks": 1393,
+        "v3_median_dist_ms": 46.44,
+        "v4_median_dist_ms": 46.22,
+        "v3_within_20ms": 0.0023,
+        "v4_within_20ms": 0.1183
+      }
+    },
+    {
+      "recording_id": "rec-aa8467fc0419dbda",
+      "title": "Thế Sự -. Cover Duywav",
+      "bpm_v3": 161.499,
+      "bpm_refined": 157.0047,
+      "bpm_ibi_median": 156.605,
+      "bpm_raw": 156.605,
+      "bpm_corrected": 157.005,
+      "bpm_resolution": 0.00013,
+      "n_beats": 683,
+      "beat_quality": {
+        "active_span_s": 263.0,
+        "beat_env_ratio": 7.627,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9924,
+        "detected_span_s": 260.644,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 3.63,
+        "reasons": [],
+        "residual_growth_ratio": 1.256,
+        "residual_max_ms": 136.591,
+        "residual_std_ms": 15.974,
+        "status": "ok",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -4.4943,
+      "landmarks": {
+        "onset_landmarks": 858,
+        "v3_median_dist_ms": 46.44,
+        "v4_median_dist_ms": 45.3,
+        "v3_within_20ms": 0.0073,
+        "v4_within_20ms": 0.1332
+      }
+    },
+    {
+      "recording_id": "rec-c9ccb3686940f57d",
+      "title": "Gió Về Miền Xuôi(Duy Cover)",
+      "bpm_v3": 161.499,
+      "bpm_refined": 160.4923,
+      "bpm_ibi_median": 159.014,
+      "bpm_raw": 159.014,
+      "bpm_corrected": 160.492,
+      "bpm_resolution": 0.0001,
+      "n_beats": 868,
+      "beat_quality": {
+        "active_span_s": 327.0,
+        "beat_env_ratio": 6.182,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9924,
+        "detected_span_s": 323.918,
+        "ibi_drift_pct": -1.54,
+        "octave_suspect": false,
+        "phase_drift_ms": 37.64,
+        "reasons": [
+          "residual_std_ms 141.8 > 20.0"
+        ],
+        "residual_growth_ratio": 1.155,
+        "residual_max_ms": 419.73,
+        "residual_std_ms": 141.821,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -1.0067,
+      "landmarks": {
+        "onset_landmarks": 1122,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 77.48,
+        "v3_within_20ms": 0.0035,
+        "v4_within_20ms": 0.1348
+      }
+    },
+    {
+      "recording_id": "rec-cdb8894fb3bf79df",
+      "title": "huan luyen",
+      "bpm_v3": 172.266,
+      "bpm_refined": 169.6588,
+      "bpm_ibi_median": 169.442,
+      "bpm_raw": 166.709,
+      "bpm_corrected": 169.659,
+      "bpm_resolution": 0.00014,
+      "n_beats": 739,
+      "beat_quality": {
+        "active_span_s": 265.0,
+        "beat_env_ratio": 4.114,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9862,
+        "detected_span_s": 260.923,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 46.4,
+        "reasons": [
+          "residual_std_ms 219.7 > 20.0",
+          "tempo_unstable growth 0.98 / drift 46.4 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 0.979,
+        "residual_max_ms": 471.96,
+        "residual_std_ms": 219.737,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -2.6072,
+      "landmarks": {
+        "onset_landmarks": 461,
+        "v3_median_dist_ms": 162.54,
+        "v4_median_dist_ms": 174.35,
+        "v3_within_20ms": 0.0027,
+        "v4_within_20ms": 0.069
+      }
+    },
+    {
+      "recording_id": "rec-d3b2ad7270f47958",
+      "title": "NÀNG YÊU HOA TÍM - MẠNH NGUYÊN-(DUY-COVER)",
+      "bpm_v3": 129.199,
+      "bpm_refined": 130.3591,
+      "bpm_ibi_median": 129.199,
+      "bpm_raw": 129.199,
+      "bpm_corrected": 130.359,
+      "bpm_resolution": 9e-05,
+      "n_beats": 685,
+      "beat_quality": {
+        "active_span_s": 315.0,
+        "beat_env_ratio": 7.937,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.0009,
+        "detected_span_s": 314.752,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 33.12,
+        "reasons": [
+          "residual_std_ms 117.0 > 20.0"
+        ],
+        "residual_growth_ratio": 0.975,
+        "residual_max_ms": 270.483,
+        "residual_std_ms": 117.02,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": 1.1601,
+      "landmarks": {
+        "onset_landmarks": 818,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 83.04,
+        "v3_within_20ms": 0.0,
+        "v4_within_20ms": 0.1752
+      }
+    },
+    {
+      "recording_id": "rec-d92d5b9fbbc9024e",
+      "title": "Untitled Session 6_mixdown",
+      "bpm_v3": 151.999,
+      "bpm_refined": 156.0079,
+      "bpm_ibi_median": 156.605,
+      "bpm_raw": 156.605,
+      "bpm_corrected": 156.008,
+      "bpm_resolution": 7e-05,
+      "n_beats": 1005,
+      "beat_quality": {
+        "active_span_s": 388.0,
+        "beat_env_ratio": 7.796,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9962,
+        "detected_span_s": 385.869,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 11.09,
+        "reasons": [
+          "residual_std_ms 24.0 > 20.0",
+          "tempo_unstable growth 2.03 / drift 11.1 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 2.027,
+        "residual_max_ms": 188.137,
+        "residual_std_ms": 23.957,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 4.0089,
+      "landmarks": {
+        "onset_landmarks": 1083,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 54.68,
+        "v3_within_20ms": 0.002,
+        "v4_within_20ms": 0.1035
+      }
+    },
+    {
+      "recording_id": "rec-da5e7113acc2ecdf",
+      "title": "Con Hứa Sẽ Về",
+      "bpm_v3": 123.047,
+      "bpm_refined": 122.8277,
+      "bpm_ibi_median": 121.599,
+      "bpm_raw": 121.599,
+      "bpm_corrected": 122.828,
+      "bpm_resolution": 0.00014,
+      "n_beats": 472,
+      "beat_quality": {
+        "active_span_s": 232.0,
+        "beat_env_ratio": 5.579,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9938,
+        "detected_span_s": 230.162,
+        "ibi_drift_pct": -1.18,
+        "octave_suspect": false,
+        "phase_drift_ms": -11.18,
+        "reasons": [
+          "residual_std_ms 148.5 > 20.0"
+        ],
+        "residual_growth_ratio": 0.697,
+        "residual_max_ms": 444.891,
+        "residual_std_ms": 148.516,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -0.2193,
+      "landmarks": {
+        "onset_landmarks": 581,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 102.91,
+        "v3_within_20ms": 0.0,
+        "v4_within_20ms": 0.1229
+      }
+    },
+    {
+      "recording_id": "rec-e3c3cc9559914a0c",
+      "title": "Đam Mê (Cover Duy)",
+      "bpm_v3": 151.999,
+      "bpm_refined": 150.2609,
+      "bpm_ibi_median": 149.796,
+      "bpm_raw": 149.796,
+      "bpm_corrected": 150.261,
+      "bpm_resolution": 0.00011,
+      "n_beats": 745,
+      "beat_quality": {
+        "active_span_s": 303.0,
+        "beat_env_ratio": 7.948,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9818,
+        "detected_span_s": 296.797,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": -25.35,
+        "reasons": [
+          "residual_std_ms 119.3 > 20.0"
+        ],
+        "residual_growth_ratio": 1.557,
+        "residual_max_ms": 252.573,
+        "residual_std_ms": 119.266,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": -1.7381,
+      "landmarks": {
+        "onset_landmarks": 906,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 100.38,
+        "v3_within_20ms": 0.0,
+        "v4_within_20ms": 0.1181
+      }
+    },
+    {
+      "recording_id": "rec-e8d0ce6b03814d91",
+      "title": "ĐỪNG HẸN KIẾP SAU(Cover Duy)",
+      "bpm_v3": 117.454,
+      "bpm_refined": 116.4522,
+      "bpm_ibi_median": 116.134,
+      "bpm_raw": 116.134,
+      "bpm_corrected": 116.452,
+      "bpm_resolution": 7e-05,
+      "n_beats": 687,
+      "beat_quality": {
+        "active_span_s": 344.0,
+        "beat_env_ratio": 6.275,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 1.029,
+        "detected_span_s": 353.779,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 154.33,
+        "reasons": [
+          "residual_std_ms 355.2 > 20.0",
+          "tempo_unstable growth 0.82 / drift 154.3 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 0.821,
+        "residual_max_ms": 1051.731,
+        "residual_std_ms": 355.158,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": -1.0018,
+      "landmarks": {
+        "onset_landmarks": 863,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 102.83,
+        "v3_within_20ms": 0.0015,
+        "v4_within_20ms": 0.1077
+      }
+    },
+    {
+      "recording_id": "rec-f313e4624a307ca2",
+      "title": "Khóc Thầm",
+      "bpm_v3": 83.354,
+      "bpm_refined": 84.0467,
+      "bpm_ibi_median": 84.032,
+      "bpm_raw": 84.032,
+      "bpm_corrected": 84.047,
+      "bpm_resolution": 8e-05,
+      "n_beats": 430,
+      "beat_quality": {
+        "active_span_s": 313.0,
+        "beat_env_ratio": 8.976,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9807,
+        "detected_span_s": 305.708,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 103.03,
+        "reasons": [
+          "residual_std_ms 129.0 > 20.0",
+          "tempo_unstable growth 5.13 / drift 103.0 ms / ibi_drift 0.0%"
+        ],
+        "residual_growth_ratio": 5.134,
+        "residual_max_ms": 639.716,
+        "residual_std_ms": 128.992,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 0.6927,
+      "landmarks": {
+        "onset_landmarks": 972,
+        "v3_median_dist_ms": 69.66,
+        "v4_median_dist_ms": 42.34,
+        "v3_within_20ms": 0.0071,
+        "v4_within_20ms": 0.2372
+      }
+    },
+    {
+      "recording_id": "rec-f644aa7aac7291ef",
+      "title": "BUỒN TRONG NỖI NHỚ (Cover- Duy)",
+      "bpm_v3": 151.999,
+      "bpm_refined": 156.0114,
+      "bpm_ibi_median": 156.605,
+      "bpm_raw": 156.605,
+      "bpm_corrected": 156.011,
+      "bpm_resolution": 7e-05,
+      "n_beats": 1005,
+      "beat_quality": {
+        "active_span_s": 387.0,
+        "beat_env_ratio": 8.17,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9987,
+        "detected_span_s": 385.875,
+        "ibi_drift_pct": -0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 15.54,
+        "reasons": [
+          "residual_std_ms 23.4 > 20.0",
+          "tempo_unstable growth 1.77 / drift 15.5 ms / ibi_drift -0.0%"
+        ],
+        "residual_growth_ratio": 1.772,
+        "residual_max_ms": 185.394,
+        "residual_std_ms": 23.382,
+        "status": "suspect",
+        "tempo_unstable": true
+      },
+      "delta_bpm": 4.0124,
+      "landmarks": {
+        "onset_landmarks": 1139,
+        "v3_median_dist_ms": 46.44,
+        "v4_median_dist_ms": 52.79,
+        "v3_within_20ms": 0.002,
+        "v4_within_20ms": 0.1403
+      }
+    },
+    {
+      "recording_id": "rec-f6dc34794985d5f3",
+      "title": "NỢ TÌNH COVER DUY",
+      "bpm_v3": 99.384,
+      "bpm_refined": 100.6708,
+      "bpm_ibi_median": 100.349,
+      "bpm_raw": 100.349,
+      "bpm_corrected": 100.671,
+      "bpm_resolution": 0.00019,
+      "n_beats": 297,
+      "beat_quality": {
+        "active_span_s": 183.0,
+        "beat_env_ratio": 6.274,
+        "coverage_high": false,
+        "coverage_low": false,
+        "coverage_ratio": 0.9673,
+        "detected_span_s": 176.605,
+        "ibi_drift_pct": 0.0,
+        "octave_suspect": false,
+        "phase_drift_ms": 23.98,
+        "reasons": [
+          "residual_std_ms 170.5 > 20.0"
+        ],
+        "residual_growth_ratio": 0.994,
+        "residual_max_ms": 489.262,
+        "residual_std_ms": 170.52,
+        "status": "suspect",
+        "tempo_unstable": false
+      },
+      "delta_bpm": 1.2868,
+      "landmarks": {
+        "onset_landmarks": 484,
+        "v3_median_dist_ms": 46.44,
+        "v4_median_dist_ms": 99.26,
+        "v3_within_20ms": 0.0034,
+        "v4_within_20ms": 0.0943
+      }
+    }
+  ]
+}

@@ -39,6 +39,7 @@ import soundfile as sf
 
 from ai_dj import render as _render
 from ai_dj import verify as _verify
+from ai_dj.analysis.beatgrid import BEAT_GRID_VERSION
 from ai_dj.timing import MASTER_SR
 
 # --- D12 contract constants (mirrored from verify.py — never softened here) ---
@@ -111,7 +112,16 @@ def has_continuity_payload(rec: dict) -> bool:
     audio-infeasible tracks — the CLI ``plan`` input gate reports them as
     ANALYSIS_REQUIRED / CORPUS_UNMEASURED, never PLAN_INFEASIBLE.
     """
-    if rec.get("continuity_version") != CONTINUITY_VERSION:
+    # DJ-P2-BEAT-GRID-001: the contract also consumes the beat/downbeat grids
+    # (``default_cue_points`` and the assessments below), so a payload whose
+    # ``beat_grid_version`` predates the refined grid is equally stale — a v3
+    # analysis row is unmeasured under v4 and is never silently mixed into a
+    # current plan.
+    versions_ok = (
+        rec.get("continuity_version") == CONTINUITY_VERSION
+        and rec.get("beat_grid_version") == BEAT_GRID_VERSION
+    )
+    if not versions_ok:
         return False
     blocks = rec.get("block_rms_dbfs")
     if not isinstance(blocks, (list, tuple, np.ndarray)) or len(blocks) == 0:
