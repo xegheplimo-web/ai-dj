@@ -6,6 +6,7 @@ no shipped v5 cache to read -- this builds the measurement.
 Usage:
     PYTHONPATH=<repo> python corpus_v5_scan.py --repo <repo> --out <path>.json
 """
+
 from __future__ import annotations
 
 import argparse
@@ -23,7 +24,8 @@ def main() -> int:
     args = ap.parse_args()
 
     sys.path.insert(0, args.repo)
-    from ai_dj.analysis.analyzer import analyze_track
+    # Deferred on purpose: this import must follow the sys.path setup above.
+    from ai_dj.analysis.analyzer import analyze_track  # noqa: PLC0415
 
     cache = Path(args.repo) / args.cache
     con = sqlite3.connect(cache)
@@ -34,29 +36,38 @@ def main() -> int:
         try:
             p = analyze_track(path)
             q = p.get("beat_quality") or {}
-            out_rows.append({
-                "recording_id": rid,
-                "title": (json.loads(payload).get("title") if payload else None),
-                "bpm_detected": p.get("bpm_detected"),
-                "bpm_corrected": p.get("bpm_corrected"),
-                "octave_ratio": (round(p["bpm_corrected"] / p["bpm_detected"], 4)
-                                 if p.get("bpm_detected") and p.get("bpm_corrected") else None),
-                "status": q.get("status"),
-                "octave_ambiguous": q.get("octave_ambiguous"),
-                "octave_level": (p.get("octave_diagnosis") or {}).get("selected_level")
-                if isinstance(p.get("octave_diagnosis"), dict) else None,
-                "octave_margin": (p.get("octave_diagnosis") or {}).get("margin")
-                if isinstance(p.get("octave_diagnosis"), dict) else None,
-                "confidence": p.get("tempo_confidence"),
-                "residual_std_ms": q.get("residual_std_ms"),
-                "beat_env_score": q.get("beat_env_score"),
-                "reasons": q.get("reasons"),
-            })
+            out_rows.append(
+                {
+                    "recording_id": rid,
+                    "title": (json.loads(payload).get("title") if payload else None),
+                    "bpm_detected": p.get("bpm_detected"),
+                    "bpm_corrected": p.get("bpm_corrected"),
+                    "octave_ratio": (
+                        round(p["bpm_corrected"] / p["bpm_detected"], 4)
+                        if p.get("bpm_detected") and p.get("bpm_corrected")
+                        else None
+                    ),
+                    "status": q.get("status"),
+                    "octave_ambiguous": q.get("octave_ambiguous"),
+                    "octave_level": (p.get("octave_diagnosis") or {}).get("selected_level")
+                    if isinstance(p.get("octave_diagnosis"), dict)
+                    else None,
+                    "octave_margin": (p.get("octave_diagnosis") or {}).get("margin")
+                    if isinstance(p.get("octave_diagnosis"), dict)
+                    else None,
+                    "confidence": p.get("tempo_confidence"),
+                    "residual_std_ms": q.get("residual_std_ms"),
+                    "beat_env_score": q.get("beat_env_score"),
+                    "reasons": q.get("reasons"),
+                }
+            )
         except Exception as exc:
             out_rows.append({"recording_id": rid, "error": repr(exc)})
-        print(f"[{i}/{len(rows)}] {rid} -> {out_rows[-1].get('bpm_corrected')} "
-              f"{out_rows[-1].get('status')} ambig={out_rows[-1].get('octave_ambiguous')}",
-              flush=True)
+        print(
+            f"[{i}/{len(rows)}] {rid} -> {out_rows[-1].get('bpm_corrected')} "
+            f"{out_rows[-1].get('status')} ambig={out_rows[-1].get('octave_ambiguous')}",
+            flush=True,
+        )
 
     ok = [r for r in out_rows if "error" not in r]
     amb = [r for r in ok if r.get("octave_ambiguous")]
@@ -81,7 +92,9 @@ def main() -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     print("\n=== summary ===")
-    print(json.dumps({k: v for k, v in report.items() if k != "rows"}, indent=2, ensure_ascii=False))
+    print(
+        json.dumps({k: v for k, v in report.items() if k != "rows"}, indent=2, ensure_ascii=False)
+    )
     print("written:", args.out)
     return 0
 

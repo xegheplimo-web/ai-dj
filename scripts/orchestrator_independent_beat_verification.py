@@ -17,10 +17,12 @@ Usage:
     PYTHONPATH=<repo> python independent_beat_verification.py --out <path>.json
 Exit codes: 0 = all gates met, 1 = a gate failed, 2 = harness error.
 """
+
 from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 import tempfile
 from pathlib import Path
@@ -30,19 +32,55 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
+from orchestrator_musical_synthetic_benchmark import render_pattern  # noqa: E402
+
 from ai_dj.analysis.analyzer import ANALYSIS_SR, analyze_track  # noqa: E402
 from ai_dj.timing import MASTER_SR, synthesize_click_track, write_wav_pcm16  # noqa: E402
-
-from musical_synthetic_benchmark import render_pattern  # noqa: E402
 
 FRAME_PERIOD = 512 / ANALYSIS_SR
 
 T1_BPMS = [
-    88.0, 92.0, 96.0, 100.0, 104.0, 108.0, 112.0, 116.0,
-    120.0, 122.5, 124.0, 126.0, 128.0, 130.0, 132.0, 134.0, 136.0,
-    138.0, 140.0, 142.0, 144.0, 146.0, 148.0, 150.0, 152.0, 154.0,
-    156.0, 158.0, 160.0, 161.484, 162.0, 164.0, 166.0, 166.686, 168.0,
-    170.0, 172.267, 174.0, 176.0, 178.0, 180.0,
+    88.0,
+    92.0,
+    96.0,
+    100.0,
+    104.0,
+    108.0,
+    112.0,
+    116.0,
+    120.0,
+    122.5,
+    124.0,
+    126.0,
+    128.0,
+    130.0,
+    132.0,
+    134.0,
+    136.0,
+    138.0,
+    140.0,
+    142.0,
+    144.0,
+    146.0,
+    148.0,
+    150.0,
+    152.0,
+    154.0,
+    156.0,
+    158.0,
+    160.0,
+    161.484,
+    162.0,
+    164.0,
+    166.0,
+    166.686,
+    168.0,
+    170.0,
+    172.267,
+    174.0,
+    176.0,
+    178.0,
+    180.0,
 ]
 
 T2_CASES = [
@@ -51,7 +89,11 @@ T2_CASES = [
     ("offladder_166_686", 166.686, {}),
     ("offladder_128_5", 128.5, {}),
     ("swing_120", 120.0, {"swing": 0.5}),
-    ("half_time_120", 120.0, {"backbeat": True, "kick_every_beat": False, "hats_on_eighths": False}),
+    (
+        "half_time_120",
+        120.0,
+        {"backbeat": True, "kick_every_beat": False, "hats_on_eighths": False},
+    ),
     ("four_on_floor_126", 126.0, {"kick_every_beat": True, "backbeat": False}),
     ("missing_every_4", 128.0, {"missing_every": 4}),
 ]
@@ -62,8 +104,9 @@ TOL_PCT = 2.0
 def _row(name, truth_bpm, payload, extra=None):
     rep = payload.get("bpm_corrected")
     ref = payload.get("bpm_refined")
-    ratio = (rep / truth_bpm) if (rep and truth_bpm == truth_bpm) else None
-    rel = (abs(rep - truth_bpm) / truth_bpm * 100.0) if (rep and truth_bpm == truth_bpm) else None
+    known = truth_bpm is not None and not math.isnan(truth_bpm)
+    ratio = (rep / truth_bpm) if (rep and known) else None
+    rel = (abs(rep - truth_bpm) / truth_bpm * 100.0) if (rep and known) else None
     row = {
         "case": name,
         "truth_bpm": truth_bpm,
@@ -90,10 +133,19 @@ def run_t1(td: Path):
         p = analyze_track(str(wav))
         ibi = p.get("median_ibi_s")
         frames = ibi / FRAME_PERIOD if ibi else None
-        rows.append(_row(f"click_{bpm:.3f}", bpm, p, {
-            "ibi_frames": round(frames, 4) if frames else None,
-            "ibi_is_integer_frames": (abs(frames - round(frames)) < 1e-4) if frames else None,
-        }))
+        rows.append(
+            _row(
+                f"click_{bpm:.3f}",
+                bpm,
+                p,
+                {
+                    "ibi_frames": round(frames, 4) if frames else None,
+                    "ibi_is_integer_frames": (abs(frames - round(frames)) < 1e-4)
+                    if frames
+                    else None,
+                },
+            )
+        )
     return rows
 
 
@@ -117,15 +169,27 @@ def run_negative(td: Path):
     y = (rng.standard_normal(n) * 0.3).astype(np.float32)
     wav = td / "neg_white_noise.wav"
     write_wav_pcm16(wav, y, sr)
-    rows.append(_row("neg_white_noise", float("nan"), analyze_track(str(wav)),
-                     {"expected": "no confident tempo"}))
+    rows.append(
+        _row(
+            "neg_white_noise",
+            float("nan"),
+            analyze_track(str(wav)),
+            {"expected": "no confident tempo"},
+        )
+    )
 
     t = np.arange(n, dtype=np.float32) / sr
     y = (0.4 * np.sin(2 * np.pi * 220.0 * t)).astype(np.float32)
     wav = td / "neg_pure_tone.wav"
     write_wav_pcm16(wav, y, sr)
-    rows.append(_row("neg_pure_tone", float("nan"), analyze_track(str(wav)),
-                     {"expected": "no confident tempo"}))
+    rows.append(
+        _row(
+            "neg_pure_tone",
+            float("nan"),
+            analyze_track(str(wav)),
+            {"expected": "no confident tempo"},
+        )
+    )
 
     y = np.zeros(n, dtype=np.float32)
     for _ in range(120):
@@ -134,8 +198,14 @@ def run_negative(td: Path):
         y[i:j] = 0.9
     wav = td / "neg_random_clicks.wav"
     write_wav_pcm16(wav, y, sr)
-    rows.append(_row("neg_random_clicks", float("nan"), analyze_track(str(wav)),
-                     {"expected": "no confident tempo"}))
+    rows.append(
+        _row(
+            "neg_random_clicks",
+            float("nan"),
+            analyze_track(str(wav)),
+            {"expected": "no confident tempo"},
+        )
+    )
     return rows
 
 
@@ -151,7 +221,9 @@ def summarize(rows, label):
         "n_error_gt_tol": len(bad),
         "n_octave_wrong": len(octave_bad),
         "n_high_confidence_but_wrong": len(hi_conf_bad),
-        "max_rel_error_pct": round(max((r["rel_error_pct"] or 0) for r in scored), 3) if scored else None,
+        "max_rel_error_pct": round(max((r["rel_error_pct"] or 0) for r in scored), 3)
+        if scored
+        else None,
         "bad_cases": [r["case"] for r in bad],
     }
 
@@ -176,37 +248,52 @@ def main() -> int:
         "run_by": "orchestrator (outside agent worktree)",
         "tolerance_pct": TOL_PCT,
         "legacy_frame_period_s": FRAME_PERIOD,
-        "note": "Ground truth decided before analysis in every tier. The analyzer never supplies its own answer.",
-        "T1": t1, "T2": t2, "T2_negative": neg,
-        "summary": {"T1": summarize(t1, "T1_controlled_synthetic"),
-                    "T2": summarize(t2, "T2_musical_synthetic")},
+        "note": (
+            "Ground truth decided before analysis in every tier. "
+            "The analyzer never supplies its own answer."
+        ),
+        "T1": t1,
+        "T2": t2,
+        "T2_negative": neg,
+        "summary": {
+            "T1": summarize(t1, "T1_controlled_synthetic"),
+            "T2": summarize(t2, "T2_musical_synthetic"),
+        },
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
 
     for tier, rows in (("T1", t1), ("T2", t2)):
         print(f"\n=== {tier} ===")
-        print(f"{'case':26} {'truth':>10} {'reported':>10} {'err%':>9} {'ratio':>7} {'conf':>5} {'ok':>5}")
+        print(
+            f"{'case':26} {'truth':>10} {'reported':>10} {'err%':>9} "
+            f"{'ratio':>7} {'conf':>5} {'ok':>5}"
+        )
         for r in rows:
-            tv = "nan" if r["truth_bpm"] != r["truth_bpm"] else f"{r['truth_bpm']:.3f}"
-            print(f"{r['case']:26} {tv:>10} {str(r['reported_bpm_corrected']):>10} "
-                  f"{str(r['rel_error_pct']):>9} {str(r['octave_ratio']):>7} "
-                  f"{str(r['confidence']):>5} {str(r['ok']):>5}")
+            tv = "nan" if math.isnan(r["truth_bpm"]) else f"{r['truth_bpm']:.3f}"
+            print(
+                f"{r['case']:26} {tv:>10} {r['reported_bpm_corrected']!s:>10} "
+                f"{r['rel_error_pct']!s:>9} {r['octave_ratio']!s:>7} "
+                f"{r['confidence']!s:>5} {r['ok']!s:>5}"
+            )
 
     print("\n=== negative cases (expected: no confident tempo) ===")
     for r in neg:
         q = r.get("beat_quality") or {}
         st = q.get("status") or q.get("suspect") or r.get("status")
-        print(f"{r['case']:26} reported={str(r['reported_bpm_corrected']):>9} "
-              f"conf={r['confidence']} quality_status={st} env_ratio={q.get('beat_env_ratio')}")
+        print(
+            f"{r['case']:26} reported={r['reported_bpm_corrected']!s:>9} "
+            f"conf={r['confidence']} quality_status={st} env_ratio={q.get('beat_env_ratio')}"
+        )
 
     print("\n=== summary ===")
     print(json.dumps(report["summary"], indent=2))
     print("\nwritten:", args.out)
 
     s1, s2 = report["summary"]["T1"], report["summary"]["T2"]
-    failed = bool(s1["n_error_gt_tol"] or s2["n_error_gt_tol"]
-                  or s1["n_octave_wrong"] or s2["n_octave_wrong"])
+    failed = bool(
+        s1["n_error_gt_tol"] or s2["n_error_gt_tol"] or s1["n_octave_wrong"] or s2["n_octave_wrong"]
+    )
     print("\nGATE:", "FAIL" if failed else "PASS")
     return 1 if failed else 0
 

@@ -13,6 +13,7 @@ Ground truth is returned by the generator, not derived from the audio.
 Usage:
     python scripts/musical_synthetic_benchmark.py --out evidence/t2_musical_benchmark.json
 """
+
 from __future__ import annotations
 
 import argparse
@@ -25,7 +26,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ai_dj.timing import MASTER_SR, write_wav_pcm16  # noqa: E402
+from ai_dj.timing import MASTER_SR, write_wav_pcm16
 
 SR = MASTER_SR
 
@@ -124,7 +125,8 @@ def main() -> int:
     ap.add_argument("--duration", type=float, default=20.0)
     args = ap.parse_args()
 
-    from ai_dj.analysis.analyzer import analyze_track
+    # Deferred on purpose: this import must follow the sys.path setup at module top.
+    from ai_dj.analysis.analyzer import analyze_track  # noqa: PLC0415
 
     cases = [
         ("straight_120", 120.0, {}),
@@ -132,14 +134,18 @@ def main() -> int:
         ("offladder_166_686", 166.686, {}),
         ("offladder_128_5", 128.5, {}),
         ("swing_120", 120.0, {"swing": 0.5}),
-        ("half_time_120", 120.0, {"backbeat": True, "kick_every_beat": False, "hats_on_eighths": False}),
+        (
+            "half_time_120",
+            120.0,
+            {"backbeat": True, "kick_every_beat": False, "hats_on_eighths": False},
+        ),
         ("four_on_floor_126", 126.0, {"kick_every_beat": True, "backbeat": False}),
         ("missing_every_4", 128.0, {"missing_every": 4}),
     ]
 
     rows = []
-    with tempfile.TemporaryDirectory() as td:
-        td = Path(td)
+    with tempfile.TemporaryDirectory() as _tmpdir:
+        td = Path(_tmpdir)
         for name, bpm, kw in cases:
             wav = td / f"{name}.wav"
             y, truth = render_pattern(bpm, args.duration, **kw)
@@ -147,19 +153,21 @@ def main() -> int:
             p = analyze_track(str(wav))
             rep = p.get("bpm_corrected")
             ratio = (rep / bpm) if rep else None
-            rows.append({
-                "case": name,
-                "truth_bpm": bpm,
-                "truth_n_beats": len(truth),
-                "reported_bpm": rep,
-                "reported_bpm_refined": p.get("bpm_refined"),
-                "reported_status": p.get("beat_grid_status") or p.get("status"),
-                "octave_ratio": round(ratio, 4) if ratio else None,
-                "abs_error_bpm": round(abs(rep - bpm), 4) if rep else None,
-                "rel_error_pct": round(abs(rep - bpm) / bpm * 100.0, 3) if rep else None,
-                "confidence": p.get("tempo_confidence"),
-                "kwargs": kw,
-            })
+            rows.append(
+                {
+                    "case": name,
+                    "truth_bpm": bpm,
+                    "truth_n_beats": len(truth),
+                    "reported_bpm": rep,
+                    "reported_bpm_refined": p.get("bpm_refined"),
+                    "reported_status": p.get("beat_grid_status") or p.get("status"),
+                    "octave_ratio": round(ratio, 4) if ratio else None,
+                    "abs_error_bpm": round(abs(rep - bpm), 4) if rep else None,
+                    "rel_error_pct": round(abs(rep - bpm) / bpm * 100.0, 3) if rep else None,
+                    "confidence": p.get("tempo_confidence"),
+                    "kwargs": kw,
+                }
+            )
 
     bad = [r for r in rows if (r["rel_error_pct"] or 0) > 2.0]
     octave_bad = [r for r in rows if r["octave_ratio"] and abs(r["octave_ratio"] - 1.0) > 0.02]
@@ -179,9 +187,14 @@ def main() -> int:
 
     print(f"{'case':22} {'truth':>9} {'reported':>10} {'err%':>8} {'ratio':>7} {'conf':>5}")
     for r in rows:
-        print(f"{r['case']:22} {r['truth_bpm']:9.3f} {str(r['reported_bpm']):>10} "
-              f"{str(r['rel_error_pct']):>8} {str(r['octave_ratio']):>7} {str(r['confidence']):>5}")
-    print(f"\ncases={out['n_cases']}  err>2%={out['n_error_gt_2pct']}  octave_wrong={out['n_octave_wrong']}")
+        print(
+            f"{r['case']:22} {r['truth_bpm']:9.3f} {r['reported_bpm']!s:>10} "
+            f"{r['rel_error_pct']!s:>8} {r['octave_ratio']!s:>7} {r['confidence']!s:>5}"
+        )
+    print(
+        f"\ncases={out['n_cases']}  err>2%={out['n_error_gt_2pct']}  "
+        f"octave_wrong={out['n_octave_wrong']}"
+    )
     print("written:", args.out)
     return 0
 

@@ -430,7 +430,9 @@ Hermes chạy 3 probe độc lập từ ngoài worktree: harness known-answer, *
 thấp** (dải T1 của agent bắt đầu ở 88 BPM nên đầu thấp chưa từng được test), và **rescan toàn
 corpus 41 track** (cache v4 stale theo thiết kế dưới v5 nên không có cache v5 để đọc).
 Evidence: `evidence/orchestrator_verify_octave.{json,md}`, `orchestrator_adversarial_octave.json`,
-`orchestrator_corpus_v5_scan.json`, + 4 script harness.
+`orchestrator_corpus_v5_scan.json`, + 4 harness script trong `scripts/orchestrator_*.py`
+(chúng là công cụ verify của dự án — đặt cạnh `scripts/timing_probe.py`, KHÔNG để trong
+`evidence/`: CI chạy `ruff check .` và bắt lint).
 
 **PASS B1–B7 (Hermes tự đo):**
 
