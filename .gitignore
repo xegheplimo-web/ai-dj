@@ -25,3 +25,10 @@ Thumbs.db
 
 # Corpus source media (tracks live outside the repo, like evidence/**/*.wav)
 library/
+
+# PoC run logs / raw ffmpeg text (audit trail kept out of git; JSON + MD report committed per card §7)
+evidence/**/*.log
+evidence/**/*.txt
+
+# Devin CLI launcher artifact dir (harness, not lane output)
+agent_logs/

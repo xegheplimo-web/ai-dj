@@ -18,18 +18,21 @@ Prove **AI-generated Vinahouse remix** of one rights-cleared Bolero from `F:\D�
 6. Master/verify: ffmpeg ebur128 (loudness, true peak, clipping), librosa BPM on OUTPUT, vocal-presence RMS on vocal stem, duration/structure, listening verdict (M7-style).
 
 ## 3. Ownership SCOPE (whitelist — Devin may touch ONLY these)
-- CREATE/MODIFY: `ai_dj/remix.py` (new module: stem/ace/align/mix/master/verify); `ai_dj/cli.py` (add `remix` subcommand); `scripts/ace_poc_*.py` (micro-probe harness, siting `scripts/` per D27); `evidence/ace_poc_*` (gitignored media + JSON evidence); `docs/ace-poc-report.md`; `.orchestrator/cards/AI-DJ-P3-ACE-001.md`.
+- CREATE/MODIFY: `ai_dj/ace_remixer.py` (new module: stem/ace/align/mix/master/verify — **post-hoc reconciliation 23/10: card originally wrote `ai_dj/remix.py`; the lane followed the live prompt's `ai_dj/ace_remixer.py`, adopted as canonical**); `ai_dj/cli.py` (add `remix` subcommand); `scripts/ace_poc_*.py` (micro-probe harness, siting `scripts/` per D27); `evidence/ace_poc_*` (gitignored media + JSON evidence); `docs/ace-poc-report.md`; `.orchestrator/cards/AI-DJ-P3-ACE-001.md`.
 - READ-ONLY / shared (do NOT modify): `.orchestrator/`, `analysis_cache.sqlite`, `evidence/kdd_remix_*`, `ai_dj/analysis/*`, `tests/`, `ai_dj/timing.py`, `scripts/timing_probe.py`, `scripts/orchestrator_*`.
 - **Do NOT modify or delete anything outside the above.** Harness/verifier lives OUTSIDE the worktree (run via `PYTHONPATH=F:/ai-dj`).
 - **KHÔNG tạo/ghi file trong `.devin/`** (ForceAsk → chết lane); nếu cần config, mô tả trong docs. `.devin/` được gitignore.
 
 ## 4. Deliverables (stems per skill §7 — unique per set)
+- `evidence/ace_poc_sample.wav` (S1 smoke gen — GITIGNORED media)
+- `evidence/ace_poc_sample_gen.json` (S1 params)
 - `evidence/ace_poc_master.wav` (GITIGNORED — media never committed)
 - `evidence/ace_poc_master.verify.json` (auto sidecar — different stem from full report)
 - `evidence/ace_poc_verification.json` (FULL report)
 - `evidence/ace_poc_render_report.json` (duration, true peak, clipping, underflows)
 - `evidence/ace_poc_plan.json` (input track sha256, target BPM/key, stem choice, alignment)
 - `evidence/ace_poc_vocal.json` (vocal stem RMS + presence metric)
+- `scripts/ace_poc_selftest.py` (new tests — live under the whitelisted `scripts/ace_poc_*` glob because `tests/` is read-only per §3; card §5 S6's "tests/" wording reconciled here)
 - `docs/ace-poc-report.md` (real command output pasted)
 
 ## 5. Acceptance (ALL required — micro-probe gates the lane)
@@ -69,3 +72,14 @@ ruff check . && ruff format --check .
 
 ## 9. Pre-dispatch baseline (Hermes)
 Snapshot `git -C F:/ai-dj status --short` before worktree add; diff the lane's changed-file list against §3 whitelist before review.
+
+## 10. Post-hoc reconciliation + findings (Hermes, 23/10 — after lane)
+- **Filename:** §3 wrote `ai_dj/remix.py`; the live prompt wrote `ai_dj/ace_remixer.py`; the lane followed the prompt. `ai_dj/ace_remixer.py` adopted as canonical (§3 corrected).
+- **Branch:** §6/§7 named `feat/ace-remix-poc`; the kit's `new-task-worktree.sh` created `task/AI-DJ-P3-ACE-001-ace-remix-poc`. Canonical = the kit's name.
+- **Tests:** §5 S6 said `pytest tests/`; `tests/` is read-only per §3, so the lane placed new tests in `scripts/ace_poc_selftest.py` (11 passed). §4 reconciled.
+- **Card-command deviations:** `ebur128=framing=1` fails on ffmpeg 9.0.1 (ran `ebur128=peak=true`); `librosa.beat.tempo` removed in librosa 1.0 (used `librosa.beat.beat_track`).
+- **Finding (not a gate fail):** ACE-Step 1.5 keyscale adherence is approximate — requested B minor, the BGM measured F# minor (5th, compatible via the D20-correct `key_compatible` rule).
+- **Finding (accuracy):** the lane's input key label "B minor" is off by one semitone; independent measurement = C# minor (0.89).
+- **Finding (mastering):** `loudnorm` compressed LRA 11.2 → 3.3 LU (dense master; acceptable for Vinahouse convention).
+- **Verified by Hermes (independent, real output):** BPM 130.07 (bar period 1.845 s) / 130.81 (`rhythm.tempo`); loudness −10.7 LUFS; true peak −1.2 dBTP; `150 passed, 1 skipped` + `11 passed`; `ruff check`/`format --check` clean; master sha256 bound to verification JSON.
+- **Verdict:** lane PASS 9/9 independently confirmed; PoC complete. Human listening review still open (S4 listening verdict not automated — flagged honestly in the report).
