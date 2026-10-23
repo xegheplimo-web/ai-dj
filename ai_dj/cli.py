@@ -18,6 +18,7 @@ import json
 import sys
 from pathlib import Path
 
+from ai_dj.ace_remixer import DEFAULT_CAPTION, run_poc
 from ai_dj.analysis.analyzer import DEFAULT_CACHE, AnalysisCache, analyze_corpus
 from ai_dj.analysis.corpus import TrackRef, duplicate_report, scan_corpus
 from ai_dj.planner import (
@@ -29,7 +30,7 @@ from ai_dj.planner import (
 )
 from ai_dj.player import play_master
 from ai_dj.render import render_plan
-from ai_dj.verdict import PlaybackRefused, write_verdict
+from ai_dj.verdict import PlaybackRefused, sha256_file, write_verdict
 from ai_dj.verify import verify_master
 
 DEFAULT_EVIDENCE = Path("evidence")
@@ -259,6 +260,66 @@ def cmd_verify(args: argparse.Namespace) -> int:
     return 0 if report["pass"] else 1
 
 
+def cmd_remix(args: argparse.Namespace) -> int:
+    """Option-Y remix PoC (AI-DJ-P3-ACE-001): vocal stem + generated BGM."""
+    src = Path(args.input)
+    if not src.exists():
+        return _fail({"error": f"input missing: {src}"}, 2)
+    evidence_dir = Path(args.evidence)
+    plan = {
+        "card": "AI-DJ-P3-ACE-001",
+        "architecture": "Option Y: demucs vocal stem + ACE-Step 1.5 generated BGM (D30)",
+        "plan_path": str(evidence_dir / "ace_poc_plan.json"),
+        "input": {
+            "path": str(src),
+            "sha256": sha256_file(src),
+            "cached_bpm": args.cached_bpm,
+            "cached_key": args.cached_key,
+            "excerpt_start_s": args.excerpt_start,
+            "excerpt_s": args.excerpt_s,
+        },
+        "stem": {"tool": "demucs", "model": "htdemucs", "two_stems": "vocals"},
+        "target_bpm": args.bpm,
+        "bgm_duration_s": args.bgm_duration,
+        "seed": args.seed,
+        "caption": args.caption or DEFAULT_CAPTION,
+        "checkpoints": args.checkpoints,
+        # ACE-Step drops .cache/ under project_root — keep it in the work dir.
+        "project_root": args.work,
+    }
+    try:
+        report = run_poc(plan, work_dir=Path(args.work), evidence_dir=evidence_dir)
+    except RuntimeError as exc:
+        return _fail({"error": str(exc)}, 1)
+    _emit(
+        {
+            "verdict": report["verdict"],
+            "checks": {k: v["pass"] for k, v in report["checks"].items()},
+        }
+    )
+    return 0 if report["pass"] else 1
+
+
+def _add_remix_parser(sub) -> None:
+    rx = sub.add_parser(
+        "remix",
+        help="Option-Y remix PoC: stem-split -> ACE-Step BGM -> align -> mix -> verify",
+    )
+    rx.add_argument("--input", required=True, help="rights-cleared source WAV")
+    rx.add_argument("--evidence", default=str(DEFAULT_EVIDENCE))
+    rx.add_argument("--work", default=str(DEFAULT_EVIDENCE / "ace_poc_work"))
+    rx.add_argument("--bpm", type=float, default=130.0, help="target BGM BPM")
+    rx.add_argument("--cached-bpm", type=float, default=None, help="prior BPM hint")
+    rx.add_argument("--cached-key", default=None, help="key fallback if unmeasurable")
+    rx.add_argument("--excerpt-start", type=float, default=56.0)
+    rx.add_argument("--excerpt-s", type=float, default=44.0)
+    rx.add_argument("--bgm-duration", type=float, default=44.0)
+    rx.add_argument("--seed", type=int, default=42)
+    rx.add_argument("--caption", default=None)
+    rx.add_argument("--checkpoints", default="F:/ace-checkpoints")
+    rx.set_defaults(func=cmd_remix)
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="ai_dj", description=__doc__)
     sub = p.add_subparsers(dest="command", required=True)
@@ -323,6 +384,8 @@ def build_parser() -> argparse.ArgumentParser:
     v.add_argument("--master", required=True)
     v.add_argument("--out", default=str(DEFAULT_EVIDENCE / "verification.json"))
     v.set_defaults(func=cmd_verify)
+
+    _add_remix_parser(sub)
     return p
 
 

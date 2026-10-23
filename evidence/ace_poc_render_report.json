@@ -1,0 +1,31 @@
+{
+  "master_wav": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_master.wav",
+  "duration_s": 44.0,
+  "sample_rate": 48000,
+  "integrated_lufs": -10.7,
+  "true_peak_dbtp": -1.1,
+  "clipping_count": 0,
+  "underflows": 0,
+  "loudness_iterations": [
+    {
+      "integrated_lufs": -14.0,
+      "true_peak_dbtp": 0.3,
+      "available": true
+    },
+    {
+      "integrated_lufs": -11.5,
+      "true_peak_dbtp": -1.0,
+      "available": true
+    },
+    {
+      "integrated_lufs": -10.7,
+      "true_peak_dbtp": -1.1,
+      "available": true
+    }
+  ],
+  "bgm_generation": {
+    "written_to": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_work\\bgm.wav",
+    "source_artifact": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_work\\fcf9ad84-4aec-bbe8-266e-1ece486b6c61.wav",
+    "init_status": "[OK] Model initialized successfully on cuda\nMain model: F:\\ace-checkpoints\\acestep-v15-turbo\nVAE: F:\\ace-checkpoints\\vae\nText encoder: F:\\ace-checkpoints\\Qwen3-Embedding-0.6B\nDtype: torch.bfloat16\nAttention: sdpa\nCompiled: False\nQuantization: Disabled\nOffload to CPU: False\nOffload DiT to CPU: False\nMLX DiT: Disabled\nMLX VAE: Disabled"
+  }
+}

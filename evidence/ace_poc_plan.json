@@ -1,0 +1,56 @@
+{
+  "card": "AI-DJ-P3-ACE-001",
+  "architecture": "Option Y: demucs vocal stem + ACE-Step 1.5 generated Vinahouse BGM (D30)",
+  "plan_path": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_plan.json",
+  "input": {
+    "recording_id": "rec-1d80838e4a40f4cb",
+    "title": "Đam Mê (Cover Duy)",
+    "path": "F:\\DỮ LIỆU\\ok\\Đam Mê (Cover Duy) .wav",
+    "sha256": "1d80838e4a40f4cb29a26b383c6e6d7ab974261e5221af076bab51c139b92acb",
+    "cached_bpm": 99.38,
+    "cached_key": "B minor",
+    "excerpt_start_s": 56.0,
+    "excerpt_s": 44.0,
+    "excerpt_note": "intro_end_s=54.0 -> excerpt starts inside verse",
+    "measured_bpm": {
+      "bpm": 100.44642857142857,
+      "bpm_median_ibi": 104.16666666666673,
+      "n_beats": 76
+    },
+    "measured_key": {
+      "key": "B minor",
+      "confidence": 0.7636
+    }
+  },
+  "stem": {
+    "tool": "demucs",
+    "model": "htdemucs",
+    "two_stems": "vocals"
+  },
+  "target_bpm": 130.0,
+  "bgm_duration_s": 44.0,
+  "seed": 42,
+  "caption": "Vinahouse remix instrumental, Vietnamese dance style, four-on-the-floor punchy kick, driving offbeat bassline, bright synth stabs and supersaw lead, energetic club groove, clean modern mix",
+  "checkpoints": "F:/ace-checkpoints",
+  "project_root": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_work",
+  "input_key": "B minor",
+  "cached_key": "B minor",
+  "bgm_key": "B minor",
+  "alignment": {
+    "method": "librosa.effects.time_stretch + first-onset -> BGM bar 4",
+    "src_bpm": 100.44642857142857,
+    "target_bpm": 130.0,
+    "stretch_rate": 1.29422,
+    "pitch_shift_semitones": 0,
+    "vocal_first_onset_s": 0.1547,
+    "vocal_offset_s": 7.2299,
+    "note": "corpus beat grid NOT used (D28); alignment measured on output only"
+  },
+  "vocal_metrics": {
+    "vocal_offset_s": 7.23,
+    "vocal_gain_db": -0.993,
+    "vocal_to_bgm_db": -2.0,
+    "vocal_stem_rms_dbfs": -19.74,
+    "bgm_rms_dbfs": -18.73
+  }
+}

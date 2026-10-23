@@ -1,0 +1,99 @@
+{
+  "verdict": "PASS",
+  "pass": true,
+  "master_wav": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_master.wav",
+  "duration_s": 44.0,
+  "checks": {
+    "bpm_126_136": {
+      "pass": true,
+      "measured_bpm": 129.31,
+      "median_ibi_bpm": 129.3103448275866
+    },
+    "key_compatible": {
+      "pass": true,
+      "input_key": "B minor",
+      "output_key": "F# minor",
+      "output_key_confidence": 0.7806
+    },
+    "loudness_-9_-11_lufs": {
+      "pass": true,
+      "integrated_lufs": -10.7
+    },
+    "true_peak_under_-1dbtp": {
+      "pass": true,
+      "true_peak_dbtp": -1.1
+    },
+    "no_clipping": {
+      "pass": true,
+      "clipped_samples": 0
+    },
+    "no_underflows": {
+      "pass": true,
+      "underflows": 0
+    },
+    "duration_ge_30s": {
+      "pass": true,
+      "duration_s": 44.0
+    },
+    "phrase_ge_8_bars": {
+      "pass": true,
+      "longest_active_bars": 23,
+      "start_bar": 0
+    },
+    "vocal_present": {
+      "pass": true,
+      "vocal_stem_rms_dbfs": -19.74,
+      "vocal_to_bgm_db": -2.0
+    }
+  },
+  "loudness": {
+    "true_peak_dbtp": -1.1,
+    "integrated_lufs": -10.7,
+    "loudness_range_lu": 3.3,
+    "available": true
+  },
+  "bpm_measurement": {
+    "method": "librosa.beat.beat_track on output WAV (hop_length=256)",
+    "bpm": 129.31,
+    "bpm_median_ibi": 129.31,
+    "n_beats": 87
+  },
+  "bar_activity": {
+    "n_bars": 23,
+    "bar_rms_dbfs": [
+      -16.8,
+      -17.6,
+      -16.3,
+      -16.6,
+      -13.8,
+      -16.0,
+      -16.6,
+      -17.7,
+      -13.2,
+      -13.5,
+      -12.9,
+      -12.7,
+      -12.7,
+      -13.1,
+      -13.3,
+      -14.7,
+      -12.7,
+      -12.8,
+      -12.8,
+      -12.9,
+      -13.4,
+      -13.2,
+      -22.3
+    ],
+    "longest_active_bars": 23,
+    "longest_active_start_bar": 0,
+    "bar_s": 1.8462
+  },
+  "note": "BPM/loudness/structure measured on the OUTPUT artifact only — the corpus analyzer grid is suspect 39/41 (D19/D28) and is never used.",
+  "artifact_binding": {
+    "plan_json": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_plan.json",
+    "plan_sha256": "227a8949b146095115bc3cdb7e782634af64205e4b321c5a836d712badff80b2",
+    "master_wav": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_master.wav",
+    "master_sha256": "bcdfe364cdb7a727d5a8e2ef3cc0c18f43056f5e92b054325f08845bd0f3c001"
+  }
+}

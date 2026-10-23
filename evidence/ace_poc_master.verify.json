@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS",
+  "pass": true,
+  "verify_report": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_verification.json",
+  "verified_by": "ai_dj.verify",
+  "provenance": {
+    "binding": "sha256 over the bytes of plan.json + master.wav measured at verify time",
+    "limits": "binds this verdict to the exact artifact bytes — it is NOT anti-forgery evidence, does not prove the WAV was rendered from this plan, and carries no signature; D12 permits plan-declared allowed_silent_gaps_s — the planner emits none, and any exempt regions are listed in the verify report"
+  },
+  "plan_json": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_plan.json",
+  "plan_sha256": "227a8949b146095115bc3cdb7e782634af64205e4b321c5a836d712badff80b2",
+  "master_wav": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\ace_poc_master.wav",
+  "master_sha256": "bcdfe364cdb7a727d5a8e2ef3cc0c18f43056f5e92b054325f08845bd0f3c001"
+}

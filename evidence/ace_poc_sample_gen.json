@@ -1,0 +1,16 @@
+{
+  "written_to": "evidence\\ace_poc_sample.wav",
+  "source_artifact": "F:\\ai-dj-worktrees\\AI-DJ-P3-ACE-001\\evidence\\42683b21-6444-39e8-8c36-e64abfb22dee.wav",
+  "params": {
+    "task_type": "text2music",
+    "caption": "Vinahouse remix instrumental, Vietnamese dance style, four-on-the-floor punchy kick, driving offbeat bassline, bright synth stabs and supersaw lead, energetic club groove, clean modern mix",
+    "bpm": 130,
+    "keyscale": "B minor",
+    "duration": 30.0,
+    "seed": 42,
+    "inference_steps": 8,
+    "instrumental": true
+  },
+  "checkpoints": "F:\\ace-checkpoints",
+  "size_bytes": 11520088
+}
