@@ -1,0 +1,108 @@
+{
+  "verdict": "PASS",
+  "pass": true,
+  "master_wav": "F:\\ai-dj\\evidence\\congi_kiep_sau\\work_v3\\mix_raw.wav",
+  "duration_s": 60.0,
+  "checks": {
+    "bpm_126_136": {
+      "pass": true,
+      "measured_bpm": 129.31,
+      "median_ibi_bpm": 130.8139534883713
+    },
+    "key_compatible": {
+      "pass": true,
+      "input_key": "F minor",
+      "output_key": "F major",
+      "output_key_confidence": 0.5704
+    },
+    "loudness_-9_-11_lufs": {
+      "pass": true,
+      "integrated_lufs": -10.4
+    },
+    "true_peak_under_-1dbtp": {
+      "pass": true,
+      "true_peak_dbtp": -1.1
+    },
+    "no_clipping": {
+      "pass": true,
+      "clipped_samples": 0
+    },
+    "no_underflows": {
+      "pass": true,
+      "underflows": 0
+    },
+    "duration_ge_30s": {
+      "pass": true,
+      "duration_s": 60.0
+    },
+    "phrase_ge_8_bars": {
+      "pass": true,
+      "longest_active_bars": 31,
+      "start_bar": 0
+    },
+    "vocal_present": {
+      "pass": true,
+      "vocal_stem_rms_dbfs": -17.85,
+      "vocal_to_bgm_db": -2.0
+    }
+  },
+  "loudness": {
+    "true_peak_dbtp": -1.1,
+    "integrated_lufs": -10.4,
+    "loudness_range_lu": 4.3,
+    "available": true
+  },
+  "bpm_measurement": {
+    "method": "librosa.beat.beat_track on output WAV (hop_length=256)",
+    "bpm": 129.31,
+    "bpm_median_ibi": 130.814,
+    "n_beats": 120
+  },
+  "bar_activity": {
+    "n_bars": 32,
+    "bar_rms_dbfs": [
+      -11.2,
+      -12.4,
+      -20.8,
+      -21.4,
+      -14.6,
+      -15.2,
+      -17.8,
+      -15.6,
+      -14.0,
+      -14.9,
+      -16.1,
+      -16.0,
+      -15.1,
+      -17.0,
+      -16.0,
+      -18.2,
+      -14.7,
+      -12.6,
+      -14.7,
+      -14.6,
+      -14.2,
+      -13.7,
+      -14.8,
+      -14.9,
+      -14.2,
+      -12.5,
+      -12.8,
+      -12.6,
+      -14.1,
+      -13.4,
+      -17.7,
+      -53.2
+    ],
+    "longest_active_bars": 31,
+    "longest_active_start_bar": 0,
+    "bar_s": 1.8462
+  },
+  "note": "BPM/loudness/structure measured on the OUTPUT artifact only — the corpus analyzer grid is suspect 39/41 (D19/D28) and is never used.",
+  "artifact_binding": {
+    "plan_json": "F:\\ai-dj\\evidence\\congi_kiep_sau\\ace_poc_plan.json",
+    "plan_sha256": "c1e572854df63349dc4eb9ca82f25d557513173d714060abfbfc71fa16a95567",
+    "master_wav": "F:\\ai-dj\\evidence\\congi_kiep_sau\\work_v3\\mix_raw.wav",
+    "master_sha256": "5f92bf5ee8e71791e08edfae31db8e82294740b65e605369b7b8292a546c3a99"
+  }
+}
