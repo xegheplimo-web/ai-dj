@@ -1,0 +1,954 @@
+{
+  "probe": "adversarial_octave",
+  "tolerance_pct": 2.0,
+  "n": 16,
+  "n_bad": 1,
+  "n_slow_falsely_doubled": 1,
+  "n_ambiguous": 3,
+  "rows": [
+    {
+      "case": "slow_click_60.0",
+      "truth_bpm": 60.0,
+      "bpm_detected": 59.9998,
+      "bpm_corrected": 60.0,
+      "rel_error_pct": 0.0,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x1.0",
+        "selected_factor": 1.0,
+        "selected_bpm": 59.9998,
+        "margin": 0.3053,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 59.9998,
+            "acf": 0.9027,
+            "acf_norm": 1.0,
+            "teeth_median": 6.971112,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.983,
+            "prior": 0.3932,
+            "score": 1.3244
+          },
+          {
+            "factor": 0.5,
+            "bpm": 29.9999,
+            "acf": 0.845,
+            "acf_norm": 0.9361,
+            "teeth_median": 7.091361,
+            "anti_median": 6.971112,
+            "anti_penalty": 0.4957,
+            "strength": 1.0,
+            "prior": 0.0326,
+            "score": 1.0191
+          },
+          {
+            "factor": 2.0,
+            "bpm": 119.9997,
+            "acf": 0.0,
+            "acf_norm": 0.0,
+            "teeth_median": 5.525077,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.7791,
+            "prior": 0.9932,
+            "score": 0.3934
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.63,
+      "note": "must not double"
+    },
+    {
+      "case": "slow_click_66.0",
+      "truth_bpm": 66.0,
+      "bpm_detected": 65.9967,
+      "bpm_corrected": 65.997,
+      "rel_error_pct": 0.0045,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x1.0",
+        "selected_factor": 1.0,
+        "selected_bpm": 65.9967,
+        "margin": 0.2755,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 65.9967,
+            "acf": 0.8896,
+            "acf_norm": 1.0,
+            "teeth_median": 7.155554,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 1.0,
+            "prior": 0.4899,
+            "score": 1.348
+          },
+          {
+            "factor": 0.5,
+            "bpm": 32.9984,
+            "acf": 0.8774,
+            "acf_norm": 0.9862,
+            "teeth_median": 7.155554,
+            "anti_median": 7.061423,
+            "anti_penalty": 0.4967,
+            "strength": 1.0,
+            "prior": 0.0504,
+            "score": 1.0725
+          },
+          {
+            "factor": 2.0,
+            "bpm": 131.9934,
+            "acf": -0.0,
+            "acf_norm": -0.0,
+            "teeth_median": 5.578865,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.7797,
+            "prior": 0.9985,
+            "score": 0.3946
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.63,
+      "note": "must not double"
+    },
+    {
+      "case": "slow_click_72.0",
+      "truth_bpm": 72.0,
+      "bpm_detected": 71.9983,
+      "bpm_corrected": 71.998,
+      "rel_error_pct": 0.0028,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x1.0",
+        "selected_factor": 1.0,
+        "selected_bpm": 71.9983,
+        "margin": 0.2445,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 71.9983,
+            "acf": 0.8889,
+            "acf_norm": 0.982,
+            "teeth_median": 7.167858,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.9713,
+            "prior": 0.5837,
+            "score": 1.3415
+          },
+          {
+            "factor": 0.5,
+            "bpm": 35.9991,
+            "acf": 0.9052,
+            "acf_norm": 1.0,
+            "teeth_median": 7.379606,
+            "anti_median": 6.78045,
+            "anti_penalty": 0.4788,
+            "strength": 1.0,
+            "prior": 0.073,
+            "score": 1.097
+          },
+          {
+            "factor": 2.0,
+            "bpm": 143.9965,
+            "acf": 0.0,
+            "acf_norm": 0.0,
+            "teeth_median": 5.773706,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.7824,
+            "prior": 0.9777,
+            "score": 0.3911
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.63,
+      "note": "must not double"
+    },
+    {
+      "case": "slow_click_78.0",
+      "truth_bpm": 78.0,
+      "bpm_detected": 77.9934,
+      "bpm_corrected": 77.993,
+      "rel_error_pct": 0.009,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x1.0",
+        "selected_factor": 1.0,
+        "selected_bpm": 77.9934,
+        "margin": 0.1953,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 77.9934,
+            "acf": 0.8893,
+            "acf_norm": 0.9592,
+            "teeth_median": 7.227021,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.8496,
+            "prior": 0.6709,
+            "score": 1.3057
+          },
+          {
+            "factor": 0.5,
+            "bpm": 38.9967,
+            "acf": 0.9272,
+            "acf_norm": 1.0,
+            "teeth_median": 8.506821,
+            "anti_median": 7.139544,
+            "anti_penalty": 0.4563,
+            "strength": 1.0,
+            "prior": 0.1006,
+            "score": 1.1104
+          },
+          {
+            "factor": 2.0,
+            "bpm": 155.9867,
+            "acf": 0.0,
+            "acf_norm": 0.0,
+            "teeth_median": 5.695548,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.6695,
+            "prior": 0.9384,
+            "score": 0.3551
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.9,
+      "note": "must not double"
+    },
+    {
+      "case": "slow_click_84.0",
+      "truth_bpm": 84.0,
+      "bpm_detected": 84.002,
+      "bpm_corrected": 84.002,
+      "rel_error_pct": 0.0024,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x1.0",
+        "selected_factor": 1.0,
+        "selected_bpm": 84.002,
+        "margin": 0.3351,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 84.002,
+            "acf": 0.9598,
+            "acf_norm": 1.0,
+            "teeth_median": 7.490358,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.9924,
+            "prior": 0.7494,
+            "score": 1.398
+          },
+          {
+            "factor": 0.5,
+            "bpm": 42.001,
+            "acf": 0.9207,
+            "acf_norm": 0.9593,
+            "teeth_median": 7.547706,
+            "anti_median": 7.37178,
+            "anti_penalty": 0.4941,
+            "strength": 1.0,
+            "prior": 0.1328,
+            "score": 1.0629
+          },
+          {
+            "factor": 2.0,
+            "bpm": 168.0039,
+            "acf": -0.0,
+            "acf_norm": -0.0,
+            "teeth_median": 5.873149,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.7781,
+            "prior": 0.8867,
+            "score": 0.3719
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.9,
+      "note": "must not double"
+    },
+    {
+      "case": "slow_click_90.0",
+      "truth_bpm": 90.0,
+      "bpm_detected": 90.0007,
+      "bpm_corrected": 90.001,
+      "rel_error_pct": 0.0011,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x1.0",
+        "selected_factor": 1.0,
+        "selected_bpm": 90.0007,
+        "margin": 0.3553,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 90.0007,
+            "acf": 0.9359,
+            "acf_norm": 1.0,
+            "teeth_median": 7.562265,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.983,
+            "prior": 0.8173,
+            "score": 1.4092
+          },
+          {
+            "factor": 0.5,
+            "bpm": 45.0004,
+            "acf": 0.8817,
+            "acf_norm": 0.9421,
+            "teeth_median": 7.693011,
+            "anti_median": 7.437059,
+            "anti_penalty": 0.4915,
+            "strength": 1.0,
+            "prior": 0.1692,
+            "score": 1.0539
+          },
+          {
+            "factor": 2.0,
+            "bpm": 180.0015,
+            "acf": 0.0,
+            "acf_norm": 0.0,
+            "teeth_median": 5.906155,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.7677,
+            "prior": 0.8278,
+            "score": 0.3575
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.9,
+      "note": "must not double"
+    },
+    {
+      "case": "slow_click_96.0",
+      "truth_bpm": 96.0,
+      "bpm_detected": 95.9979,
+      "bpm_corrected": 95.998,
+      "rel_error_pct": 0.0021,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x1.0",
+        "selected_factor": 1.0,
+        "selected_bpm": 95.9979,
+        "margin": 0.3338,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 95.9979,
+            "acf": 0.9061,
+            "acf_norm": 1.0,
+            "teeth_median": 7.594129,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 1.0,
+            "prior": 0.8741,
+            "score": 1.4248
+          },
+          {
+            "factor": 0.5,
+            "bpm": 47.9989,
+            "acf": 0.8827,
+            "acf_norm": 0.9742,
+            "teeth_median": 7.594137,
+            "anti_median": 7.594129,
+            "anti_penalty": 0.5,
+            "strength": 1.0,
+            "prior": 0.2092,
+            "score": 1.091
+          },
+          {
+            "factor": 2.0,
+            "bpm": 191.9957,
+            "acf": 0.0,
+            "acf_norm": 0.0,
+            "teeth_median": 6.373507,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.8393,
+            "prior": 0.7654,
+            "score": 0.3629
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.9,
+      "note": "must not double"
+    },
+    {
+      "case": "slow_drum_70",
+      "truth_bpm": 70.0,
+      "bpm_detected": 139.9986,
+      "bpm_corrected": 139.999,
+      "rel_error_pct": 99.9986,
+      "ok": false,
+      "status": "suspect",
+      "octave_ambiguous": true,
+      "octave_diagnosis": {
+        "verdict": "ambiguous",
+        "selected_factor": 1.0,
+        "selected_bpm": 139.9986,
+        "margin": 0.0696,
+        "ambiguous": true,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 139.9986,
+            "acf": 0.7011,
+            "acf_norm": 0.8864,
+            "teeth_median": 13.965618,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.8144,
+            "prior": 0.987,
+            "score": 1.2875
+          },
+          {
+            "factor": 0.5,
+            "bpm": 69.9993,
+            "acf": 0.791,
+            "acf_norm": 1.0,
+            "teeth_median": 17.147703,
+            "anti_median": 11.808052,
+            "anti_penalty": 0.4078,
+            "strength": 1.0,
+            "prior": 0.553,
+            "score": 1.2179
+          },
+          {
+            "factor": 2.0,
+            "bpm": 279.9971,
+            "acf": 0.0,
+            "acf_norm": 0.0,
+            "teeth_median": 8.401415,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.4899,
+            "prior": 0.3692,
+            "score": 0.1963
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.4,
+      "note": "must not double"
+    },
+    {
+      "case": "slow_drum_80",
+      "truth_bpm": 80.0,
+      "bpm_detected": 80.0015,
+      "bpm_corrected": 80.001,
+      "rel_error_pct": 0.0013,
+      "ok": true,
+      "status": "suspect",
+      "octave_ambiguous": true,
+      "octave_diagnosis": {
+        "verdict": "ambiguous",
+        "selected_factor": 1.0,
+        "selected_bpm": 80.0015,
+        "margin": 0.052,
+        "ambiguous": true,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 80.0015,
+            "acf": 0.8505,
+            "acf_norm": 1.0,
+            "teeth_median": 16.668446,
+            "anti_median": 13.790561,
+            "anti_penalty": 0.4528,
+            "strength": 0.9915,
+            "prior": 0.6983,
+            "score": 1.2291
+          },
+          {
+            "factor": 2.0,
+            "bpm": 160.0029,
+            "acf": 0.668,
+            "acf_norm": 0.7855,
+            "teeth_median": 13.926767,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.8285,
+            "prior": 0.9222,
+            "score": 1.177
+          },
+          {
+            "factor": 0.5,
+            "bpm": 40.0007,
+            "acf": 0.7716,
+            "acf_norm": 0.9073,
+            "teeth_median": 16.810579,
+            "anti_median": 13.975992,
+            "anti_penalty": 0.454,
+            "strength": 1.0,
+            "prior": 0.1108,
+            "score": 1.0205
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.4,
+      "note": "must not double"
+    },
+    {
+      "case": "slow_drum_90",
+      "truth_bpm": 90.0,
+      "bpm_detected": 90.0,
+      "bpm_corrected": 90.0,
+      "rel_error_pct": 0.0,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x1.0",
+        "selected_factor": 1.0,
+        "selected_bpm": 90.0,
+        "margin": 0.0993,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 90.0,
+            "acf": 0.8732,
+            "acf_norm": 1.0,
+            "teeth_median": 16.753223,
+            "anti_median": 13.3064,
+            "anti_penalty": 0.4427,
+            "strength": 0.9792,
+            "prior": 0.8173,
+            "score": 1.2533
+          },
+          {
+            "factor": 2.0,
+            "bpm": 180.0,
+            "acf": 0.6707,
+            "acf_norm": 0.7681,
+            "teeth_median": 15.079708,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.8814,
+            "prior": 0.8278,
+            "score": 1.154
+          },
+          {
+            "factor": 0.5,
+            "bpm": 45.0,
+            "acf": 0.8007,
+            "acf_norm": 0.917,
+            "teeth_median": 17.10857,
+            "anti_median": 16.221429,
+            "anti_penalty": 0.4867,
+            "strength": 1.0,
+            "prior": 0.1692,
+            "score": 1.0305
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.9,
+      "note": "must not double"
+    },
+    {
+      "case": "fast_click_168",
+      "truth_bpm": 168.0,
+      "bpm_detected": 83.9953,
+      "bpm_corrected": 167.991,
+      "rel_error_pct": 0.0054,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x2.0",
+        "selected_factor": 2.0,
+        "selected_bpm": 167.9906,
+        "margin": 0.1983,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 2.0,
+            "bpm": 167.9906,
+            "acf": 0.9014,
+            "acf_norm": 0.9481,
+            "teeth_median": 7.988328,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 1.0,
+            "prior": 0.8867,
+            "score": 1.3754
+          },
+          {
+            "factor": 1.0,
+            "bpm": 83.9953,
+            "acf": 0.9508,
+            "acf_norm": 1.0,
+            "teeth_median": 7.189293,
+            "anti_median": 9.332672,
+            "anti_penalty": 0.5649,
+            "strength": 0.9,
+            "prior": 0.7493,
+            "score": 1.1772
+          },
+          {
+            "factor": 0.5,
+            "bpm": 41.9977,
+            "acf": 0.9028,
+            "acf_norm": 0.9495,
+            "teeth_median": 7.189293,
+            "anti_median": 7.131138,
+            "anti_penalty": 0.498,
+            "strength": 0.9,
+            "prior": 0.1327,
+            "score": 1.0268
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.63,
+      "note": "the D26 B1 target cases"
+    },
+    {
+      "case": "fast_click_174",
+      "truth_bpm": 174.0,
+      "bpm_detected": 87.0041,
+      "bpm_corrected": 174.008,
+      "rel_error_pct": 0.0046,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x2.0",
+        "selected_factor": 2.0,
+        "selected_bpm": 174.0082,
+        "margin": 0.1442,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 2.0,
+            "bpm": 174.0082,
+            "acf": 0.9074,
+            "acf_norm": 0.9875,
+            "teeth_median": 6.725449,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.9088,
+            "prior": 0.8578,
+            "score": 1.3862
+          },
+          {
+            "factor": 1.0,
+            "bpm": 87.0041,
+            "acf": 0.9189,
+            "acf_norm": 1.0,
+            "teeth_median": 7.364098,
+            "anti_median": 6.474399,
+            "anti_penalty": 0.4679,
+            "strength": 0.9951,
+            "prior": 0.7848,
+            "score": 1.242
+          },
+          {
+            "factor": 0.5,
+            "bpm": 43.502,
+            "acf": 0.8582,
+            "acf_norm": 0.9339,
+            "teeth_median": 7.400692,
+            "anti_median": 7.328698,
+            "anti_penalty": 0.4976,
+            "strength": 1.0,
+            "prior": 0.1505,
+            "score": 1.0399
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.63,
+      "note": "the D26 B1 target cases"
+    },
+    {
+      "case": "fast_click_178",
+      "truth_bpm": 178.0,
+      "bpm_detected": 88.9975,
+      "bpm_corrected": 177.995,
+      "rel_error_pct": 0.0028,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x2.0",
+        "selected_factor": 2.0,
+        "selected_bpm": 177.9949,
+        "margin": 0.2266,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 2.0,
+            "bpm": 177.9949,
+            "acf": 0.9665,
+            "acf_norm": 1.0,
+            "teeth_median": 7.673272,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 1.0,
+            "prior": 0.838,
+            "score": 1.4176
+          },
+          {
+            "factor": 1.0,
+            "bpm": 88.9975,
+            "acf": 0.9341,
+            "acf_norm": 0.9665,
+            "teeth_median": 7.442463,
+            "anti_median": 7.826167,
+            "anti_penalty": 0.5126,
+            "strength": 0.9699,
+            "prior": 0.8067,
+            "score": 1.1909
+          },
+          {
+            "factor": 0.5,
+            "bpm": 44.4987,
+            "acf": 0.8754,
+            "acf_norm": 0.9057,
+            "teeth_median": 7.542713,
+            "anti_median": 7.399131,
+            "anti_penalty": 0.4952,
+            "strength": 0.983,
+            "prior": 0.1628,
+            "score": 1.0107
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.63,
+      "note": "the D26 B1 target cases"
+    },
+    {
+      "case": "fast_click_180",
+      "truth_bpm": 180.0,
+      "bpm_detected": 90.003,
+      "bpm_corrected": 180.006,
+      "rel_error_pct": 0.0033,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x2.0",
+        "selected_factor": 2.0,
+        "selected_bpm": 180.006,
+        "margin": 0.1274,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 2.0,
+            "bpm": 180.006,
+            "acf": 0.906,
+            "acf_norm": 0.9758,
+            "teeth_median": 7.255734,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.9434,
+            "prior": 0.8278,
+            "score": 1.3772
+          },
+          {
+            "factor": 1.0,
+            "bpm": 90.003,
+            "acf": 0.9285,
+            "acf_norm": 1.0,
+            "teeth_median": 7.691109,
+            "anti_median": 6.754468,
+            "anti_penalty": 0.4676,
+            "strength": 1.0,
+            "prior": 0.8173,
+            "score": 1.2498
+          },
+          {
+            "factor": 0.5,
+            "bpm": 45.0015,
+            "acf": 0.8684,
+            "acf_norm": 0.9353,
+            "teeth_median": 7.691109,
+            "anti_median": 7.569547,
+            "anti_penalty": 0.496,
+            "strength": 1.0,
+            "prior": 0.1692,
+            "score": 1.0455
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.63,
+      "note": "the D26 B1 target cases"
+    },
+    {
+      "case": "drum_120",
+      "truth_bpm": 120.0,
+      "bpm_detected": 119.9988,
+      "bpm_corrected": 119.999,
+      "rel_error_pct": 0.0008,
+      "ok": true,
+      "status": "suspect",
+      "octave_ambiguous": true,
+      "octave_diagnosis": {
+        "verdict": "ambiguous",
+        "selected_factor": 1.0,
+        "selected_bpm": 119.9988,
+        "margin": 0.0743,
+        "ambiguous": true,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 119.9988,
+            "acf": 0.8899,
+            "acf_norm": 1.0,
+            "teeth_median": 15.942341,
+            "anti_median": 16.840239,
+            "anti_penalty": 0.5137,
+            "strength": 0.9524,
+            "prior": 0.9932,
+            "score": 1.257
+          },
+          {
+            "factor": 2.0,
+            "bpm": 239.9976,
+            "acf": 0.7364,
+            "acf_norm": 0.8275,
+            "teeth_median": 16.739197,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 1.0,
+            "prior": 0.526,
+            "score": 1.1827
+          },
+          {
+            "factor": 0.5,
+            "bpm": 59.9994,
+            "acf": 0.8255,
+            "acf_norm": 0.9276,
+            "teeth_median": 16.739197,
+            "anti_median": 15.815988,
+            "anti_penalty": 0.4858,
+            "strength": 1.0,
+            "prior": 0.3932,
+            "score": 1.0862
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.4,
+      "note": "control"
+    },
+    {
+      "case": "drum_140",
+      "truth_bpm": 140.0,
+      "bpm_detected": 140.0025,
+      "bpm_corrected": 140.002,
+      "rel_error_pct": 0.0014,
+      "ok": true,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_diagnosis": {
+        "verdict": "x1.0",
+        "selected_factor": 1.0,
+        "selected_bpm": 140.0025,
+        "margin": 0.1341,
+        "ambiguous": false,
+        "phase_offset_beats": 0,
+        "candidates": [
+          {
+            "factor": 1.0,
+            "bpm": 140.0025,
+            "acf": 0.8749,
+            "acf_norm": 1.0,
+            "teeth_median": 17.312939,
+            "anti_median": 15.757462,
+            "anti_penalty": 0.4765,
+            "strength": 0.992,
+            "prior": 0.987,
+            "score": 1.2786
+          },
+          {
+            "factor": 2.0,
+            "bpm": 280.005,
+            "acf": 0.7315,
+            "acf_norm": 0.836,
+            "teeth_median": 16.383669,
+            "anti_median": 0.0,
+            "anti_penalty": 0.0,
+            "strength": 0.9388,
+            "prior": 0.3692,
+            "score": 1.1446
+          },
+          {
+            "factor": 0.5,
+            "bpm": 70.0012,
+            "acf": 0.8023,
+            "acf_norm": 0.917,
+            "teeth_median": 17.452101,
+            "anti_median": 17.000541,
+            "anti_penalty": 0.4934,
+            "strength": 1.0,
+            "prior": 0.5531,
+            "score": 1.1049
+          }
+        ],
+        "raw_vs_detected": "agree"
+      },
+      "confidence": 0.9,
+      "note": "control"
+    }
+  ]
+}

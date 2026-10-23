@@ -137,8 +137,9 @@ class TestRefinedAnalysis(unittest.TestCase):
             "residual_growth_ratio",
             "phase_drift_ms",
             "ibi_drift_pct",
-            "beat_env_ratio",
+            "beat_env_score",
             "octave_suspect",
+            "octave_ambiguous",
             "tempo_unstable",
             "status",
             "reasons",
@@ -158,11 +159,11 @@ class TestRefinedAnalysis(unittest.TestCase):
             rec = analyzer.analyze_track(wav)
         q = rec["beat_quality"]
         self.assertEqual(q["status"], "suspect", q)
-        self.assertLess(q["beat_env_ratio"], beatgrid.BEAT_ENV_RATIO_MIN)
+        self.assertLess(q["beat_env_score"], beatgrid.BEAT_ENV_SCORE_MIN)
 
-    def test_click_track_has_strong_beat_env_ratio(self) -> None:
+    def test_click_track_has_strong_beat_env_score(self) -> None:
         rec = _analyzed_click(120.0)
-        self.assertGreaterEqual(rec["beat_quality"]["beat_env_ratio"], beatgrid.BEAT_ENV_RATIO_MIN)
+        self.assertGreaterEqual(rec["beat_quality"]["beat_env_score"], beatgrid.BEAT_ENV_SCORE_MIN)
 
     def test_tempo_change_is_flagged_unstable(self) -> None:
         # Known ground truth: the click track changes tempo halfway through —
@@ -215,6 +216,139 @@ class TestRefinedAnalysis(unittest.TestCase):
         q = beatgrid.assess_quality(t, fit, active_span_s=50.0, octave_diagnosis="raw_double_time")
         self.assertTrue(q["octave_suspect"])
         self.assertEqual(q["status"], "suspect")
+
+    def test_octave_ambiguous_never_ok(self) -> None:
+        # An unverifiable level is the honest answer — suspect, never ok (D26 B1).
+        t = 0.5 * np.arange(100)
+        fit = beatgrid.fit_beat_grid(t)
+        q = beatgrid.assess_quality(
+            t, fit, active_span_s=50.0, octave_diagnosis="agree", octave_ambiguous=True
+        )
+        self.assertTrue(q["octave_ambiguous"])
+        self.assertEqual(q["status"], "suspect")
+        self.assertTrue(any("octave" in r for r in q["reasons"]))
+
+
+class TestBoundedBeatEnvScore(unittest.TestCase):
+    """F2: the replacement for the unbounded beat_env_ratio."""
+
+    def _env_and_frames(self, kind: str) -> tuple[np.ndarray, np.ndarray]:
+        rng = np.random.default_rng(7)
+        n = 2000
+        if kind == "sparse":
+            env = np.zeros(n)
+            peaks = np.arange(100, n, 200)
+            env[peaks] = 10.0
+            return env, peaks
+        if kind == "flat":
+            env = rng.uniform(0.0, 0.02, n) + 0.005
+            return env, np.arange(0, n, 41)
+        raise AssertionError(kind)
+
+    def test_score_is_bounded_and_finite(self) -> None:
+        # The old metric returned ~7e9 here (median env ~0); the bounded
+        # score must stay inside [0, 1] on exactly this material.
+        env, frames = self._env_and_frames("sparse")
+        score = beatgrid.beat_env_score(env, frames)
+        self.assertIsNotNone(score)
+        self.assertTrue(np.isfinite(score))
+        self.assertGreaterEqual(score, 0.0)
+        self.assertLessEqual(score, 1.0)
+
+    def test_score_is_scale_invariant(self) -> None:
+        env, frames = self._env_and_frames("flat")
+        s1 = beatgrid.beat_env_score(env, frames)
+        s2 = beatgrid.beat_env_score(env * 37.5, frames)
+        s3 = beatgrid.beat_env_score(env * 1e-4, frames)
+        self.assertAlmostEqual(s1, s2, places=9)
+        self.assertAlmostEqual(s1, s3, places=9)
+
+    def test_score_preserves_old_gate_boundary(self) -> None:
+        # score = r/(1+r): the old `ratio < 2.0` flag is exactly `score < 2/3`.
+        env = np.ones(1000)
+        frames = np.arange(0, 1000, 10)
+        env[frames] = 3.0  # medB=3, med_env=1 -> ratio 3 -> score 0.75 (pass)
+        self.assertGreaterEqual(beatgrid.beat_env_score(env, frames), beatgrid.BEAT_ENV_SCORE_MIN)
+        env[frames] = 1.5  # ratio 1.5 -> score 0.6 (flag)
+        self.assertLess(beatgrid.beat_env_score(env, frames), beatgrid.BEAT_ENV_SCORE_MIN)
+
+    def test_flat_envelope_scores_near_half(self) -> None:
+        env, frames = self._env_and_frames("flat")
+        score = beatgrid.beat_env_score(env, frames)
+        self.assertLess(score, beatgrid.BEAT_ENV_SCORE_MIN)
+
+    def test_empty_inputs_return_none(self) -> None:
+        self.assertIsNone(beatgrid.beat_env_score(np.zeros(0), np.zeros(0)))
+        self.assertIsNone(beatgrid.beat_env_score(np.ones(10), np.zeros(0)))
+
+
+class TestOctaveResolution(unittest.TestCase):
+    """D26 §7.1 multi-hypothesis octave resolution via the real analyzer."""
+
+    def test_candidates_evaluated_for_every_level(self) -> None:
+        rec = _analyzed_click(120.0)
+        diag = rec["octave_diagnosis"]
+        self.assertIsInstance(diag, dict)
+        factors = sorted(c["factor"] for c in diag["candidates"])
+        self.assertEqual(factors, [0.5, 1.0, 2.0])
+        for c in diag["candidates"]:
+            for key in ("bpm", "acf", "teeth_median", "anti_median", "prior", "score"):
+                self.assertIn(key, c)
+                self.assertTrue(np.isfinite(c[key]), (key, c))
+        self.assertIn(diag["verdict"], ("x0.5", "x1.0", "x2.0", "ambiguous", "unverified"))
+
+    def test_high_tempo_clicks_resolve_double_time(self) -> None:
+        # The four silent half-time failures from D27 F1: the detector lands
+        # on every other click; the resolver must recover the true octave.
+        for truth in (168.0, 174.0, 178.0, 180.0):
+            rec = _analyzed_click(truth, 20.0)
+            self.assertAlmostEqual(
+                rec["bpm_refined"], truth, delta=truth * 0.02, msg=f"click_{truth}"
+            )
+            self.assertAlmostEqual(
+                rec["bpm_corrected"], truth, delta=truth * 0.02, msg=f"click_{truth}"
+            )
+            self.assertEqual(rec["octave_diagnosis"]["selected_factor"], 2.0)
+            self.assertFalse(rec["octave_diagnosis"]["ambiguous"])
+            # the shipped grid is at the resolved level, not the detected one
+            self.assertAlmostEqual(rec["median_ibi_s"], 60.0 / truth, delta=0.005)
+
+    def test_normal_tempo_stays_detected_level(self) -> None:
+        rec = _analyzed_click(120.0)
+        self.assertEqual(rec["octave_diagnosis"]["selected_factor"], 1.0)
+        self.assertAlmostEqual(rec["bpm_refined"], 120.0, delta=2.4)
+
+    def test_ambiguous_level_is_never_ok(self) -> None:
+        # Straight eighth-note drums at equal strength genuinely support two
+        # octave readings — if the resolver cannot separate them the track
+        # must come back flagged, not silently verified (D26 §7.6 B1).
+        with tempfile.TemporaryDirectory() as td:
+            y, _truth = render_pattern(120.0, 20.0)
+            wav = Path(td) / "drums.wav"
+            write_wav_pcm16(wav, y, MASTER_SR)
+            rec = analyzer.analyze_track(wav)
+        diag = rec["octave_diagnosis"]
+        if diag["ambiguous"]:
+            q = rec["beat_quality"]
+            self.assertNotEqual(q["status"], "ok")
+            self.assertTrue(q["octave_ambiguous"])
+            self.assertLessEqual(rec["tempo_confidence"], 0.4)
+
+    def test_unverified_when_too_few_beats(self) -> None:
+        env = np.zeros(500)
+        detected = np.asarray([0.5, 1.0, 1.5])  # < _MIN_BEATS_OCTAVE
+        diag = beatgrid.resolve_octave_level(env, detected, 0.5, FINE_FRAME_S)
+        self.assertEqual(diag["verdict"], "unverified")
+        self.assertTrue(diag["ambiguous"])
+        self.assertEqual(diag["candidates"], [])
+
+    def test_shipped_grid_matches_resolved_level(self) -> None:
+        # x2 resolution must ship the doubled grid: beat count ~2n-1 and the
+        # shipped IBI half the detected one.
+        rec = _analyzed_click(168.0, 20.0)
+        n_det = len(rec["beat_times_detected_s"])
+        self.assertEqual(rec["n_beats"], 2 * n_det - 1)
+        self.assertAlmostEqual(rec["median_ibi_s"] * 2, rec["median_ibi_detected_s"], delta=0.005)
 
 
 class TestStaleGridFailsClosed(unittest.TestCase):
@@ -467,6 +601,7 @@ def _truth_row(name: str, truth_bpm: float, rec: dict, truth_beats=None) -> dict
         "bpm_corrected": rec["bpm_corrected"],
         "octave_diagnosis": rec["octave_diagnosis"],
         "beat_status": (rec.get("beat_quality") or {}).get("status"),
+        "beat_env_score": (rec.get("beat_quality") or {}).get("beat_env_score"),
         "bpm_error_vs_truth": (
             round(abs(ref - truth_bpm), 4) if ref and np.isfinite(truth_bpm) else None
         ),
@@ -535,6 +670,7 @@ def _synthetic_validation() -> dict:
                     "n_beats": rec["n_beats"],
                     "tempo_confidence": rec["tempo_confidence"],
                     "beat_status": (rec.get("beat_quality") or {}).get("status"),
+                    "beat_env_score": (rec.get("beat_quality") or {}).get("beat_env_score"),
                 }
             )
         clicks = np.zeros(n, dtype=np.float32)
@@ -552,6 +688,7 @@ def _synthetic_validation() -> dict:
                 "n_beats": rec["n_beats"],
                 "tempo_confidence": rec["tempo_confidence"],
                 "beat_status": (rec.get("beat_quality") or {}).get("status"),
+                "beat_env_score": (rec.get("beat_quality") or {}).get("beat_env_score"),
             }
         )
     out["T1_click_sweep"] = t1

@@ -20,6 +20,14 @@ the quantization bound; ``beat_quality`` carries the residual/coverage/drift
 metrics plus the quality-gate verdict — a fit alone cannot prove the detector
 found the right beats (D25: quality gate, no hard frame-period rejection).
 
+v5 (DJ-P2-OCTAVE-001): multi-hypothesis octave resolution (D26 §7.1) scores
+the detected grid's level against the onset envelope at ``{B/2, B, 2B}`` —
+the shipped grid and ``bpm_refined``/``bpm_corrected`` carry the resolved
+level (``bpm_detected`` keeps the raw detected tempo), and a level that
+cannot be distinguished from its neighbours is reported ``ambiguous`` /
+``unverified`` — never a silent ``ok``. The unbounded ``beat_env_ratio`` is
+replaced by the bounded, scale-invariant ``beat_env_score`` (F2).
+
 Confidence is honest: fields that cannot be estimated reliably are explicitly
 ``UNKNOWN``/low-confidence (D6 — no fabricated key/downbeat confidence). The
 downbeat grid is marked ``estimated: true`` because it assumes 4/4 from the
@@ -43,7 +51,7 @@ import numpy as np
 from ai_dj import continuity
 from ai_dj.analysis import beatgrid
 
-ANALYSIS_VERSION = 4  # v4: refined beat grid (hop 128 + LS tempo) + beat_quality
+ANALYSIS_VERSION = 5  # v5: octave-resolved grid + bounded beat_env_score
 ANALYSIS_SR = 22050
 DEFAULT_CACHE = "analysis_cache.sqlite"
 
@@ -212,28 +220,42 @@ def _beat_grid_fields(
     n_detected = int(detected_times.size)
 
     # Fabrication check: does the envelope carry real transient strength at
-    # the detected beat frames? On music beats land on peaks (ratio ~4-10);
+    # the detected beat frames? On music beats land on peaks (score ~0.8-0.9);
     # on a flat envelope (sustained tone) beat_track emits a regular grid
-    # anyway and the ratio sits near 1 — self-consistency metrics cannot
-    # distinguish that from real tracking.
-    env_med = float(np.median(onset_env)) if onset_env.size else 0.0
-    if n_detected >= 2:
-        beat_fr = np.clip(np.asarray(beat_frames, dtype=int), 0, onset_env.size - 1)
-        beat_env_ratio = float(np.median(onset_env[beat_fr]) / (env_med + 1e-9))
-    else:
-        beat_env_ratio = None
+    # anyway and the score sits near 0.5 — self-consistency metrics cannot
+    # distinguish that from real tracking. Bounded replacement for the old
+    # unbounded ratio (F2).
+    beat_env_sc = beatgrid.beat_env_score(onset_env, beat_frames)
 
     fit = beatgrid.fit_beat_grid(detected_times)
     ibi_refined = fit["ibi_s"] if fit is not None else float("nan")
-    bpm_refined = 60.0 / ibi_refined if ibi_refined > 0 else float("nan")
+    bpm_detected = 60.0 / ibi_refined if ibi_refined > 0 else float("nan")
+
+    # Multi-hypothesis octave resolution (D26 §7.1): score {B/2, B, 2B}
+    # against the onset envelope; below the ambiguity margin the detected
+    # level ships with an explicit unverified flag — never a silent guess.
+    oct_diag = beatgrid.resolve_octave_level(onset_env, detected_times, ibi_refined, frame_period_s)
+    level = 1.0 if oct_diag["ambiguous"] else float(oct_diag["selected_factor"])
+    parity = int(oct_diag["phase_offset_beats"])
+
     if fit is not None:
         # The shipped grid is the fitted line — the same constant-tempo model
         # the renderer projects into beat_crossfade overlaps — not the raw
-        # frame-snapped detections.
-        beat_times = beatgrid.refined_grid(ibi_refined, fit["phase_s"], n_detected)
+        # frame-snapped detections — at the octave level the resolver chose:
+        # x2 interleaves the midpoints, x0.5 keeps the stronger parity.
+        ibi_ship = ibi_refined / level
+        if level == 2.0:
+            n_ship = 2 * n_detected - 1
+        elif level == 0.5:
+            n_ship = (n_detected - parity + 1) // 2
+        else:
+            n_ship = n_detected
+        beat_times = beatgrid.refined_grid(ibi_ship, fit["phase_s"] + parity * ibi_refined, n_ship)
     else:
+        ibi_ship = float("nan")
         beat_times = detected_times
     median_ibi = float(np.median(np.diff(beat_times))) if beat_times.size >= 2 else float("nan")
+    bpm_refined = 60.0 / ibi_ship if ibi_ship > 0 else float("nan")
 
     if n_detected >= 2:
         detected_ibis = np.diff(detected_times)
@@ -251,25 +273,38 @@ def _beat_grid_fields(
             float("nan"),
         )
 
-    bpm_corrected, octave_diag = resolve_octave(bpm_raw, bpm_refined)
+    # Raw-vs-detected diagnostic kept for provenance: how the librosa tempo
+    # histogram related to where beats actually landed.
+    _raw_ref, raw_diag = resolve_octave(bpm_raw, bpm_detected)
+    bpm_corrected = bpm_refined if np.isfinite(bpm_refined) else bpm_raw
+    oct_diag["raw_vs_detected"] = raw_diag
 
     if fit is not None:
         beat_quality = beatgrid.assess_quality(
             detected_times,
             fit,
             active_span_s=active_span_s,
-            octave_diagnosis=octave_diag,
-            beat_env_ratio=beat_env_ratio,
+            octave_diagnosis=raw_diag,
+            beat_env_score=beat_env_sc,
+            octave_ambiguous=oct_diag["ambiguous"],
         )
-        bpm_resolution = beatgrid.bpm_resolution(ibi_refined, n_detected, frame_period_s)
+        bpm_resolution = beatgrid.bpm_resolution(ibi_ship, int(beat_times.size), frame_period_s)
     else:
         beat_quality = {
             "status": "insufficient_beats",
             "reasons": [f"n_beats {n_detected} < 2"],
-            "beat_env_ratio": (round(beat_env_ratio, 3) if beat_env_ratio is not None else None),
-            "octave_suspect": octave_diag in ("raw_double_time", "raw_half_time", "raw_off_grid"),
+            "beat_env_score": (round(beat_env_sc, 4) if beat_env_sc is not None else None),
+            "octave_suspect": raw_diag in ("raw_double_time", "raw_half_time", "raw_off_grid"),
+            "octave_ambiguous": True,
         }
         bpm_resolution = float("nan")
+
+    # An unverified octave is not a confident tempo (D26 §7.6): cap the
+    # confidence below the planner's beatmatch floor rather than fabricate
+    # certainty the envelope does not support.
+    conf = tempo_confidence(ibi_cv, n_detected)
+    if oct_diag["ambiguous"]:
+        conf = min(conf, 0.4)
 
     fields = {
         "beat_grid_version": beatgrid.BEAT_GRID_VERSION,
@@ -277,17 +312,18 @@ def _beat_grid_fields(
         "beat_frame_period_ms": round(frame_period_s * 1000.0, 4),
         "bpm_raw": round(bpm_raw, 3),
         "bpm_ibi_median": round(bpm_ibi_median, 3) if np.isfinite(bpm_ibi_median) else None,
+        "bpm_detected": round(bpm_detected, 4) if np.isfinite(bpm_detected) else None,
         "bpm_refined": round(bpm_refined, 4) if np.isfinite(bpm_refined) else None,
         "bpm_resolution": (round(bpm_resolution, 5) if np.isfinite(bpm_resolution) else None),
         "bpm_corrected": round(bpm_corrected, 3),
-        "octave_diagnosis": octave_diag,
+        "octave_diagnosis": oct_diag,
         "median_ibi_s": round(median_ibi, 6) if np.isfinite(median_ibi) else None,
         "median_ibi_detected_s": (
             round(median_ibi_detected, 6) if np.isfinite(median_ibi_detected) else None
         ),
         "ibi_cv": round(ibi_cv, 4) if np.isfinite(ibi_cv) else None,
         "beat_quality": beat_quality,
-        "tempo_confidence": tempo_confidence(ibi_cv, n_detected),
+        "tempo_confidence": conf,
         "n_beats": int(beat_times.size),
         "beat_times_s": [round(t, 5) for t in beat_times.tolist()],
         "beat_times_detected_s": [round(t, 5) for t in detected_times.tolist()],

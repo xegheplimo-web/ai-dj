@@ -1,0 +1,15 @@
+{
+ "scenario": "v4 record (beat_grid_version=2) in cache, plan command",
+ "exit_code": 5,
+ "stderr": {
+  "error": "CORPUS_UNMEASURED",
+  "reason": "missing_continuity_data",
+  "analysis_version_required": 5,
+  "continuity_version_required": 1,
+  "missing_recording_ids": [
+   "stale_v4_rec"
+  ],
+  "missing_count": 1,
+  "message": "Every usable corpus record lacks the continuity payload \u2014 run analyze before planning."
+ }
+}
