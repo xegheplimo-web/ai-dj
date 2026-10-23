@@ -1,0 +1,741 @@
+{
+  "analyzer_scan": "corpus_v5",
+  "n": 41,
+  "n_ok": 41,
+  "n_ambiguous": 6,
+  "n_suspect": 39,
+  "octave_level_histogram": {
+    "null": 41
+  },
+  "octave_ratio_histogram": {
+    "1.0": 40,
+    "2.0": 1
+  },
+  "rows": [
+    {
+      "recording_id": "rec-7041a3ee40c1a78c",
+      "title": "âm thanh huấn luyện ok",
+      "bpm_detected": 144.022,
+      "bpm_corrected": 144.022,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.2758,
+      "confidence": 0.7,
+      "residual_std_ms": 1182.094,
+      "beat_env_score": 0.8027,
+      "reasons": [
+        "residual_std_ms 1182.1 > 20.0",
+        "tempo_unstable growth 1.45 / drift 801.4 ms / ibi_drift 1.4%"
+      ]
+    },
+    {
+      "recording_id": "rec-a7612bd3ecbc7b80",
+      "title": "CHẲNG THỂ CẢM HÓA - COVER DUY",
+      "bpm_detected": 168.0187,
+      "bpm_corrected": 168.019,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": true,
+      "octave_level": null,
+      "octave_margin": 0.0543,
+      "confidence": 0.4,
+      "residual_std_ms": 21.112,
+      "beat_env_score": 0.843,
+      "reasons": [
+        "residual_std_ms 21.1 > 20.0",
+        "octave_ambiguous — level indistinguishable from a neighbouring octave hypothesis (or unverifiable); not a verified tempo (D26 B1)"
+      ]
+    },
+    {
+      "recording_id": "rec-a5fe22eb310f73fa",
+      "title": "Chuyện tình cô lái đò-Bolero(Cover Duy)",
+      "bpm_detected": 149.9836,
+      "bpm_corrected": 149.984,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1001,
+      "confidence": 0.9,
+      "residual_std_ms": 25.497,
+      "beat_env_score": 0.8756,
+      "reasons": [
+        "residual_std_ms 25.5 > 20.0"
+      ]
+    },
+    {
+      "recording_id": "rec-da5e7113acc2ecdf",
+      "title": "Con Hứa Sẽ Về",
+      "bpm_detected": 122.8277,
+      "bpm_corrected": 122.828,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1169,
+      "confidence": 0.7,
+      "residual_std_ms": 148.516,
+      "beat_env_score": 0.848,
+      "reasons": [
+        "residual_std_ms 148.5 > 20.0"
+      ]
+    },
+    {
+      "recording_id": "rec-1d80838e4a40f4cb",
+      "title": "Đam Mê (Cover Duy) ",
+      "bpm_detected": 115.705,
+      "bpm_corrected": 115.705,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.2585,
+      "confidence": 0.7,
+      "residual_std_ms": 348.312,
+      "beat_env_score": 0.9068,
+      "reasons": [
+        "residual_std_ms 348.3 > 20.0",
+        "tempo_unstable growth 0.65 / drift 96.0 ms / ibi_drift 3.5%"
+      ]
+    },
+    {
+      "recording_id": "rec-0d43cfd24e250861",
+      "title": "Đoạn Tái Bút – Cover Duy (Sáng tác -Tú Nhi & Bằng Giang)",
+      "bpm_detected": 150.0433,
+      "bpm_corrected": 150.043,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1573,
+      "confidence": 0.9,
+      "residual_std_ms": 43.286,
+      "beat_env_score": 0.8856,
+      "reasons": [
+        "residual_std_ms 43.3 > 20.0",
+        "tempo_unstable growth 3.64 / drift 47.9 ms / ibi_drift -0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-a9062c7c0a9f9ad1",
+      "title": "ĐOẠN TUYỆT - COVER -DUY ",
+      "bpm_detected": 159.9866,
+      "bpm_corrected": 159.987,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1222,
+      "confidence": 0.9,
+      "residual_std_ms": 18.18,
+      "beat_env_score": 0.8983,
+      "reasons": [
+        "tempo_unstable growth 2.47 / drift -14.1 ms / ibi_drift -0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-e8d0ce6b03814d91",
+      "title": "ĐỪNG HẸN KIẾP SAU(Cover Duy)",
+      "bpm_detected": 116.4522,
+      "bpm_corrected": 116.452,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.094,
+      "confidence": 0.9,
+      "residual_std_ms": 355.158,
+      "beat_env_score": 0.8625,
+      "reasons": [
+        "residual_std_ms 355.2 > 20.0",
+        "tempo_unstable growth 0.82 / drift 154.3 ms / ibi_drift 0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-1a32d2bd9d82ecbd",
+      "title": "Gió Về Miền Xuôi (Duy Cover)(1)",
+      "bpm_detected": 160.8616,
+      "bpm_corrected": 160.862,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.12,
+      "confidence": 0.9,
+      "residual_std_ms": 219.429,
+      "beat_env_score": 0.8592,
+      "reasons": [
+        "residual_std_ms 219.4 > 20.0",
+        "tempo_unstable growth 0.48 / drift -125.2 ms / ibi_drift 0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-01ca119e72a121c6",
+      "title": "Gió Về Miền Xuôi (Duy Cover)",
+      "bpm_detected": 160.6588,
+      "bpm_corrected": 160.659,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": true,
+      "octave_level": null,
+      "octave_margin": 0.0608,
+      "confidence": 0.4,
+      "residual_std_ms": 184.459,
+      "beat_env_score": 0.859,
+      "reasons": [
+        "residual_std_ms 184.5 > 20.0",
+        "tempo_unstable growth 1.42 / drift -46.3 ms / ibi_drift 1.6%",
+        "octave_ambiguous — level indistinguishable from a neighbouring octave hypothesis (or unverifiable); not a verified tempo (D26 B1)"
+      ]
+    },
+    {
+      "recording_id": "rec-2b4db63934ea5f70",
+      "title": "Mẹ Hiền Ơi (Cover Duy)",
+      "bpm_detected": 109.1099,
+      "bpm_corrected": 109.11,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1976,
+      "confidence": 0.7,
+      "residual_std_ms": 592.54,
+      "beat_env_score": 0.8486,
+      "reasons": [
+        "residual_std_ms 592.5 > 20.0",
+        "tempo_unstable growth 1.13 / drift 63.9 ms / ibi_drift -1.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-c9ccb3686940f57d",
+      "title": "Gió Về Miền Xuôi(Duy Cover)",
+      "bpm_detected": 160.4923,
+      "bpm_corrected": 160.492,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1083,
+      "confidence": 0.9,
+      "residual_std_ms": 141.821,
+      "beat_env_score": 0.8608,
+      "reasons": [
+        "residual_std_ms 141.8 > 20.0"
+      ]
+    },
+    {
+      "recording_id": "rec-4abe167c7f9c8ea3",
+      "title": "Gõ Cửa - Bolero Cover – Duy",
+      "bpm_detected": 96.0743,
+      "bpm_corrected": 192.149,
+      "octave_ratio": 2.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1442,
+      "confidence": 0.7,
+      "residual_std_ms": 380.038,
+      "beat_env_score": 0.8675,
+      "reasons": [
+        "residual_std_ms 380.0 > 20.0",
+        "tempo_unstable growth 0.59 / drift -67.7 ms / ibi_drift -0.5%"
+      ]
+    },
+    {
+      "recording_id": "rec-0f91e3ec4630b55a",
+      "title": "Mẹ Hiền Ơi - (Duy-Cover)",
+      "bpm_detected": 109.1348,
+      "bpm_corrected": 109.135,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.2023,
+      "confidence": 0.7,
+      "residual_std_ms": 596.714,
+      "beat_env_score": 0.8517,
+      "reasons": [
+        "residual_std_ms 596.7 > 20.0",
+        "tempo_unstable growth 1.13 / drift 69.8 ms / ibi_drift -1.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-d3b2ad7270f47958",
+      "title": "NÀNG YÊU HOA TÍM - MẠNH NGUYÊN-(DUY-COVER)",
+      "bpm_detected": 130.3591,
+      "bpm_corrected": 130.359,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.2165,
+      "confidence": 0.9,
+      "residual_std_ms": 117.02,
+      "beat_env_score": 0.8881,
+      "reasons": [
+        "residual_std_ms 117.0 > 20.0"
+      ]
+    },
+    {
+      "recording_id": "rec-f6dc34794985d5f3",
+      "title": "NỢ TÌNH COVER DUY",
+      "bpm_detected": 100.6708,
+      "bpm_corrected": 100.671,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1354,
+      "confidence": 0.9,
+      "residual_std_ms": 170.52,
+      "beat_env_score": 0.8625,
+      "reasons": [
+        "residual_std_ms 170.5 > 20.0"
+      ]
+    },
+    {
+      "recording_id": "rec-456190e736b3b9e0",
+      "title": "audio",
+      "bpm_detected": 160.3848,
+      "bpm_corrected": 160.385,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.2302,
+      "confidence": 0.7,
+      "residual_std_ms": 278.438,
+      "beat_env_score": 0.8712,
+      "reasons": [
+        "residual_std_ms 278.4 > 20.0"
+      ]
+    },
+    {
+      "recording_id": "rec-1633439077ecc118",
+      "title": "BUỒN TRONG NỖI NHỚ (Cover- Duy)",
+      "bpm_detected": 156.076,
+      "bpm_corrected": 156.076,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.0823,
+      "confidence": 0.9,
+      "residual_std_ms": 103.939,
+      "beat_env_score": 0.8931,
+      "reasons": [
+        "residual_std_ms 103.9 > 20.0",
+        "tempo_unstable growth 4.84 / drift 107.4 ms / ibi_drift -0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-66c47384f35fab84",
+      "title": "CÂU HẸN CÂU THỀ - COVER DUY",
+      "bpm_detected": 171.0005,
+      "bpm_corrected": 171.0,
+      "octave_ratio": 1.0,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1577,
+      "confidence": 0.9,
+      "residual_std_ms": 16.372,
+      "beat_env_score": 0.8359,
+      "reasons": []
+    },
+    {
+      "recording_id": "rec-e3c3cc9559914a0c",
+      "title": "Đam Mê (Cover Duy)",
+      "bpm_detected": 150.2609,
+      "bpm_corrected": 150.261,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": true,
+      "octave_level": null,
+      "octave_margin": 0.0097,
+      "confidence": 0.4,
+      "residual_std_ms": 119.266,
+      "beat_env_score": 0.8882,
+      "reasons": [
+        "residual_std_ms 119.3 > 20.0",
+        "octave_ambiguous — level indistinguishable from a neighbouring octave hypothesis (or unverifiable); not a verified tempo (D26 B1)"
+      ]
+    },
+    {
+      "recording_id": "rec-2a30b3deb9c1ac39",
+      "title": "ĐOẠN TUYỆT - COVER -DUY ",
+      "bpm_detected": 159.9908,
+      "bpm_corrected": 159.991,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.133,
+      "confidence": 0.9,
+      "residual_std_ms": 17.287,
+      "beat_env_score": 0.9006,
+      "reasons": [
+        "tempo_unstable growth 2.57 / drift -12.2 ms / ibi_drift -0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-85c045c8d752fcea",
+      "title": "ĐỐI DIỆN NHÀ EM - DUY COVER",
+      "bpm_detected": 158.2366,
+      "bpm_corrected": 158.237,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1453,
+      "confidence": 0.9,
+      "residual_std_ms": 113.101,
+      "beat_env_score": 0.8754,
+      "reasons": [
+        "residual_std_ms 113.1 > 20.0",
+        "tempo_unstable growth 0.47 / drift -57.6 ms / ibi_drift 0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-3177f4d0d6cad1e4",
+      "title": "ĐỐI DIỆN NHÀ EM - DUY GỐC",
+      "bpm_detected": 142.2309,
+      "bpm_corrected": 142.231,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.3234,
+      "confidence": 0.7,
+      "residual_std_ms": 410.154,
+      "beat_env_score": 0.8168,
+      "reasons": [
+        "residual_std_ms 410.2 > 20.0",
+        "tempo_unstable growth 0.67 / drift 266.9 ms / ibi_drift 1.4%"
+      ]
+    },
+    {
+      "recording_id": "rec-cdb8894fb3bf79df",
+      "title": "huan luyen",
+      "bpm_detected": 169.6588,
+      "bpm_corrected": 169.659,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.2386,
+      "confidence": 0.7,
+      "residual_std_ms": 219.737,
+      "beat_env_score": 0.8045,
+      "reasons": [
+        "residual_std_ms 219.7 > 20.0",
+        "tempo_unstable growth 0.98 / drift 46.4 ms / ibi_drift 0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-798dc7ccde6f2433",
+      "title": "Khóa Ly Biệt (Cover Duy)",
+      "bpm_detected": 140.7021,
+      "bpm_corrected": 140.702,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1448,
+      "confidence": 0.7,
+      "residual_std_ms": 137.79,
+      "beat_env_score": 0.7803,
+      "reasons": [
+        "residual_std_ms 137.8 > 20.0"
+      ]
+    },
+    {
+      "recording_id": "rec-f313e4624a307ca2",
+      "title": "Khóc Thầm",
+      "bpm_detected": 84.0467,
+      "bpm_corrected": 84.047,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.0914,
+      "confidence": 0.9,
+      "residual_std_ms": 128.992,
+      "beat_env_score": 0.8998,
+      "reasons": [
+        "residual_std_ms 129.0 > 20.0",
+        "tempo_unstable growth 5.13 / drift 103.0 ms / ibi_drift 0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-6a93ac2d52baefc6",
+      "title": "PHIM BA NGƯỜI (DUY COVER)",
+      "bpm_detected": 164.2726,
+      "bpm_corrected": 164.273,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1737,
+      "confidence": 0.9,
+      "residual_std_ms": 216.628,
+      "beat_env_score": 0.8264,
+      "reasons": [
+        "residual_std_ms 216.6 > 20.0",
+        "tempo_unstable growth 0.82 / drift 142.1 ms / ibi_drift -0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-91da690acb76ab21",
+      "title": "PHIM BA NGƯỜI - COVER - DUY",
+      "bpm_detected": 164.9479,
+      "bpm_corrected": 164.948,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1725,
+      "confidence": 0.7,
+      "residual_std_ms": 97.003,
+      "beat_env_score": 0.8154,
+      "reasons": [
+        "residual_std_ms 97.0 > 20.0"
+      ]
+    },
+    {
+      "recording_id": "rec-aa8467fc0419dbda",
+      "title": "Thế Sự -. Cover Duywav",
+      "bpm_detected": 157.0047,
+      "bpm_corrected": 157.005,
+      "octave_ratio": 1.0,
+      "status": "ok",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1289,
+      "confidence": 0.9,
+      "residual_std_ms": 15.974,
+      "beat_env_score": 0.8841,
+      "reasons": []
+    },
+    {
+      "recording_id": "rec-5a84548057ad9e88",
+      "title": "TÌNH ANH - COVER DUY",
+      "bpm_detected": 169.6605,
+      "bpm_corrected": 169.661,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.158,
+      "confidence": 0.9,
+      "residual_std_ms": 114.375,
+      "beat_env_score": 0.8387,
+      "reasons": [
+        "residual_std_ms 114.4 > 20.0",
+        "tempo_unstable growth 0.57 / drift -125.6 ms / ibi_drift 0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-87f38b799dcea6e2",
+      "title": "Untitled Session 19_mixdown",
+      "bpm_detected": 140.769,
+      "bpm_corrected": 140.769,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.2639,
+      "confidence": 0.7,
+      "residual_std_ms": 780.895,
+      "beat_env_score": 0.812,
+      "reasons": [
+        "residual_std_ms 780.9 > 20.0",
+        "tempo_unstable growth 1.98 / drift 225.9 ms / ibi_drift 0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-093e6c9bf8c742f0",
+      "title": "Untitled Session 32_mixdown",
+      "bpm_detected": 170.7804,
+      "bpm_corrected": 170.78,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1614,
+      "confidence": 0.9,
+      "residual_std_ms": 192.122,
+      "beat_env_score": 0.8401,
+      "reasons": [
+        "residual_std_ms 192.1 > 20.0",
+        "tempo_unstable growth 3.98 / drift -229.4 ms / ibi_drift 0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-03cba80609bd1363",
+      "title": "Untitled Session 33_mixdown",
+      "bpm_detected": 149.8623,
+      "bpm_corrected": 149.862,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": true,
+      "octave_level": null,
+      "octave_margin": 0.0346,
+      "confidence": 0.4,
+      "residual_std_ms": 130.112,
+      "beat_env_score": 0.8864,
+      "reasons": [
+        "residual_std_ms 130.1 > 20.0",
+        "tempo_unstable growth 1.58 / drift -129.4 ms / ibi_drift 0.0%",
+        "octave_ambiguous — level indistinguishable from a neighbouring octave hypothesis (or unverifiable); not a verified tempo (D26 B1)"
+      ]
+    },
+    {
+      "recording_id": "rec-52ef1d309f22398a",
+      "title": "Untitled Session 35_mixdown",
+      "bpm_detected": 170.7837,
+      "bpm_corrected": 170.784,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1543,
+      "confidence": 0.9,
+      "residual_std_ms": 190.045,
+      "beat_env_score": 0.8407,
+      "reasons": [
+        "residual_std_ms 190.0 > 20.0",
+        "tempo_unstable growth 4.02 / drift -230.3 ms / ibi_drift 1.7%"
+      ]
+    },
+    {
+      "recording_id": "rec-d92d5b9fbbc9024e",
+      "title": "Untitled Session 6_mixdown",
+      "bpm_detected": 156.0079,
+      "bpm_corrected": 156.008,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1169,
+      "confidence": 0.9,
+      "residual_std_ms": 23.957,
+      "beat_env_score": 0.8863,
+      "reasons": [
+        "residual_std_ms 24.0 > 20.0",
+        "tempo_unstable growth 2.03 / drift 11.1 ms / ibi_drift 0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-f644aa7aac7291ef",
+      "title": "BUỒN TRONG NỖI NHỚ (Cover- Duy)",
+      "bpm_detected": 156.0114,
+      "bpm_corrected": 156.011,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.0852,
+      "confidence": 0.9,
+      "residual_std_ms": 23.382,
+      "beat_env_score": 0.8909,
+      "reasons": [
+        "residual_std_ms 23.4 > 20.0",
+        "tempo_unstable growth 1.77 / drift 15.5 ms / ibi_drift -0.0%"
+      ]
+    },
+    {
+      "recording_id": "rec-9ff0e665425462d6",
+      "title": "TÌNH ANH – Cover Duy",
+      "bpm_detected": 169.566,
+      "bpm_corrected": 169.566,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1609,
+      "confidence": 0.9,
+      "residual_std_ms": 81.166,
+      "beat_env_score": 0.8308,
+      "reasons": [
+        "residual_std_ms 81.2 > 20.0",
+        "tempo_unstable growth 0.44 / drift 51.7 ms / ibi_drift 1.7%"
+      ]
+    },
+    {
+      "recording_id": "rec-793608aaeb5b6242",
+      "title": "vô thường và buông xả",
+      "bpm_detected": 160.9982,
+      "bpm_corrected": 160.998,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.1963,
+      "confidence": 0.7,
+      "residual_std_ms": 193.529,
+      "beat_env_score": 0.8313,
+      "reasons": [
+        "residual_std_ms 193.5 > 20.0",
+        "tempo_unstable growth 0.45 / drift 71.1 ms / ibi_drift 1.6%"
+      ]
+    },
+    {
+      "recording_id": "rec-36bd9cb09f26f5b8",
+      "title": "Sao Lòng Còn Thương - Trọng Hải",
+      "bpm_detected": 159.8838,
+      "bpm_corrected": 159.884,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": true,
+      "octave_level": null,
+      "octave_margin": 0.0738,
+      "confidence": 0.4,
+      "residual_std_ms": 120.94,
+      "beat_env_score": 0.8764,
+      "reasons": [
+        "residual_std_ms 120.9 > 20.0",
+        "tempo_unstable growth 2.27 / drift -150.1 ms / ibi_drift -0.0%",
+        "octave_ambiguous — level indistinguishable from a neighbouring octave hypothesis (or unverifiable); not a verified tempo (D26 B1)"
+      ]
+    },
+    {
+      "recording_id": "rec-5511fe14e6c9f241",
+      "title": "Thiệp Hồng Sai Tên – Cover Duy",
+      "bpm_detected": 168.0038,
+      "bpm_corrected": 168.004,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": true,
+      "octave_level": null,
+      "octave_margin": 0.0119,
+      "confidence": 0.4,
+      "residual_std_ms": 20.855,
+      "beat_env_score": 0.8336,
+      "reasons": [
+        "residual_std_ms 20.9 > 20.0",
+        "octave_ambiguous — level indistinguishable from a neighbouring octave hypothesis (or unverifiable); not a verified tempo (D26 B1)"
+      ]
+    },
+    {
+      "recording_id": "rec-4416bd26d4db6844",
+      "title": "Vu Lan Nhớ Mẹ – Cover Duy (Sáng tác - Hoàng Duy)",
+      "bpm_detected": 136.3421,
+      "bpm_corrected": 136.342,
+      "octave_ratio": 1.0,
+      "status": "suspect",
+      "octave_ambiguous": false,
+      "octave_level": null,
+      "octave_margin": 0.2212,
+      "confidence": 0.7,
+      "residual_std_ms": 398.488,
+      "beat_env_score": 0.7727,
+      "reasons": [
+        "residual_std_ms 398.5 > 20.0",
+        "tempo_unstable growth 0.75 / drift -83.2 ms / ibi_drift -3.8%"
+      ]
+    }
+  ]
+}

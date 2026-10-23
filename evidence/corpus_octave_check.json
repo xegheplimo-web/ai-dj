@@ -1,0 +1,98 @@
+[
+ {
+  "file": "BUỒN TRONG NỖI NHỚ (Cover- Duy).wav",
+  "bpm_detected": 156.076,
+  "bpm_refined": 156.076,
+  "tempo_confidence": 0.9,
+  "beat_status": "suspect",
+  "beat_env_score": 0.8931,
+  "octave_verdict": "x1.0",
+  "octave_margin": 0.0823,
+  "octave_ambiguous": false,
+  "octave_factor": 1.0
+ },
+ {
+  "file": "CÂU HẸN CÂU THỀ - COVER DUY.wav",
+  "bpm_detected": 171.0005,
+  "bpm_refined": 171.0005,
+  "tempo_confidence": 0.9,
+  "beat_status": "ok",
+  "beat_env_score": 0.8359,
+  "octave_verdict": "x1.0",
+  "octave_margin": 0.1577,
+  "octave_ambiguous": false,
+  "octave_factor": 1.0
+ },
+ {
+  "file": "Khóa Ly Biệt (Cover Duy).wav",
+  "bpm_detected": 140.7021,
+  "bpm_refined": 140.7021,
+  "tempo_confidence": 0.7,
+  "beat_status": "suspect",
+  "beat_env_score": 0.7803,
+  "octave_verdict": "x1.0",
+  "octave_margin": 0.1448,
+  "octave_ambiguous": false,
+  "octave_factor": 1.0
+ },
+ {
+  "file": "Khóc Thầm.wav",
+  "bpm_detected": 84.0467,
+  "bpm_refined": 84.0467,
+  "tempo_confidence": 0.9,
+  "beat_status": "suspect",
+  "beat_env_score": 0.8998,
+  "octave_verdict": "x1.0",
+  "octave_margin": 0.0914,
+  "octave_ambiguous": false,
+  "octave_factor": 1.0
+ },
+ {
+  "file": "PHIM BA NGƯỜI (DUY COVER).wav",
+  "bpm_detected": 164.2726,
+  "bpm_refined": 164.2726,
+  "tempo_confidence": 0.9,
+  "beat_status": "suspect",
+  "beat_env_score": 0.8264,
+  "octave_verdict": "x1.0",
+  "octave_margin": 0.1737,
+  "octave_ambiguous": false,
+  "octave_factor": 1.0
+ },
+ {
+  "file": "PHIM BA NGƯỜI - COVER - DUY.wav",
+  "bpm_detected": 164.9479,
+  "bpm_refined": 164.9479,
+  "tempo_confidence": 0.7,
+  "beat_status": "suspect",
+  "beat_env_score": 0.8154,
+  "octave_verdict": "x1.0",
+  "octave_margin": 0.1725,
+  "octave_ambiguous": false,
+  "octave_factor": 1.0
+ },
+ {
+  "file": "Thế Sự -. Cover Duywav.wav",
+  "bpm_detected": 157.0047,
+  "bpm_refined": 157.0047,
+  "tempo_confidence": 0.9,
+  "beat_status": "ok",
+  "beat_env_score": 0.8841,
+  "octave_verdict": "x1.0",
+  "octave_margin": 0.1289,
+  "octave_ambiguous": false,
+  "octave_factor": 1.0
+ },
+ {
+  "file": "TÌNH ANH - COVER DUY.wav",
+  "bpm_detected": 169.6605,
+  "bpm_refined": 169.6605,
+  "tempo_confidence": 0.9,
+  "beat_status": "suspect",
+  "beat_env_score": 0.8387,
+  "octave_verdict": "x1.0",
+  "octave_margin": 0.158,
+  "octave_ambiguous": false,
+  "octave_factor": 1.0
+ }
+]
